@@ -1,6 +1,8 @@
 import customtkinter as ctk
 import tkinter as tk
 from menubar import menubar
+from agg_contribuyentes import agg_contribuyentes
+from gestion_contribuyentes import gestion_contribuyentes
 
 def contribuyentes(window, last_window):
     for widget in window.winfo_children():
@@ -34,12 +36,14 @@ def contribuyentes(window, last_window):
     window_title.pack(padx=10, pady=10, side="left")
     
     #Contenido del left frame
-    
-    contribuyente_btn = ctk.CTkButton(left_frame, text="Agregar Contribuyentes", command=lambda: print("Aca va la funcion de la ventana contribuyentes"), width=190, font=poppins20bold)
+    menu = last_window
+    contribuyentes
+
+    contribuyente_btn = ctk.CTkButton(left_frame, text="Agregar Contribuyentes", command=lambda: agg_contribuyentes(window, menu, contribuyentes), width=190, font=poppins20bold)
     contribuyente_btn.pack(pady=105, padx=50, anchor="center", expand=True)
     
     #Contenido del right frame
     
-    contribuyente_btn = ctk.CTkButton(right_frame, text="Gestionar Contribuyentes", command=lambda: print("Aca va la funcion de la ventana contribuyentes"), width=190, font=poppins20bold)
+    contribuyente_btn = ctk.CTkButton(right_frame, text="Gestionar Contribuyentes", command=lambda: gestion_contribuyentes(window, menu, contribuyentes), width=190, font=poppins20bold)
     contribuyente_btn.pack(pady=105, padx=50, anchor="center", expand=True)
     
