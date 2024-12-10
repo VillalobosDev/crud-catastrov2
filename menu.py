@@ -2,6 +2,7 @@ import customtkinter as ctk
 import tkinter as tk
 from menubar import menubar
 from contribuyentes import contribuyentes
+from inmuebles import inmuebles
 
 
 def menu(window):
@@ -40,7 +41,7 @@ def menu(window):
     contribuyente_btn = ctk.CTkButton(left_frame, text="Contribuyentes", command=lambda: contribuyentes(window, menu), width=190, font=poppins20bold)
     contribuyente_btn.pack(pady=50, padx=50, anchor="center", expand=True)
 
-    inmuebles_btn = ctk.CTkButton(left_frame, text="Inmuebles", command=lambda: print("Aca va la funcion de la ventana inmuebles"), width=190, font=poppins20bold)
+    inmuebles_btn = ctk.CTkButton(left_frame, text="Inmuebles", command=lambda: inmuebles(window, menu), width=190, font=poppins20bold)
     inmuebles_btn.pack( padx=50, anchor="center", expand=True)
 
     sector_btn = ctk.CTkButton(left_frame, text="Sectores", command=lambda: print("Aca va la funcion de la ventana sectores"), width=190, font=poppins20bold)
