@@ -1,8 +1,8 @@
 import customtkinter as ctk
 import tkinter as tk
 from menubar import menubar
-from agg_inmuebles import agg_inmuebles
-from gestion_inmuebles import gestion_inmuebles
+from inmuebles_agg import inmuebles_agg
+from inmuebles_gestion import inmuebles_gestion
 
 def inmuebles(window, last_window):
     for widget in window.winfo_children():
@@ -39,11 +39,11 @@ def inmuebles(window, last_window):
     menu = last_window
 
     #                                                                                                       (window, last window, last_window2) 
-    l_inmuebles_btn = ctk.CTkButton(left_frame, text="Agregar Inmuebles", command=lambda: agg_inmuebles(window, menu, inmuebles), width=190, font=poppins20bold)
+    l_inmuebles_btn = ctk.CTkButton(left_frame, text="Agregar Inmuebles", command=lambda: inmuebles_agg(window, menu, inmuebles), width=190, font=poppins20bold)
     l_inmuebles_btn.pack(pady=105, padx=50, anchor="center", expand=True)
     
     #Contenido del right frame
     
-    r_inmuebles_btn = ctk.CTkButton(right_frame, text="Gestionar Inmuebles", command=lambda: gestion_inmuebles(window, menu, inmuebles), width=190, font=poppins20bold)
+    r_inmuebles_btn = ctk.CTkButton(right_frame, text="Gestionar Inmuebles", command=lambda: inmuebles_gestion(window, menu, inmuebles), width=190, font=poppins20bold)
     r_inmuebles_btn.pack(pady=105, padx=50, anchor="center", expand=True)
     
