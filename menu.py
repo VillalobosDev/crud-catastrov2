@@ -3,6 +3,8 @@ import tkinter as tk
 from menubar import menubar
 from contribuyentes import contribuyentes
 from inmuebles import inmuebles
+from liquidacion import liquidacionv2
+from PIL import Image, ImageTk
 
 
 def menu(window):
@@ -42,9 +44,12 @@ def menu(window):
     contribuyente_btn.pack(pady=50, padx=50, anchor="center", expand=True)
 
     inmuebles_btn = ctk.CTkButton(left_frame, text="Inmuebles", command=lambda: inmuebles(window, menu), width=190, font=poppins20bold)
-    inmuebles_btn.pack( padx=50, anchor="center", expand=True)
+    inmuebles_btn.pack(pady=50, padx=50, anchor="center", expand=True)
 
     sector_btn = ctk.CTkButton(left_frame, text="Sectores", command=lambda: print("Aca va la funcion de la ventana sectores"), width=190, font=poppins20bold)
     sector_btn.pack(pady=50, padx=50, anchor="center", expand=True)
- # Define main window
+    
+    liquidacion_btn = ctk.CTkButton(left_frame, text="Liquidación", command=lambda: liquidacionv2(window, menu), width=190, font=poppins20bold)
+    liquidacion_btn.pack(pady=50, padx=50, anchor="center", expand=True)
 
+ # Define main window
