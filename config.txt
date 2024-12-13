@@ -1,7 +1,7 @@
 ################################### TREEVIEWS ######################################
  MODO CLARO
 
-     style = ttk.Style()
+    style = ttk.Style()
     style.configure("Custom.Treeview", font=("Poppins", 12), rowheight=25)  
     style.configure("Custom.Treeview.Heading", font=("Poppins", 14, "bold")) 
     
