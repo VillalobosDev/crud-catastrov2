@@ -1,7 +1,7 @@
 import sqlite3
 
 def connection():
-    return sqlite3.connect('dbcatastro.db')
+    return sqlite3.connect('db.db')
 
 def read():
     try:

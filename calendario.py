@@ -30,15 +30,11 @@ def open_calendar_popup(entry_widget):
 
     
 def create_date_range_selector(parent_frame):
-    """Create a date range selector with two entries for start and end dates."""
-    # Fonts
-    poppins12 = ("Poppins", 12)
+    poppins12 = ("Poppins", 12, "bold")
 
-    # Frame for date range
     date_range_frame = ctk.CTkFrame(parent_frame)
     date_range_frame.pack(pady=10, padx=10, fill="x")
 
-    # Start date entry
     start_date_entry = ctk.CTkEntry(date_range_frame, placeholder_text="Fecha Inicio", font=poppins12, width=150)
     start_date_entry.pack(padx=5, pady=5, side="left")
 
@@ -47,7 +43,6 @@ def create_date_range_selector(parent_frame):
     )
     start_date_button.pack(pady=5, padx=5, side="left")
 
-    # End date entry
     end_date_entry = ctk.CTkEntry(date_range_frame, placeholder_text="Fecha Fin", font=poppins12, width=150)
     end_date_entry.pack(padx=5, pady=5, side="left")
 

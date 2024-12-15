@@ -1,0 +1,5 @@
+Well, as you may know we are doing some switches and stuff but i didn't say for what, we are making this treeview in the bottom frame and this going to work as a filter searcher. We aren't doing this now but the main thing its that as you can see in the next code, there are a search (busqueda) button that displays that stuff, i wanna have another button to filter the results in the treeview in the next way:
+
+There are switches, then we turn on or off depending which results we want and then another button to refresh the treeview.
+
+Dont do this now, im just saying so we can do this later on
