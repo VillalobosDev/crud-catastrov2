@@ -1,11 +1,25 @@
 import tkinter as tk
 import customtkinter as ctk
-from PIL import ImageTk, Image
+from PIL import Image, ImageTk
 from menu import menu
 
 # Configuración de CustomTkinter
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("dark-blue")
+
+def resize_background(event, window, original_image, background_label):
+    """Resize background image dynamically based on window size."""
+    # Get the current window dimensions
+    width = window.winfo_width()
+    height = window.winfo_height()
+
+    # Resize the original image to match the window size
+    resized_image = original_image.resize((width, height), Image.LANCZOS)
+    background_photo = ImageTk.PhotoImage(resized_image)
+
+    # Update the background label with the resized image
+    background_label.configure(image=background_photo)
+    background_label.image = background_photo  # Keep a reference to avoid garbage collection
 
 def login(window):
     """Pantalla de inicio de sesión"""
@@ -14,14 +28,17 @@ def login(window):
     poppins20bold = ("Poppins", 20)
     poppins16bold = ("Poppins", 16, "bold")
 
-    # Fondo de pantalla
-    background_image = Image.open("login.png")
-    background_photo = ImageTk.PhotoImage(background_image)
+    # Load the original background image
+    original_image = Image.open("login.png")
 
-    # Crear un Label para la imagen de fondo
-    background_label = tk.Label(window, image=background_photo)
-    background_label.image = background_photo  # Evita que se elimine la referencia
+    # Create a Label for the background image
+    background_label = tk.Label(window)
     background_label.place(relwidth=1, relheight=1)
+
+    # Bind the "<Configure>" event to resize the background image dynamically
+    window.bind(
+        "<Configure>", lambda event: resize_background(event, window, original_image, background_label)
+    )
 
     # Frame principal
     left_frame = ctk.CTkFrame(window, width=500)
@@ -87,7 +104,6 @@ def check(entry, window):
     """Validación de contraseña"""
     contr = "1234"
     if entry.get() == contr:
-       
         for widget in window.winfo_children():
             widget.destroy()
         menu(window)
