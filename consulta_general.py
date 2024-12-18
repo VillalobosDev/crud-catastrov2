@@ -13,8 +13,7 @@ search_filter_created = False
 column_switches_created = False
 
 def display_column_switches(top_frame4, treeview, original_data):
-    global column_switches_created, column_switches
-
+    global column_switches_created
     if column_switches_created:
         return  # Skip if already created
 
@@ -23,32 +22,44 @@ def display_column_switches(top_frame4, treeview, original_data):
     switches_frame.pack(pady=5, padx=5, side="left", fill="x", expand=True)
 
     # Dictionary to store the switch states
-    column_switches = {  # Start with all columns enabled
-        'Inmueble': True, 'Codigo Catastral': True, 'Uso': True, 'Contribuyente': True,
-        'CI': True, 'RIF': True, 'Telefono': True, 'Correo': True, 'Sector': True,
-        'Ubicacion Sector': True, 'Liquidacion ID': True, 'Monto 1': True, 
-        'Monto 2': True, 'Fecha Liquidacion 1': True, 'Fecha Liquidacion 2': True
-    }
+    column_switches = {}
 
-    # Create switches for each column
-    for col in column_switches.keys():
+    # Treeview columns
+    columns = [
+        'Inmueble', 'Codigo Catastral', 'Uso', 'Contribuyente', 'CI', 'RIF', 
+        'Telefono', 'Correo', 'Sector', 'Ubicacion Sector', 
+        'Liquidacion ID', 'Monto 1', 'Monto 2', 'Fecha Liquidacion 1', 'Fecha Liquidacion 2'
+    ]
+
+    # Create switches in a grid
+    max_columns_per_row = 10  # Number of switches per row
+    row = 0
+    col = 0
+
+    for col_name in columns:
         switch = ctk.CTkSwitch(
             switches_frame,
-            text=col,
-            command=lambda c=col: toggle_column(treeview, c, original_data)
+            text=col_name,
+            command=lambda c=col_name: toggle_column(treeview, column_switches, c, original_data)
         )
-        switch.pack(side="left", padx=5, pady=5)
+        switch.grid(row=row, column=col, padx=5, pady=5)  # Use grid layout for multi-row arrangement
+        column_switches[col_name] = switch
         switch.select()  # Enable all columns by default
 
-    # Refresh button
-    refresh_button = ctk.CTkButton(
-        switches_frame,
-        text="Refresh Treeview",
-        command=lambda: refresh_treeview(treeview, original_data)
-    )
-    refresh_button.pack(pady=10, side="right")
+        col += 1
+        if col >= max_columns_per_row:  # Move to the next row
+            col = 0
+            row += 1
 
-    column_switches_created = True
+    # Refresh button (place this next to the switches)
+    refresh_button = ctk.CTkButton(
+        switches_frame, 
+        text="Refresh Treeview", 
+        command=lambda: refresh_treeview(treeview, column_switches, original_data)
+    )
+    refresh_button.grid(row=row + 1, column=0, columnspan=max_columns_per_row, pady=10)  # Place the button below the switches
+
+    column_switches_created = True  # Mark column switches as created
 
 def toggle_column(treeview, column, original_data):
     # Toggle the state of the column
