@@ -13,7 +13,8 @@ search_filter_created = False
 column_switches_created = False
 
 def display_column_switches(top_frame4, treeview, original_data):
-    global column_switches_created
+    global column_switches_created, column_switches
+
     if column_switches_created:
         return  # Skip if already created
 
@@ -22,77 +23,97 @@ def display_column_switches(top_frame4, treeview, original_data):
     switches_frame.pack(pady=5, padx=5, side="left", fill="x", expand=True)
 
     # Dictionary to store the switch states
-    column_switches = {}
-
-    # Treeview columns
-    columns = [
-        'Inmueble', 'Codigo Catastral', 'Uso', 'Contribuyente', 'CI', 'RIF', 
-        'Telefono', 'Correo', 'Sector', 'Ubicacion Sector', 
-        'Liquidacion ID', 'Monto 1', 'Monto 2', 'Fecha Liquidacion 1', 'Fecha Liquidacion 2'
-    ]
+    column_switches = {  # Start with all columns enabled
+        'Inmueble': True, 'Codigo Catastral': True, 'Uso': True, 'Contribuyente': True,
+        'CI': True, 'RIF': True, 'Telefono': True, 'Correo': True, 'Sector': True,
+        'Ubicacion Sector': True, 'Liquidacion ID': True, 'Monto 1': True, 
+        'Monto 2': True, 'Fecha Liquidacion 1': True, 'Fecha Liquidacion 2': True
+    }
 
     # Create switches for each column
-    for col in columns:
+    for col in column_switches.keys():
         switch = ctk.CTkSwitch(
             switches_frame,
             text=col,
-            command=lambda c=col: toggle_column(treeview, column_switches, c, original_data)
+            command=lambda c=col: toggle_column(treeview, c, original_data)
         )
-        switch.pack(side="left", padx=5, pady=5)  # Switches aligned horizontally
-        column_switches[col] = switch
+        switch.pack(side="left", padx=5, pady=5)
         switch.select()  # Enable all columns by default
 
-    # Refresh button (place this next to the switches)
+    # Refresh button
     refresh_button = ctk.CTkButton(
-        switches_frame, 
-        text="Refresh Treeview", 
-        command=lambda: refresh_treeview(treeview, column_switches, original_data)
+        switches_frame,
+        text="Refresh Treeview",
+        command=lambda: refresh_treeview(treeview, original_data)
     )
     refresh_button.pack(pady=10, side="right")
 
-    column_switches_created = True  # Mark column switches as created
+    column_switches_created = True
 
-def toggle_column(treeview, column_switches, column_name, original_data):
-    """Enable or disable a column and filter rows accordingly."""
-    visible_columns = [col for col, switch in column_switches.items() if switch.get() == 1]
+def toggle_column(treeview, column, original_data):
+    # Toggle the state of the column
+    column_switches[column] = not column_switches[column]
+    print(f"Toggled {column}: {column_switches[column]}")  # Debugging
+    refresh_treeview(treeview, original_data)
 
-    if column_name not in visible_columns:
-        column_switches[column_name].deselect()
-    else:
-        column_switches[column_name].select()
+def refresh_treeview(treeview, original_data):
+    # Clear the Treeview
+    for item in treeview.get_children():
+        treeview.delete(item)
 
-    # Refresh the treeview to match the visible columns
-    refresh_treeview(treeview, column_switches, original_data)
+    # Build dynamic SELECT query
+    selected_columns = [col for col, is_visible in column_switches.items() if is_visible]
+    if not selected_columns:
+        print("No columns selected. Please select at least one column.")
+        return
 
-def refresh_treeview(treeview, column_switches, original_data):
-    """Repopulate the treeview based on selected columns."""
-    visible_columns = [col for col, switch in column_switches.items() if switch.get() == 1]
+    # Map columns to database fields
+    db_columns = {
+        'Inmueble': 'inmuebles.nom_inmueble',
+        'Codigo Catastral': 'inmuebles.cod_catastral',
+        'Uso': 'inmuebles.uso',
+        'Contribuyente': "contribuyentes.nombres || ' ' || contribuyentes.apellidos",
+        'CI': 'contribuyentes.ci_contribuyente',
+        'RIF': 'contribuyentes.rif',
+        'Telefono': 'contribuyentes.telefono',
+        'Correo': 'contribuyentes.correo',
+        'Sector': 'sectores.nom_sector',
+        'Ubicacion Sector': 'sectores.ubic_sector',
+        'Liquidacion ID': 'liquidaciones.id_liquidacion',
+        'Monto 1': 'liquidaciones.monto_1',
+        'Monto 2': 'liquidaciones.monto_2',
+        'Fecha Liquidacion 1': 'liquidaciones.fecha_liquidacion_1',
+        'Fecha Liquidacion 2': 'liquidaciones.fecha_liquidacion_2'
+    }
 
-    # Update treeview columns
-    treeview["columns"] = visible_columns
-    for col in visible_columns:
-        treeview.heading(col, text=col)
-        treeview.column(col, anchor="center", width=100)
+    selected_db_columns = [db_columns[col] for col in selected_columns]
 
-    # Hide columns that are not selected
-    for col in column_switches.keys():
-        if col not in visible_columns:
-            treeview.column(col, width=0)
-            treeview.heading(col, text="")
+    # Construct the SQL query
+    query = f"SELECT {', '.join(selected_db_columns)} FROM inmuebles " \
+            f"JOIN contribuyentes ON inmuebles.id_contribuyente = contribuyentes.id_contribuyente " \
+            f"JOIN sectores ON inmuebles.id_sector = sectores.id_sector " \
+            f"JOIN liquidaciones ON inmuebles.id_inmueble = liquidaciones.id_inmueble"
 
-    # Clear existing rows
-    treeview.delete(*treeview.get_children())
+    print(f"Executing Query: {query}")  # Debugging
 
-    # Populate treeview with filtered rows, skipping the first column (auto-increment ID)
-    for row in original_data:
-        print(f'row: {row}')
-        # Skip the first value (ID) and only take the actual data
-        filtered_row = row[1:]  # Skip the first item (auto-increment ID) in the row
-        print(f"filtered: {filtered_row}")
+    # Fetch new data
+    try:
+        with connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(query)
+            filtered_data = cursor.fetchall()
 
-        # Now, create the filtered row for the treeview, based on visible columns
-        filtered_row_for_treeview = [filtered_row[idx] for idx, col in enumerate(column_switches.keys()) if col in visible_columns]
-        treeview.insert("", "end", values=filtered_row_for_treeview)
+            # Update Treeview columns and insert new data
+            treeview["columns"] = selected_columns
+            for col in selected_columns:
+                treeview.heading(col, text=col)
+                treeview.column(col, anchor="center", width=100)
+
+            for row in filtered_data:
+                treeview.insert("", "end", values=row)
+
+    except Exception as e:
+        print(f"Error during query execution: {e}")
 
 def toggle_top_frame_visibility(frame_to_show, frame_to_hide):
     """Toggle visibility of the frames."""
@@ -282,6 +303,10 @@ def bottom_treeview(frame):
         JOIN liquidaciones ON inmuebles.id_inmueble = liquidaciones.id_inmueble '''
             cursor.execute(sql)
             original_data = cursor.fetchall()
+
+            print(f"Fetched {len(original_data)} rows from the database.")
+            for row in original_data:
+                print(row) 
 
             # Insert all data into Treeview initially
             for row in original_data:
