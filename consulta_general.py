@@ -6,6 +6,84 @@ from calendario import create_date_range_selector
 from rectangle import rectangle
 from tkinter import ttk
 
+
+def display_column_switches(top_frame3, treeview, original_data):
+    # Frame to hold switches
+    switches_frame = ctk.CTkFrame(top_frame3, corner_radius=15)
+    switches_frame.pack(pady=5, padx=5, side="left", fill="x", expand=True)
+
+    # Dictionary to store the switch states
+    column_switches = {}
+
+    # Treeview columns
+    columns = [
+        'Inmueble', 'Codigo Catastral', 'Uso', 'Contribuyente', 'CI', 'RIF', 
+        'Telefono', 'Correo', 'Sector', 'Ubicacion Sector', 
+        'Liquidacion ID', 'Monto 1', 'Monto 2', 'Fecha Liquidacion 1', 'Fecha Liquidacion 2'
+    ]
+
+    # Create switches for each column
+    for col in columns:
+        switch = ctk.CTkSwitch(
+            switches_frame,
+            text=col,
+            command=lambda c=col: toggle_column(treeview, column_switches, c, original_data)
+        )
+        switch.pack(side="left", padx=5, pady=5)  # Switches aligned horizontally
+        column_switches[col] = switch
+        switch.select()  # Enable all columns by default
+
+    # Refresh button (place this next to the switches)
+    refresh_button = ctk.CTkButton(
+        switches_frame, 
+        text="Refresh Treeview", 
+        command=lambda: refresh_treeview(treeview, column_switches, original_data)
+    )
+    refresh_button.pack(pady=10, side="right")
+
+def toggle_column(treeview, column_switches, column_name, original_data):
+    """Enable or disable a column and filter rows accordingly."""
+    visible_columns = [col for col, switch in column_switches.items() if switch.get() == 1]
+
+    if column_name not in visible_columns:
+        column_switches[column_name].deselect()
+    else:
+        column_switches[column_name].select()
+
+    # Refresh the treeview to match the visible columns
+    refresh_treeview(treeview, column_switches, original_data)
+
+def refresh_treeview(treeview, column_switches, original_data):
+    """Repopulate the treeview based on selected columns."""
+    visible_columns = [col for col, switch in column_switches.items() if switch.get() == 1]
+
+    # Update treeview columns
+    treeview["columns"] = visible_columns
+    for col in visible_columns:
+        treeview.heading(col, text=col)
+        treeview.column(col, anchor="center", width=100)
+
+    # Hide columns that are not selected
+    for col in column_switches.keys():
+        if col not in visible_columns:
+            treeview.column(col, width=0)
+            treeview.heading(col, text="")
+
+    # Clear existing rows
+    treeview.delete(*treeview.get_children())
+
+    # Populate treeview with filtered rows
+    for row in original_data:
+        filtered_row = [row[idx] for idx, col in enumerate(column_switches.keys()) if col in visible_columns]
+        treeview.insert("", "end", values=filtered_row)
+
+def toggle_top_frame3(top_frame3):
+        if top_frame3.winfo_ismapped():  # Check if top_frame3 is currently visible
+            top_frame3.pack_forget()  # Hide it
+        else:
+            top_frame3.pack(fill="x", padx=10, pady=5, after=top_frame2)  # Show it
+
+
 def consulta(window, last_window):
     for widget in window.winfo_children():
         widget.destroy()
@@ -46,53 +124,55 @@ def consulta(window, last_window):
     window_title = ctk.CTkLabel(top_frame, text="Sección de Gestión Liquidación", font=poppins30bold)
     window_title.pack(padx=10, pady=10, side="left")
 
-    #Top Frame 2 Content
+    # Bottom Frame Content
+    my_tree, original_data = bottom_treeview(bottom_frame)
 
-    busqueda = ctk.CTkButton(top_frame2, text="Buscar", width=80, font=poppins14bold, command=lambda:  display_search_filter(top_frame3))
+    # Top Frame 2 Content
+    busqueda = ctk.CTkButton(top_frame2, text="Buscar", width=80, font=poppins14bold, command=lambda: display_search_filter(top_frame3, my_tree, original_data))
     busqueda.pack(padx=10, pady=5, side="left")
-
-    #Bottom Frame Content
-
-    bottom_treeview(bottom_frame)
-
-def display_search_filter(frame):
     
+    # Add a new button in top_frame2 for showing/hiding top_frame3 (the search filter)
+    show_filter_btn = ctk.CTkButton(top_frame2, text="Show Filter", width=100, font=poppins14bold, command=lambda: toggle_top_frame3(top_frame3))
+    show_filter_btn.pack(padx=10, pady=5, side="left")
+
+    
+    
+
+# Add a global variable to track if the filter has been created
+search_filter_created = False
+def display_search_filter(frame, treeview, original_data):
+    global search_filter_created
+    if search_filter_created:
+        return  # Avoid creating widgets multiple times
+
     poppins12 = ("Poppins", 12, "bold")
-
-
+    
     top_frame3 = frame
     top_frame3.pack(fill="x", padx=10, pady=5, after=top_frame2)
-    
+
     current_widgets = {"frame": None}
 
-    global searchbtn  # Make it globally accessible
+    global searchbtn
     searchbtn = ctk.CTkButton(top_frame3, text="Buscar", font=poppins12, width=70)
-    searchbtn.pack_forget()  # Initially hide the button
+    searchbtn.pack_forget()
 
     def toggle_entry(switch_name, placeholder_text):
-        """Replace the current entry with a new one based on the selected switch."""
-        # Deactivate all switches except the current one
         for other_switch_name, other_switch in switches.items():
             if other_switch_name != switch_name:
                 other_switch.deselect()
 
-        # Remove current widgets if they exist
         if current_widgets["frame"]:
             current_widgets["frame"].destroy()
             current_widgets["frame"] = None
 
-        # Create new widgets if the switch is activated
         if switches[switch_name].get() == 1:
-            
             searchbtn.pack(side="right", pady=10, padx=5)
             
             if switch_name == "Rango Fecha":
-                # Create date range selector
                 current_widgets["frame"] = ctk.CTkFrame(top_frame3)
                 current_widgets["frame"].pack(padx=5, pady=5, side="right")
                 create_date_range_selector(current_widgets["frame"])
             else:
-                # Create a single entry
                 current_widgets["frame"] = ctk.CTkFrame(top_frame3)
                 current_widgets["frame"].pack(padx=5, pady=5, side="right")
 
@@ -101,7 +181,6 @@ def display_search_filter(frame):
         else:
             searchbtn.pack_forget()
 
-    # Switches
     switches = {}
     switch_labels = ["Cedula", "Nombre", "Sector", "Inmueble", "Rango Fecha"]
     placeholders = ["Ingrese Cédula", "Ingrese Nombre", "Ingrese Sector", "Ingrese Inmueble", "Rango Fecha"]
@@ -116,14 +195,19 @@ def display_search_filter(frame):
         switch.pack(padx=10, pady=10, side="left")
         switches[label] = switch
 
+    # Add column switches after search filters
+    display_column_switches(top_frame3, treeview, original_data)
+
+    search_filter_created = True
+
 def bottom_treeview(frame):
-    # BOTTOM FRAME CONTENT  
+    # Treeview frame
     treeframe = ctk.CTkFrame(frame, corner_radius=15)
     treeframe.pack(padx=5, pady=5, fill="both", expand=True)
 
-    # Creating the Treeview frame
+    # Treeview container
     frame_tree = ctk.CTkFrame(treeframe, fg_color='white', width=580, height=360)
-    frame_tree.pack(pady=10, padx=10, expand=True, fill="both")  
+    frame_tree.pack(pady=10, padx=10, expand=True, fill="both")
 
     style = ttk.Style()
     style.configure("Custom.Treeview", font=("Poppins", 12), rowheight=25)  
@@ -137,77 +221,53 @@ def bottom_treeview(frame):
     horizontal_scrollbar.pack(side="bottom", fill="x")
 
     # Define the columns
-    my_tree['columns'] = (
-        'Inmueble', 'Codigo Catastral', 'Uso', 'Contribuyente', 'CI', 'RIF', 'Telefono', 'Correo', 
-        'Sector', 'Ubicacion Sector', 'Liquidacion ID', 'Monto 1', 'Monto 2', 'Fecha Liquidacion 1', 'Fecha Liquidacion 2'
-    )
+    columns = [
+        'Inmueble', 'Codigo Catastral', 'Uso', 'Contribuyente', 'CI', 'RIF', 
+        'Telefono', 'Correo', 'Sector', 'Ubicacion Sector', 
+        'Liquidacion ID', 'Monto 1', 'Monto 2', 'Fecha Liquidacion 1', 'Fecha Liquidacion 2'
+    ]
+    my_tree["columns"] = columns
 
     # Set column headers
-    for col in my_tree['columns']:
-        my_tree.heading(col, text=col.capitalize(), anchor='center')
-        my_tree.column(col, anchor='center')
+    for col in columns:
+        my_tree.heading(col, text=col)
+        my_tree.column(col, anchor="center", width=100)
 
-    canvas = ctk.CTkCanvas(frame_tree, width=0, height=0, highlightthickness=0, bg='white')
-    canvas.pack()  # Position the canvas
-    rectangle(canvas, 10, 10, 0, 0, r=5, fill='lightgray', outline='black')
-
+    # Fetch data
+    original_data = []
     try:
-        # Database connection and query
         with connection() as conn:
-            print("Database connection established.")
             cursor = conn.cursor()
-
-            # SQL query to join the tables and fetch the required data
-            sql = '''
-                SELECT 
-                    inmuebles.id_inmueble,
-                    inmuebles.nom_inmueble,
-                    inmuebles.cod_catastral,
-                    inmuebles.uso,
-                    contribuyentes.nombres || ' ' || contribuyentes.apellidos AS contribuyente,
-                    contribuyentes.ci_contribuyente,
-                    contribuyentes.rif,
-                    contribuyentes.telefono,
-                    contribuyentes.correo,
-                    sectores.nom_sector,
-                    sectores.ubic_sector,
-                    liquidaciones.id_liquidacion,
-                    liquidaciones.monto_1,
-                    liquidaciones.monto_2,
-                    liquidaciones.fecha_Liquidacion_1,
-                    liquidaciones.fecha_Liquidacion_2
-                FROM
-                    inmuebles
-                JOIN contribuyentes ON inmuebles.id_contribuyente = contribuyentes.id_contribuyente
-                JOIN sectores ON inmuebles.id_sector = sectores.id_sector
-                JOIN liquidaciones ON inmuebles.id_inmueble = liquidaciones.id_inmueble;
-            '''
+            sql = ''' SELECT 
+            inmuebles.id_inmueble,
+            inmuebles.nom_inmueble,
+            inmuebles.cod_catastral,
+            inmuebles.uso,
+            contribuyentes.nombres || ' ' || contribuyentes.apellidos AS contribuyente,
+            contribuyentes.ci_contribuyente,
+            contribuyentes.rif,
+            contribuyentes.telefono,
+            contribuyentes.correo,
+            sectores.nom_sector,
+            sectores.ubic_sector,
+            liquidaciones.id_liquidacion,
+            liquidaciones.monto_1,
+            liquidaciones.monto_2,
+            liquidaciones.fecha_Liquidacion_1,
+            liquidaciones.fecha_Liquidacion_2
+        FROM
+            inmuebles
+        JOIN contribuyentes ON inmuebles.id_contribuyente = contribuyentes.id_contribuyente
+        JOIN sectores ON inmuebles.id_sector = sectores.id_sector
+        JOIN liquidaciones ON inmuebles.id_inmueble = liquidaciones.id_inmueble '''
             cursor.execute(sql)
-            results = cursor.fetchall()
-            print(f"Query executed successfully, fetched results: {results}")
+            original_data = cursor.fetchall()
 
-            # Insert data into Treeview
-            for row in results:
-                for value in row:
-                    print(value) 
-                my_tree.insert("", "end", values=(
-                    row[1],  # Inmueble name
-                    row[2],  # Codigo Catastral
-                    row[3],  # Uso
-                    row[4],  # Contribuyente
-                    row[5],  # CI
-                    row[6],  # RIF
-                    row[7],  # Telefono
-                    row[8],  # Correo
-                    row[9],  # Sector
-                    row[10], # Ubicacion Sector
-                    row[11], # Liquidacion ID
-                    row[12], # Monto 1
-                    row[13], # Monto 2
-                    row[14], # Fecha Liquidacion 1
-                    row[15]  # Fecha Liquidacion
-                ))
+            # Insert all data into Treeview initially
+            for row in original_data:
+                my_tree.insert("", "end", values=row)
 
     except Exception as e:
         print(f"Error during database operation: {e}")
 
+    return my_tree, original_data  # Return both my_tree and original_data
