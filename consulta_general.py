@@ -6,10 +6,19 @@ from calendario import create_date_range_selector
 from rectangle import rectangle
 from tkinter import ttk
 
+# Global flags
+search_filter_shown = False
+column_switch_shown = False
+search_filter_created = False
+column_switches_created = False
 
-def display_column_switches(top_frame3, treeview, original_data):
+def display_column_switches(top_frame4, treeview, original_data):
+    global column_switches_created
+    if column_switches_created:
+        return  # Skip if already created
+
     # Frame to hold switches
-    switches_frame = ctk.CTkFrame(top_frame3, corner_radius=15)
+    switches_frame = ctk.CTkFrame(top_frame4, corner_radius=15)
     switches_frame.pack(pady=5, padx=5, side="left", fill="x", expand=True)
 
     # Dictionary to store the switch states
@@ -40,6 +49,8 @@ def display_column_switches(top_frame3, treeview, original_data):
         command=lambda: refresh_treeview(treeview, column_switches, original_data)
     )
     refresh_button.pack(pady=10, side="right")
+
+    column_switches_created = True  # Mark column switches as created
 
 def toggle_column(treeview, column_switches, column_name, original_data):
     """Enable or disable a column and filter rows accordingly."""
@@ -77,12 +88,13 @@ def refresh_treeview(treeview, column_switches, original_data):
         filtered_row = [row[idx] for idx, col in enumerate(column_switches.keys()) if col in visible_columns]
         treeview.insert("", "end", values=filtered_row)
 
-def toggle_top_frame3(top_frame3):
-        if top_frame3.winfo_ismapped():  # Check if top_frame3 is currently visible
-            top_frame3.pack_forget()  # Hide it
-        else:
-            top_frame3.pack(fill="x", padx=10, pady=5, after=top_frame2)  # Show it
-
+def toggle_top_frame_visibility(frame_to_show, frame_to_hide):
+    """Toggle visibility of the frames."""
+    if frame_to_show.winfo_ismapped():
+        frame_to_show.pack_forget()  # Hide it
+    else:
+        frame_to_show.pack(fill="x", padx=10, pady=5, after=top_frame2)  # Show it
+        frame_to_hide.pack_forget()  # Hide the other frame
 
 def consulta(window, last_window):
     for widget in window.winfo_children():
@@ -107,8 +119,12 @@ def consulta(window, last_window):
     top_frame2 = ctk.CTkFrame(window, height=150, corner_radius=15)
     top_frame2.pack(fill="x", padx=10, pady=5)
 
-    top_frame3 = ctk.CTkFrame(window, height=60, corner_radius=15)
-    top_frame3.pack_forget()
+    global top_frame3
+    top_frame3 = ctk.CTkFrame(window, height=150, corner_radius=15)
+    top_frame4 = ctk.CTkFrame(window, height=150, corner_radius=15)
+
+    top_frame3.pack_forget()  # Hide by default
+    top_frame4.pack_forget()  # Hide by default
 
     bottom_frame = ctk.CTkFrame(window, corner_radius=15)
     bottom_frame.pack(padx=10, pady=5, fill="both", expand=True)
@@ -128,18 +144,19 @@ def consulta(window, last_window):
     my_tree, original_data = bottom_treeview(bottom_frame)
 
     # Top Frame 2 Content
-    busqueda = ctk.CTkButton(top_frame2, text="Buscar", width=80, font=poppins14bold, command=lambda: display_search_filter(top_frame3, my_tree, original_data))
+    busqueda = ctk.CTkButton(top_frame2, text="Buscar", width=80, font=poppins14bold, command=lambda: toggle_top_frame_visibility(top_frame3, top_frame4))
     busqueda.pack(padx=10, pady=5, side="left")
     
-    # Add a new button in top_frame2 for showing/hiding top_frame3 (the search filter)
-    show_filter_btn = ctk.CTkButton(top_frame2, text="Show Filter", width=100, font=poppins14bold, command=lambda: toggle_top_frame3(top_frame3))
+    show_filter_btn = ctk.CTkButton(top_frame2, text="Show Filter", width=100, font=poppins14bold, command=lambda: toggle_top_frame_visibility(top_frame4, top_frame3))
     show_filter_btn.pack(padx=10, pady=5, side="left")
 
-    
-    
+    # Add search filter UI to top_frame3
+    display_search_filter(top_frame3, my_tree, original_data)
+
+    # Add column switch UI to top_frame4
+    display_column_switches(top_frame4, my_tree, original_data)
 
 # Add a global variable to track if the filter has been created
-search_filter_created = False
 def display_search_filter(frame, treeview, original_data):
     global search_filter_created
     if search_filter_created:
@@ -194,9 +211,6 @@ def display_search_filter(frame, treeview, original_data):
         )
         switch.pack(padx=10, pady=10, side="left")
         switches[label] = switch
-
-    # Add column switches after search filters
-    display_column_switches(top_frame3, treeview, original_data)
 
     search_filter_created = True
 
