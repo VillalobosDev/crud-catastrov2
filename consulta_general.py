@@ -83,10 +83,16 @@ def refresh_treeview(treeview, column_switches, original_data):
     # Clear existing rows
     treeview.delete(*treeview.get_children())
 
-    # Populate treeview with filtered rows
+    # Populate treeview with filtered rows, skipping the first column (auto-increment ID)
     for row in original_data:
-        filtered_row = [row[idx] for idx, col in enumerate(column_switches.keys()) if col in visible_columns]
-        treeview.insert("", "end", values=filtered_row)
+        print(f'row: {row}')
+        # Skip the first value (ID) and only take the actual data
+        filtered_row = row[1:]  # Skip the first item (auto-increment ID) in the row
+        print(f"filtered: {filtered_row}")
+
+        # Now, create the filtered row for the treeview, based on visible columns
+        filtered_row_for_treeview = [filtered_row[idx] for idx, col in enumerate(column_switches.keys()) if col in visible_columns]
+        treeview.insert("", "end", values=filtered_row_for_treeview)
 
 def toggle_top_frame_visibility(frame_to_show, frame_to_hide):
     """Toggle visibility of the frames."""
