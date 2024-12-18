@@ -40,7 +40,8 @@ def display_column_switches(top_frame4, treeview, original_data):
         switch = ctk.CTkSwitch(
             switches_frame,
             text=col_name,
-            command=lambda c=col_name: toggle_column(treeview, column_switches, c, original_data)
+            command=lambda c=col_name: toggle_column(treeview, c, original_data, column_switches)
+
         )
         switch.grid(row=row, column=col, padx=5, pady=5)  # Use grid layout for multi-row arrangement
         column_switches[col_name] = switch
@@ -55,19 +56,19 @@ def display_column_switches(top_frame4, treeview, original_data):
     refresh_button = ctk.CTkButton(
         switches_frame, 
         text="Refresh Treeview", 
-        command=lambda: refresh_treeview(treeview, column_switches, original_data)
+        command=lambda: refresh_treeview(treeview, column_switches)
     )
     refresh_button.grid(row=row + 1, column=0, columnspan=max_columns_per_row, pady=10)  # Place the button below the switches
 
     column_switches_created = True  # Mark column switches as created
 
-def toggle_column(treeview, column, original_data):
-    # Toggle the state of the column
+def toggle_column(treeview, column, original_data, column_switches):
     column_switches[column] = not column_switches[column]
     print(f"Toggled {column}: {column_switches[column]}")  # Debugging
-    refresh_treeview(treeview, original_data)
+    refresh_treeview(treeview, column_switches)
 
-def refresh_treeview(treeview, original_data):
+
+def refresh_treeview(treeview, column_switches):
     # Clear the Treeview
     for item in treeview.get_children():
         treeview.delete(item)
