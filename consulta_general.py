@@ -40,8 +40,7 @@ def display_column_switches(top_frame4, treeview, original_data):
         switch = ctk.CTkSwitch(
             switches_frame,
             text=col_name,
-            command=lambda c=col_name: toggle_column(treeview, c, original_data, column_switches)
-
+            command=lambda c=col_name: toggle_column(column_switches, c)
         )
         switch.grid(row=row, column=col, padx=5, pady=5)  # Use grid layout for multi-row arrangement
         column_switches[col_name] = switch
@@ -62,24 +61,25 @@ def display_column_switches(top_frame4, treeview, original_data):
 
     column_switches_created = True  # Mark column switches as created
 
-def toggle_column(treeview, column, original_data, column_switches):
+def toggle_column(column_switches, column):
+    # Toggle the visibility of the column
     column_switches[column] = not column_switches[column]
-    print(f"Toggled {column}: {column_switches[column]}")  # Debugging
-    refresh_treeview(treeview, column_switches)
-
+    print(f"Column {column} visibility is now {column_switches[column]}")
 
 def refresh_treeview(treeview, column_switches):
-    # Clear the Treeview
+    # Clear the Treeview before updating with new data
     for item in treeview.get_children():
         treeview.delete(item)
 
-    # Build dynamic SELECT query
+    # Select columns that are marked as visible in the column_switches
     selected_columns = [col for col, is_visible in column_switches.items() if is_visible]
+    
+    # If no columns are selected, show an error and stop the function
     if not selected_columns:
         print("No columns selected. Please select at least one column.")
         return
 
-    # Map columns to database fields
+    # Map the user-friendly column names to actual database fields
     db_columns = {
         'Inmueble': 'inmuebles.nom_inmueble',
         'Codigo Catastral': 'inmuebles.cod_catastral',
@@ -98,29 +98,31 @@ def refresh_treeview(treeview, column_switches):
         'Fecha Liquidacion 2': 'liquidaciones.fecha_liquidacion_2'
     }
 
+    # Map the selected columns to the actual database fields for the SQL query
     selected_db_columns = [db_columns[col] for col in selected_columns]
 
-    # Construct the SQL query
+    # Construct the SQL query dynamically based on selected columns
     query = f"SELECT {', '.join(selected_db_columns)} FROM inmuebles " \
             f"JOIN contribuyentes ON inmuebles.id_contribuyente = contribuyentes.id_contribuyente " \
             f"JOIN sectores ON inmuebles.id_sector = sectores.id_sector " \
             f"JOIN liquidaciones ON inmuebles.id_inmueble = liquidaciones.id_inmueble"
 
-    print(f"Executing Query: {query}")  # Debugging
+    print(f"Executing Query: {query}")  # Debugging: Show the query being executed
 
-    # Fetch new data
+    # Try to fetch the data from the database
     try:
         with connection() as conn:
             cursor = conn.cursor()
             cursor.execute(query)
             filtered_data = cursor.fetchall()
 
-            # Update Treeview columns and insert new data
+            # Update the Treeview columns and insert the new data into the Treeview
             treeview["columns"] = selected_columns
             for col in selected_columns:
                 treeview.heading(col, text=col)
                 treeview.column(col, anchor="center", width=100)
 
+            # Insert the rows fetched from the query into the Treeview
             for row in filtered_data:
                 treeview.insert("", "end", values=row)
 
