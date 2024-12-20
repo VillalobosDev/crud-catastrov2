@@ -18,8 +18,10 @@ window.title("Menu")
 window.geometry("1080x720")
 
 consulta(window, menu)
+# login(window)
+
 
 # Close the window after 5 seconds (5000 milliseconds)
-close_after_timeout(window, 40000)
+# close_after_timeout(window, 40000)
 
 window.mainloop()

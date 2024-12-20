@@ -5,6 +5,7 @@ from calendario import open_calendar_popup
 from calendario import create_date_range_selector
 from rectangle import rectangle
 from tkinter import ttk
+from rango_fecha import *
 
 # Global flags
 search_filter_shown = False
@@ -13,6 +14,9 @@ search_filter_created = False
 column_switches_created = False
 
 def display_column_switches(top_frame4, treeview, original_data):
+    
+    poppins12 = ("Poppins", 12, "bold")
+
     global column_switches_created
     if column_switches_created:
         return  # Skip if already created
@@ -31,33 +35,38 @@ def display_column_switches(top_frame4, treeview, original_data):
         'Liquidacion ID', 'Monto 1', 'Monto 2', 'Fecha Liquidacion 1', 'Fecha Liquidacion 2'
     ]
 
-    # Create switches in a grid
+    # Create switches in rows using pack
     max_columns_per_row = 10  # Number of switches per row
-    row = 0
-    col = 0
+    current_row_frame = None  # To keep track of the current row
+    switch_count = 0
 
-    for col_name in columns:
+    for idx, col_name in enumerate(columns):
+        # Create a new row frame when needed
+        if idx % max_columns_per_row == 0:
+            current_row_frame = ctk.CTkFrame(switches_frame)
+            current_row_frame.pack(fill="x", padx=5, pady=5)
+
+        # Create the switch inside the current row frame
         switch = ctk.CTkSwitch(
-            switches_frame,
+            current_row_frame,
             text=col_name,
+            font=poppins12,
             command=lambda c=col_name: toggle_column(column_switches, c)
         )
-        switch.grid(row=row, column=col, padx=5, pady=5)  # Use grid layout for multi-row arrangement
+        switch.pack(side="left", padx=5, pady=5)  # Pack the switches side by side
         column_switches[col_name] = switch
-        switch.select()  # Enable all columns by default
+        switch.select() # Enable all columns by default
 
-        col += 1
-        if col >= max_columns_per_row:  # Move to the next row
-            col = 0
-            row += 1
-
-    # Refresh button (place this next to the switches)
+        switch_count += 1
+    
     refresh_button = ctk.CTkButton(
-        switches_frame, 
-        text="Refresh Treeview", 
+        current_row_frame,
+        text="Refresh Treeview",
+        font=poppins12,
         command=lambda: refresh_treeview(treeview, column_switches)
     )
-    refresh_button.grid(row=row + 1, column=0, columnspan=max_columns_per_row, pady=10)  # Place the button below the switches
+    refresh_button.pack(side="right", padx=5, pady=5)  # Place the button on the right inside the `button_frame`
+     # Place the button below the switches
 
     column_switches_created = True  # Mark column switches as created
 
@@ -197,8 +206,9 @@ def consulta(window, last_window):
     # Add column switch UI to top_frame4
     display_column_switches(top_frame4, my_tree, original_data)
 
-# Add a global variable to track if the filter has been created
-def display_search_filter(frame, treeview, original_data):
+    create_date_range_selector(top_frame4, searchbtn, my_tree, original_data)
+
+def display_search_filter(frame, my_tree, original_data):
     global search_filter_created
     if search_filter_created:
         return  # Avoid creating widgets multiple times
@@ -206,7 +216,6 @@ def display_search_filter(frame, treeview, original_data):
     poppins12 = ("Poppins", 12, "bold")
     
     top_frame3 = frame
-    top_frame3.pack(fill="x", padx=10, pady=5, after=top_frame2)
 
     current_widgets = {"frame": None}
 
@@ -225,19 +234,30 @@ def display_search_filter(frame, treeview, original_data):
 
         if switches[switch_name].get() == 1:
             searchbtn.pack(side="right", pady=10, padx=5)
-            
+
             if switch_name == "Rango Fecha":
                 current_widgets["frame"] = ctk.CTkFrame(top_frame3)
                 current_widgets["frame"].pack(padx=5, pady=5, side="right")
-                create_date_range_selector(current_widgets["frame"])
+                create_date_range_selector(current_widgets["frame"], searchbtn, my_tree, original_data)
             else:
                 current_widgets["frame"] = ctk.CTkFrame(top_frame3)
                 current_widgets["frame"].pack(padx=5, pady=5, side="right")
 
                 new_entry = ctk.CTkEntry(current_widgets["frame"], placeholder_text=placeholder_text, font=poppins12, width=200)
                 new_entry.pack(side="left")
+
+                if switch_name == "Cedula":
+                    searchbtn.configure(command=lambda: cedula_search(my_tree, original_data, new_entry))
+                elif switch_name == "Nombre":
+                    searchbtn.configure(command=lambda: nombre_search(my_tree, original_data, new_entry))
+                elif switch_name == "Sector":
+                    searchbtn.configure(command=lambda: sector_search(my_tree, original_data, new_entry))
+                elif switch_name == "Inmueble":
+                    searchbtn.configure(command=lambda: inmueble_search(my_tree, original_data, new_entry))
         else:
-            searchbtn.pack_forget()
+            if not any(switch.get() == 1 for switch in switches.values()):
+                searchbtn.configure(command=lambda: fetch_all_records(my_tree, original_data))
+
 
     switches = {}
     switch_labels = ["Cedula", "Nombre", "Sector", "Inmueble", "Rango Fecha"]
@@ -294,7 +314,6 @@ def bottom_treeview(frame):
         with connection() as conn:
             cursor = conn.cursor()
             sql = ''' SELECT 
-            inmuebles.id_inmueble,
             inmuebles.nom_inmueble,
             inmuebles.cod_catastral,
             inmuebles.uso,
@@ -314,7 +333,9 @@ def bottom_treeview(frame):
             inmuebles
         JOIN contribuyentes ON inmuebles.id_contribuyente = contribuyentes.id_contribuyente
         JOIN sectores ON inmuebles.id_sector = sectores.id_sector
-        JOIN liquidaciones ON inmuebles.id_inmueble = liquidaciones.id_inmueble '''
+        JOIN liquidaciones ON inmuebles.id_inmueble = liquidaciones.id_inmueble 
+        ORDER BY contribuyentes.ci_contribuyente ASC
+        '''
             cursor.execute(sql)
             original_data = cursor.fetchall()
 
@@ -330,3 +351,64 @@ def bottom_treeview(frame):
         print(f"Error during database operation: {e}")
 
     return my_tree, original_data  # Return both my_tree and original_data
+
+def cedula_search(my_tree, original_data, cedula_entry):
+    """Filter treeview data based on Cédula."""
+    cedula_value = cedula_entry.get().strip()
+    if not cedula_value:
+        print("Cédula field is empty.")
+        return
+
+    # Filter the data based on the entered Cédula value
+    filtered_data = [row for row in original_data if cedula_value in str(row[4])]  # Assuming CI (index 4) matches
+
+    # Update Treeview
+    update_treeview(my_tree, filtered_data)
+
+def fetch_all_records(tree, data):
+    # Clear the treeview
+    for item in tree.get_children():
+        tree.delete(item)
+
+    # Insert all records from the original data
+    for record in data:
+        tree.insert("", "end", values=record)
+
+def nombre_search(my_tree, original_data, name_entry):
+    """Filter treeview data based on Nombre (Name)."""
+    name_value = name_entry.get().strip()
+    if not name_value:
+        print("Name field is empty.")
+        return
+
+    # Filter the data based on the entered Name value
+    filtered_data = [row for row in original_data if name_value.lower() in str(row[3]).lower()]  # Assuming `row[3]` is "Contribuyente"
+
+    # Update Treeview
+    update_treeview(my_tree, filtered_data)
+
+def sector_search(my_tree, original_data, sector_entry):
+    """Filter treeview data based on Sector."""
+    sector_value = sector_entry.get().strip()
+    if not sector_value:
+        print("Sector field is empty.")
+        return
+
+    # Filter the data based on the entered Sector value
+    filtered_data = [row for row in original_data if sector_value.lower() in str(row[8]).lower()]  # Assuming `row[8]` is "Sector"
+
+    # Update Treeview
+    update_treeview(my_tree, filtered_data)
+
+def inmueble_search(my_tree, original_data, inmueble_entry):
+    """Filter treeview data based on Inmueble (Property)."""
+    inmueble_value = inmueble_entry.get().strip()
+    if not inmueble_value:
+        print("Inmueble field is empty.")
+        return
+
+    # Filter the data based on the entered Inmueble value
+    filtered_data = [row for row in original_data if inmueble_value.lower() in str(row[0]).lower()]  # Assuming `row[0]` is "Inmueble"
+
+    # Update Treeview
+    update_treeview(my_tree, filtered_data)
