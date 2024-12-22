@@ -4,6 +4,7 @@ from PIL import ImageTk, Image
 from login_fun import login
 from menu import menu
 from consulta_general import consulta
+from inmuebles import inmuebles
 
 # Configuración de CustomTkinter
 ctk.set_appearance_mode("dark")
@@ -17,11 +18,6 @@ window = ctk.CTk()
 window.title("Menu")
 window.geometry("1080x720")
 
-consulta(window, menu)
-# login(window)
-
-
-# Close the window after 5 seconds (5000 milliseconds)
-# close_after_timeout(window, 40000)
+inmuebles(window, menu)
 
 window.mainloop()

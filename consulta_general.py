@@ -1,9 +1,7 @@
 import customtkinter as ctk
 from menubar import menubar
 from functions import * 
-from calendario import open_calendar_popup
 from calendario import create_date_range_selector
-from rectangle import rectangle
 from tkinter import ttk
 from rango_fecha import *
 
@@ -15,10 +13,12 @@ column_switches_created = False
 
 def display_column_switches(top_frame4, treeview, original_data):
     
-    poppins12 = ("Poppins", 12, "bold")
+    poppins12 = ("Poppins", 12, "bold")    
 
     global column_switches_created
+    column_switches_created = False
     if column_switches_created:
+        print("Alredy exist")
         return  # Skip if already created
 
     # Frame to hold switches
@@ -143,12 +143,15 @@ def toggle_top_frame_visibility(frame_to_show, frame_to_hide):
     if frame_to_show.winfo_ismapped():
         frame_to_show.pack_forget()  # Hide it
     else:
-        frame_to_show.pack(fill="x", padx=10, pady=5, after=top_frame2)  # Show it
-        frame_to_hide.pack_forget()  # Hide the other frame
+        frame_to_show.pack(fill="x", padx=10, pady=5, after=top_frame2)  # Show it after top_frame2
+        frame_to_hide.pack_forget() 
 
 def consulta(window, last_window):
     for widget in window.winfo_children():
         widget.destroy()
+
+    global search_filter_created
+    search_filter_created = False
 
     ctk.set_appearance_mode('dark')
     ctk.set_default_color_theme('dark-blue')
@@ -200,13 +203,13 @@ def consulta(window, last_window):
     show_filter_btn = ctk.CTkButton(top_frame2, text="Show Filter", width=100, font=poppins14bold, command=lambda: toggle_top_frame_visibility(top_frame4, top_frame3))
     show_filter_btn.pack(padx=10, pady=5, side="left")
 
-    # Add search filter UI to top_frame3
-    display_search_filter(top_frame3, my_tree, original_data)
-
     # Add column switch UI to top_frame4
     display_column_switches(top_frame4, my_tree, original_data)
 
-    create_date_range_selector(top_frame4, searchbtn, my_tree, original_data)
+    searchbtn = display_search_filter(top_frame3, my_tree, original_data)
+    print(type(searchbtn)) 
+
+    # create_date_range_selector(top_frame4, searchbtn, my_tree, original_data)
 
 def display_search_filter(frame, my_tree, original_data):
     global search_filter_created
@@ -219,7 +222,6 @@ def display_search_filter(frame, my_tree, original_data):
 
     current_widgets = {"frame": None}
 
-    global searchbtn
     searchbtn = ctk.CTkButton(top_frame3, text="Buscar", font=poppins12, width=70)
     searchbtn.pack_forget()
 
@@ -274,6 +276,7 @@ def display_search_filter(frame, my_tree, original_data):
         switches[label] = switch
 
     search_filter_created = True
+    return searchbtn
 
 def bottom_treeview(frame):
     # Treeview frame

@@ -32,14 +32,11 @@ def ifasignar(bottom_frame):
         inmueblecod_frame = ctk.CTkFrame(frame_left)
         inmueblecod_frame.pack(padx=10, pady=5, fill="x")
 
-        monto1_frame = ctk.CTkFrame(frame_left)
-        monto1_frame.pack(padx=10, pady=5, fill="x")
+        uso_frame = ctk.CTkFrame(frame_left)
+        uso_frame.pack(padx=10, pady=5, fill="x")
 
-        monto2_frame = ctk.CTkFrame(frame_left)
-        monto2_frame.pack(padx=10, pady=5, fill="x")
-
-        fecha_frame = ctk.CTkFrame(frame_left)
-        fecha_frame.pack(padx=10, pady=5,fill="x")
+        sector_frame = ctk.CTkFrame(frame_left)
+        sector_frame.pack(padx=10, pady=5, fill="x")
 
         # Entrys del frame contribuyente
 
@@ -49,23 +46,59 @@ def ifasignar(bottom_frame):
         contribuyentenombre = ctk.CTkEntry(contribuyentenombre_frame, placeholder_text="Contribuyente", font=poppins14bold, width=250)
         contribuyentenombre.pack(pady=5, padx=5, side="left")
 
-        valuesinmuebles = ["Inmuebles"]
-        inmueble = ctk.CTkOptionMenu(inmueble_frame, values=valuesinmuebles, font=poppins14bold)
+        ########################################################
+        def autofill_nombre_apellido(event):
+            ci = contribuyenteci.get().strip()
+            if not ci:
+                return
+
+            try:
+                with connection() as conn:
+                    cursor = conn.cursor()
+                    cursor.execute(
+                        "SELECT nombres, apellidos FROM contribuyentes WHERE ci_contribuyente = ?",
+                        (ci,)
+                    )
+                    result = cursor.fetchone()
+                    if result:
+                        # Concatenate nombre and apellido
+                        full_name = f"{result[0]} {result[1]}"
+                        contribuyentenombre.delete(0, 'end')
+                        contribuyentenombre.insert(0, full_name)  # Set full name
+                    else:
+                        # Clear field if no match
+                        contribuyentenombre.delete(0, 'end')
+            except Exception as e:
+                print(f"Error fetching contribuyente data: {e}")
+            # Bind the function to contribuyenteci
+        contribuyenteci.bind("<FocusOut>", autofill_nombre_apellido) 
+        ########################################################
+
+        inmueble = ctk.CTkEntry(inmueble_frame,placeholder_text="Inmueble", font=poppins14bold, width=250)
         inmueble.pack(padx=5, pady=5, side="left")
 
         inmueblecod = ctk.CTkEntry(inmueblecod_frame, placeholder_text="Codigo Catastral", font=poppins14bold, width=250)
         inmueblecod.pack(pady=5, padx=5, side="left")
 
-        monto1 = ctk.CTkEntry(monto1_frame, placeholder_text="Monto 1", font=poppins14bold, width=250)
-        monto1.pack(pady=5, padx=5, side="left")
+        usovalues = ["Comercial", "Residencial"]
+        uso = ctk.CTkOptionMenu(uso_frame, values=usovalues, font=poppins14bold, width=250)
+        uso.pack(pady=5, padx=5, side="left")
 
-        monto2 = ctk.CTkEntry(monto2_frame, placeholder_text="Monto 2", font=poppins14bold, width=250)
-        monto2.pack(pady=5, padx=5, side="left")
 
-        fecha = ctk.CTkEntry(fecha_frame, placeholder_text="Fecha Liquidacion", font=poppins14bold, width=250)
-        fecha.pack(pady=5, padx=5, side="left")
+        try:
+            with connection() as conn:
+                cursor = conn.cursor()
+                cursor.execute("SELECT nom_sector FROM sectores")
+                sector_results = cursor.fetchall()
+                sector_names = [row[0] for row in sector_results]
+                sector.configure(values=sector_names)  # Update dropdown options
+        except Exception as e:
+            print(f"Error loading sectors: {e}")
 
-        btnsave = ctk.CTkButton(frame_left, text="Guardar", command=lambda: print("Aca la funcion guardar"), font=poppins14bold)
+        sector = ctk.CTkOptionMenu(sector_frame, values=sector_names, font=poppins14bold, width=250)
+        sector.pack(pady=5, padx=5, side="left")
+
+        btnsave = ctk.CTkButton(frame_left, text="Guardar", command=lambda: asginarinmueble(contribuyenteci, contribuyentenombre, inmueble, inmueblecod, uso, sector), font=poppins14bold)
         btnsave.pack(padx=10, pady=10, anchor="e", side="bottom")
 
         # Fin del contenido del left frame #########################################################################
@@ -103,7 +136,7 @@ def ifasignar(bottom_frame):
             with connection() as conn:
                 print("Database connection established.")
                 cursor = conn.cursor()
-                sql = 'SELECT * FROM liquidaciones'
+                sql = 'SELECT * FROM inmuebles'
                 cursor.execute(sql)
                 results = cursor.fetchall()
                 print(f"Query executed successfully, fetched results: {results}")
@@ -116,10 +149,64 @@ def ifasignar(bottom_frame):
             print(f"Error during database operation: {e}")
 
 
-        # FIN del Contenido del RIGHT FRAME
+        def asginarinmueble(contribuyenteci, contribuyentenombre, inmueble, inmueblecod, uso, sector):
+    # Get values from entry fields
+            contribuyenteci = contribuyenteci.get()
+            contribuyentenombre = contribuyentenombre.get()
+            inmueble = inmueble.get()
+            inmueblecod = inmueblecod.get()
+            uso = uso.get()
+            sector = sector.get()
 
+            if not (contribuyenteci and contribuyentenombre and inmueble and inmueblecod and uso and sector):
+                print("Please fill in all fields.")
+                return
+
+            try:
+                with connection() as conn:
+                    cursor = conn.cursor()
+
+                    # Step 1: Get `id_contribuyente` from `contribuyentes` table
+                    cursor.execute(
+                        "SELECT id_contribuyente FROM contribuyentes WHERE ci_contribuyente = ? AND nombres = ?",
+                        (contribuyenteci, contribuyentenombre)
+                    )
+                    contribuyente_result = cursor.fetchone()
+                    if contribuyente_result:
+                        id_contribuyente = contribuyente_result[0]
+                    else:
+                        print("Contribuyente not found.")
+                        return
+
+                    # Step 2: Get `id_sector` from `sectores` table
+                    cursor.execute(
+                        "SELECT id_sector FROM sectores WHERE nom_sector = ?",
+                        (sector,)
+                    )
+                    sector_result = cursor.fetchone()
+                    if sector_result:
+                        id_sector = sector_result[0]
+                    else:
+                        print("Sector not found.")
+                        return
+
+                    # Step 3: Insert into `inmuebles` table
+                    sql = '''
+                    INSERT INTO inmuebles (nom_inmueble, cod_catastral, uso, id_contribuyente, id_sector)
+                    VALUES (?, ?, ?, ?, ?)
+                    '''
+                    cursor.execute(sql, (inmueble, inmueblecod, uso, id_contribuyente, id_sector))
+                    conn.commit()
+                    print("Inmueble successfully assigned!")
+                    # Inside asignarinmueble
+                    reload_treeview(my_tree)
+
+                    
+
+            except Exception as e:
+                print(f"Error: {e}")
+# FIN del Contenido del RIGHT FRAME
 def ifgestionar(bottom_frame):
-
     poppins14bold = ("Poppins", 14, "bold")
 
     for widget in bottom_frame.winfo_children():
@@ -143,14 +230,13 @@ def ifgestionar(bottom_frame):
     inmueblecod_frame = ctk.CTkFrame(frame_left)
     inmueblecod_frame.pack(padx=10, pady=5, fill="x")
 
-    monto1_frame = ctk.CTkFrame(frame_left)
-    monto1_frame.pack(padx=10, pady=5, fill="x")
+    uso_frame = ctk.CTkFrame(frame_left)
+    uso_frame.pack(padx=10, pady=5, fill="x")
 
-    monto2_frame = ctk.CTkFrame(frame_left)
-    monto2_frame.pack(padx=10, pady=5, fill="x")
+    sector_frame = ctk.CTkFrame(frame_left)
+    sector_frame.pack(padx=10, pady=5, fill="x")
 
-    fecha_frame = ctk.CTkFrame(frame_left)
-    fecha_frame.pack(padx=10, pady=5, fill="x")
+    # Entrys del frame contribuyente
 
     contribuyenteci = ctk.CTkEntry(contribuyenteci_frame, placeholder_text="Cedula Contribuyente", font=poppins14bold, width=250)
     contribuyenteci.pack(pady=5, padx=5, side="left")
@@ -158,24 +244,36 @@ def ifgestionar(bottom_frame):
     contribuyentenombre = ctk.CTkEntry(contribuyentenombre_frame, placeholder_text="Contribuyente", font=poppins14bold, width=250)
     contribuyentenombre.pack(pady=5, padx=5, side="left")
 
-    valuesinmuebles = ["Inmuebles"]
-    inmueble = ctk.CTkOptionMenu(inmueble_frame, values=valuesinmuebles, font=poppins14bold)
+    inmueble = ctk.CTkEntry(inmueble_frame, placeholder_text="Inmueble", font=poppins14bold, width=250)
     inmueble.pack(padx=5, pady=5, side="left")
 
     inmueblecod = ctk.CTkEntry(inmueblecod_frame, placeholder_text="Codigo Catastral", font=poppins14bold, width=250)
     inmueblecod.pack(pady=5, padx=5, side="left")
 
-    monto1 = ctk.CTkEntry(monto1_frame, placeholder_text="Monto 1", font=poppins14bold, width=250)
-    monto1.pack(pady=5, padx=5, side="left")
+    usovalues = ["Comercial", "Residencial"]
+    uso = ctk.CTkOptionMenu(uso_frame, values=usovalues, font=poppins14bold, width=250)
+    uso.pack(pady=5, padx=5, side="left")
 
-    monto2 = ctk.CTkEntry(monto2_frame, placeholder_text="Monto 2", font=poppins14bold, width=250)
-    monto2.pack(pady=5, padx=5, side="left")
+    valuesector = ["Sector"]
+    sector = ctk.CTkOptionMenu(sector_frame, values=valuesector, font=poppins14bold, width=250)
+    sector.pack(pady=5, padx=5, side="left")
 
-    fecha = ctk.CTkEntry(fecha_frame, placeholder_text="Fecha Liquidacion", font=poppins14bold, width=250)
-    fecha.pack(pady=5, padx=5, side="left")
+    selected_item = None  # Initialize selected_item
 
-    btnsave = ctk.CTkButton(frame_left, text="Guardar", command=lambda: print("Guardar Gestión"), font=poppins14bold)
+    def cancel_action():
+        contribuyenteci.delete(0, ctk.END)
+        contribuyentenombre.delete(0, ctk.END)
+        inmueble.delete(0, ctk.END)
+        inmueblecod.delete(0, ctk.END)
+        uso.set("")
+        sector.set("")
+        my_tree.bind("<ButtonRelease-1>", on_tree_select)
+
+    btnsave = ctk.CTkButton(frame_left, text="Guardar", command=lambda: save_changes(selected_item), font=poppins14bold)
     btnsave.pack(padx=10, pady=10, anchor="e", side="bottom")
+
+    btncancel = ctk.CTkButton(frame_left, text="Cancelar", command=lambda: cancel_action(), font=poppins14bold)
+    btncancel.pack(padx=10, pady=10, anchor="e", side="bottom")
 
     frame_tree = ctk.CTkFrame(frame_right, fg_color="white")
     frame_tree.pack(pady=10, padx=10, expand=True, fill="both")
@@ -187,7 +285,7 @@ def ifgestionar(bottom_frame):
     my_tree = ttk.Treeview(frame_tree, style="Custom.Treeview", show="headings")
     my_tree.pack(pady=10, padx=10, fill="both", expand=True)
 
-    my_tree["columns"] = ("CI", "Contribuyente", "Inmueble", "Codigo Catastral", "Monto 1", "Monto 2", "Fecha Liquidacion")
+    my_tree["columns"] = ("CI", "Contribuyente", "Inmueble", "Codigo Catastral", "Uso", "Sector")
     for col in my_tree["columns"]:
         my_tree.heading(col, text=col.capitalize(), anchor="center")
         my_tree.column(col, anchor="center")
@@ -196,7 +294,7 @@ def ifgestionar(bottom_frame):
     try:
         with connection() as conn:
             cursor = conn.cursor()
-            sql = "SELECT * FROM liquidaciones"  # Modify table name as needed
+            sql = "SELECT ci_contribuyente, contribuyente, nom_inmueble, cod_catastral, uso, sector FROM inmuebles"  # Modify table name as needed
             cursor.execute(sql)
             results = cursor.fetchall()
             for row in results:
@@ -204,6 +302,57 @@ def ifgestionar(bottom_frame):
 
     except Exception as e:
         print(f"Error fetching data: {e}")
+
+    def on_tree_select(event):
+        nonlocal selected_item  # Use nonlocal to modify the outer variable
+        selected_item = my_tree.selection()[0]
+        values = my_tree.item(selected_item, "values")
+
+        contribuyenteci.delete(0, ctk.END)
+        contribuyenteci.insert(0, values[0])
+
+        contribuyentenombre.delete(0, ctk.END)
+        contribuyentenombre.insert(0, values[1])
+
+        inmueble.delete(0, ctk.END)
+        inmueble.insert(0, values[2])
+
+        inmueblecod.delete(0, ctk.END)
+        inmueblecod.insert(0, values[3])
+
+        uso.set(values[4])
+        sector.set(values[5])
+
+        my_tree.unbind("<ButtonRelease-1>")
+
+    def save_changes(selected_item):
+        new_values = (
+            contribuyenteci.get(),
+            contribuyentenombre.get(),
+            inmueble.get(),
+            inmueblecod.get(),
+            uso.get(),
+            sector.get()
+        )
+
+        try:
+            with connection() as conn:
+                cursor = conn.cursor()
+                sql = '''
+                UPDATE inmuebles
+                SET ci_contribuyente = ?, contribuyente = ?, nom_inmueble = ?, cod_catastral = ?, uso = ?, sector = ?
+                WHERE ci_contribuyente = ? AND cod_catastral = ?
+                '''
+                cursor.execute(sql, new_values + (my_tree.item(selected_item, "values")[0], my_tree.item(selected_item, "values")[3]))
+                conn.commit()
+                print("Changes saved successfully!")
+                reload_treeview(my_tree)
+                my_tree.bind("<ButtonRelease-1>", on_tree_select)
+
+        except Exception as e:
+            print(f"Error saving changes: {e}")
+
+    my_tree.bind("<ButtonRelease-1>", on_tree_select)
 
 def inmuebles(window, last_window):
     
@@ -216,7 +365,7 @@ def inmuebles(window, last_window):
     poppins30bold = ("Poppins", 30, "bold")
     poppins20bold = ("Poppins", 20, "bold")
     poppins14bold = ("Poppins", 14, "bold")
-    poppins12 = ("Poppins", 12)
+    poppins12 = ("Poppins", 12, "bold")
     
     menubar(window)
     
@@ -290,7 +439,6 @@ def inmuebles(window, last_window):
             sql = 'SELECT * FROM liquidaciones'
             cursor.execute(sql)
             results = cursor.fetchall()
-            print(f"Query executed successfully, fetched results: {results}")
 
             # Ensure data fits Treeview structure
             for row in results:
@@ -299,5 +447,20 @@ def inmuebles(window, last_window):
     except Exception as e:
         print(f"Error during database operation: {e}")
 
-    
+def reload_treeview(treeview):
+    try:
+        with connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM inmuebles")
+            results = cursor.fetchall()
+
+            # Clear existing rows
+            for row in treeview.get_children():
+                treeview.delete(row)
+
+            # Insert updated rows
+            for row in results:
+                treeview.insert("", "end", values=row)
+    except Exception as e:
+        print(f"Error refreshing Treeview: {e}")
 
