@@ -203,7 +203,201 @@ def ifasignar(bottom_frame):
 
 
 
-def ifgestionar(bottom_frame):
+# def ifgestionar(window, bottom_frame):
+#     poppins14bold = ("Poppins", 14, "bold")
+
+#     for widget in bottom_frame.winfo_children():
+#         widget.destroy()
+
+#     frame_left = ctk.CTkFrame(bottom_frame, corner_radius=15, width=300)
+#     frame_left.pack(padx=5, pady=5, side="left", fill="y")
+
+#     frame_right = ctk.CTkFrame(bottom_frame, corner_radius=15)
+#     frame_right.pack(padx=5, pady=5, side="right", fill="both", expand=True)
+
+#     contribuyenteci_frame = ctk.CTkFrame(frame_left)
+#     contribuyenteci_frame.pack(padx=10, pady=5, fill="x")
+
+#     contribuyentenombre_frame = ctk.CTkFrame(frame_left)
+#     contribuyentenombre_frame.pack(padx=10, pady=5, fill="x")
+
+#     inmueble_frame = ctk.CTkFrame(frame_left)
+#     inmueble_frame.pack(padx=10, pady=5, anchor="w")
+
+#     inmueblecod_frame = ctk.CTkFrame(frame_left)
+#     inmueblecod_frame.pack(padx=10, pady=5, fill="x")
+
+#     uso_frame = ctk.CTkFrame(frame_left)
+#     uso_frame.pack(padx=10, pady=5, fill="x")
+
+#     sector_frame = ctk.CTkFrame(frame_left)
+#     sector_frame.pack(padx=10, pady=5, fill="x")
+
+#     # Entrys del frame contribuyente
+
+#     contribuyenteci = ctk.CTkEntry(contribuyenteci_frame, placeholder_text="Cedula Contribuyente", font=poppins14bold, width=250)
+#     contribuyenteci.pack(pady=5, padx=5, side="left")
+
+#     contribuyentenombre = ctk.CTkEntry(contribuyentenombre_frame, placeholder_text="Contribuyente", font=poppins14bold, width=250)
+#     contribuyentenombre.pack(pady=5, padx=5, side="left")
+
+#     inmueble = ctk.CTkEntry(inmueble_frame, placeholder_text="Inmueble", font=poppins14bold, width=250)
+#     inmueble.pack(padx=5, pady=5, side="left")
+
+#     inmueblecod = ctk.CTkEntry(inmueblecod_frame, placeholder_text="Codigo Catastral", font=poppins14bold, width=250)
+#     inmueblecod.pack(pady=5, padx=5, side="left")
+
+#     usovalues = ["Comercial", "Residencial"]
+#     uso = ctk.CTkOptionMenu(uso_frame, values=usovalues, font=poppins14bold, width=250)
+#     uso.pack(pady=5, padx=5, side="left")
+
+#     valuesector = ["Sector"]
+#     sector = ctk.CTkOptionMenu(sector_frame, values=valuesector, font=poppins14bold, width=250)
+#     sector.pack(pady=5, padx=5, side="left")
+
+#     selected_item = None  # Initialize selected_item
+
+#     def cancel_action():
+#         contribuyenteci.delete(0, ctk.END)
+#         contribuyentenombre.delete(0, ctk.END)
+#         inmueble.delete(0, ctk.END)
+#         inmueblecod.delete(0, ctk.END)
+#         uso.set("")
+#         sector.set("")
+#         my_tree.bind("<ButtonRelease-1>", on_tree_select)
+
+#     def on_tree_select(event):
+#         nonlocal selected_item  # Use nonlocal to modify the outer variable
+#         selected_item = my_tree.selection()[0]
+#         values = my_tree.item(selected_item, "values")
+
+#         contribuyenteci.delete(0, ctk.END)
+#         contribuyenteci.insert(0, values[0])
+
+#         contribuyentenombre.delete(0, ctk.END)
+#         contribuyentenombre.insert(0, values[1])
+
+#         inmueble.delete(0, ctk.END)
+#         inmueble.insert(0, values[2])
+
+#         inmueblecod.delete(0, ctk.END)
+#         inmueblecod.insert(0, values[3])
+
+#         uso.set(values[4])
+#         sector.set(values[5])
+
+#         my_tree.unbind("<ButtonRelease-1>")
+
+#     def save_changes(selected_item):
+#         new_values = (
+#             contribuyenteci.get(),
+#             contribuyentenombre.get(),
+#             inmueble.get(),
+#             inmueblecod.get(),
+#             uso.get(),
+#             sector.get()
+#         )
+
+#         try:
+#             with connection() as conn:
+#                 cursor = conn.cursor()
+
+#                 # Get id_contribuyente from contribuyentes table
+#                 cursor.execute("SELECT id_contribuyente FROM contribuyentes WHERE ci_contribuyente = ?", (new_values[0],))
+#                 id_contribuyente = cursor.fetchone()[0]
+
+#                 # Get id_sector from sectores table
+#                 cursor.execute("SELECT id_sector FROM sectores WHERE nom_sector = ?", (new_values[5],))
+#                 id_sector = cursor.fetchone()[0]
+
+#                 sql = '''
+#                 UPDATE inmuebles
+#                 SET nom_inmueble = ?, cod_catastral = ?, uso = ?, id_contribuyente = ?, id_sector = ?
+#                 WHERE id_inmueble = ?
+#                 '''
+#                 cursor.execute(sql, (new_values[2], new_values[3], new_values[4], id_contribuyente, id_sector, selected_item))
+#                 conn.commit()
+#                 print("Changes saved successfully!")
+#                 reload_treeview(my_tree)
+#                 my_tree.bind("<ButtonRelease-1>", on_tree_select)
+
+#         except Exception as e:
+#             print(f"Error saving changes: {e}")
+
+#     def delete_record(selected_item):
+#         try:
+#             with connection() as conn:
+#                 cursor = conn.cursor()
+#                 cursor.execute("DELETE FROM inmuebles WHERE id_inmueble = ?", (selected_item,))
+#                 conn.commit()
+#                 print("Record deleted successfully!")
+#                 reload_treeview(my_tree)
+#         except Exception as e:
+#             print(f"Error deleting record: {e}")
+
+#     def confirm_delete():
+#         if selected_item:
+#             confirm = ctk.CTkToplevel(window)
+#             confirm.title("Confirm Delete")
+#             confirm.geometry("300x150")
+
+#             label = ctk.CTkLabel(confirm, text="Are you sure you want to delete this record?", font=poppins14bold)
+#             label.pack(pady=20)
+
+#             btn_yes = ctk.CTkButton(confirm, text="Yes", command=lambda: [delete_record(selected_item), confirm.destroy()], font=poppins14bold)
+#             btn_yes.pack(side="left", padx=20, pady=20)
+
+#             btn_no = ctk.CTkButton(confirm, text="No", command=confirm.destroy, font=poppins14bold)
+#             btn_no.pack(side="right", padx=20, pady=20)
+
+#     btnsave = ctk.CTkButton(frame_left, text="Guardar", command=lambda: save_changes(selected_item), font=poppins14bold)
+#     btnsave.pack(padx=10, pady=10, anchor="e", side="bottom")
+
+#     btncancel = ctk.CTkButton(frame_left, text="Cancelar", command=cancel_action, font=poppins14bold)
+#     btncancel.pack(padx=10, pady=10, anchor="e", side="bottom")
+
+    
+
+#     btndelete = ctk.CTkButton(frame_left, text="Eliminar", command=confirm_delete, font=poppins14bold)
+#     btndelete.pack(padx=10, pady=10, anchor="e", side="bottom")
+
+#     frame_tree = ctk.CTkFrame(frame_right, fg_color="white")
+#     frame_tree.pack(pady=10, padx=10, expand=True, fill="both")
+
+#     style = ttk.Style()
+#     style.configure("Custom.Treeview", font=("Poppins", 12), rowheight=25)
+#     style.configure("Custom.Treeview.Heading", font=("Poppins", 14, "bold"))
+
+#     my_tree = ttk.Treeview(frame_tree, style="Custom.Treeview", show="headings")
+#     my_tree.pack(pady=10, padx=10, fill="both", expand=True)
+
+#     my_tree["columns"] = ("CI", "Contribuyente", "Inmueble", "Codigo Catastral", "Uso", "Sector")
+#     for col in my_tree["columns"]:
+#         my_tree.heading(col, text=col.capitalize(), anchor="center")
+#         my_tree.column(col, anchor="center")
+
+#     # Fetch data to populate Treeview
+#     try:
+#         with connection() as conn:
+#             cursor = conn.cursor()
+#             sql = """
+#             SELECT i.id_inmueble, c.ci_contribuyente, c.nombres || ' ' || c.apellidos AS contribuyente, i.nom_inmueble, i.cod_catastral, i.uso, s.nom_sector AS sector
+#             FROM inmuebles i
+#             JOIN contribuyentes c ON i.id_contribuyente = c.id_contribuyente
+#             JOIN sectores s ON i.id_sector = s.id_sector
+#             """
+#             cursor.execute(sql)
+#             results = cursor.fetchall()
+#             for row in results:
+#                 my_tree.insert("", "end", iid=row[0], values=row[1:])
+
+#     except Exception as e:
+#         print(f"Error fetching data: {e}")
+
+#     my_tree.bind("<ButtonRelease-1>", on_tree_select)
+
+
+def ifgestionar(window, bottom_frame):
     poppins14bold = ("Poppins", 14, "bold")
 
     for widget in bottom_frame.winfo_children():
@@ -315,7 +509,7 @@ def ifgestionar(bottom_frame):
                 SET nom_inmueble = ?, cod_catastral = ?, uso = ?, id_contribuyente = ?, id_sector = ?
                 WHERE id_inmueble = ?
                 '''
-                cursor.execute(sql, (new_values[2], new_values[3], new_values[4], id_contribuyente, id_sector, my_tree.item(selected_item, "values")[0]))
+                cursor.execute(sql, (new_values[2], new_values[3], new_values[4], id_contribuyente, id_sector, selected_item))
                 conn.commit()
                 print("Changes saved successfully!")
                 reload_treeview(my_tree)
@@ -324,11 +518,46 @@ def ifgestionar(bottom_frame):
         except Exception as e:
             print(f"Error saving changes: {e}")
 
+    def delete_record(selected_item):
+        try:
+            with connection() as conn:
+                cursor = conn.cursor()
+                cursor.execute("DELETE FROM inmuebles WHERE id_inmueble = ?", (selected_item,))
+                conn.commit()
+                print("Record deleted successfully!")
+                reload_treeview(my_tree)
+                reset_selection()
+        except Exception as e:
+            print(f"Error deleting record: {e}")
+
+    def confirm_delete():
+        if selected_item:
+            confirm = ctk.CTkToplevel(window)
+            confirm.title("Confirm Delete")
+            confirm.geometry("300x150")
+
+            label = ctk.CTkLabel(confirm, text="Are you sure you want to delete this record?", font=poppins14bold)
+            label.pack(pady=20)
+
+            btn_yes = ctk.CTkButton(confirm, text="Yes", command=lambda: [delete_record(selected_item), confirm.destroy()], font=poppins14bold)
+            btn_yes.pack(side="left", padx=20, pady=20)
+
+            btn_no = ctk.CTkButton(confirm, text="No", command=confirm.destroy, font=poppins14bold)
+            btn_no.pack(side="right", padx=20, pady=20)
+
+    def reset_selection():
+        nonlocal selected_item
+        selected_item = None
+        my_tree.bind("<ButtonRelease-1>", on_tree_select)
+
     btnsave = ctk.CTkButton(frame_left, text="Guardar", command=lambda: save_changes(selected_item), font=poppins14bold)
     btnsave.pack(padx=10, pady=10, anchor="e", side="bottom")
 
     btncancel = ctk.CTkButton(frame_left, text="Cancelar", command=cancel_action, font=poppins14bold)
     btncancel.pack(padx=10, pady=10, anchor="e", side="bottom")
+
+    btndelete = ctk.CTkButton(frame_left, text="Eliminar", command=confirm_delete, font=poppins14bold)
+    btndelete.pack(padx=10, pady=10, anchor="e", side="bottom")
 
     frame_tree = ctk.CTkFrame(frame_right, fg_color="white")
     frame_tree.pack(pady=10, padx=10, expand=True, fill="both")
@@ -346,26 +575,9 @@ def ifgestionar(bottom_frame):
         my_tree.column(col, anchor="center")
 
     # Fetch data to populate Treeview
-    try:
-        with connection() as conn:
-            cursor = conn.cursor()
-            sql = """
-            SELECT c.ci_contribuyente, c.nombres || ' ' || c.apellidos AS contribuyente, i.nom_inmueble, i.cod_catastral, i.uso, s.nom_sector AS sector
-            FROM inmuebles i
-            JOIN contribuyentes c ON i.id_contribuyente = c.id_contribuyente
-            JOIN sectores s ON i.id_sector = s.id_sector
-            """
-            cursor.execute(sql)
-            results = cursor.fetchall()
-            for row in results:
-                my_tree.insert("", "end", values=row)
-
-    except Exception as e:
-        print(f"Error fetching data: {e}")
+    reload_treeview(my_tree)
 
     my_tree.bind("<ButtonRelease-1>", on_tree_select)
-
-
 
 def inmuebles(window, last_window):
     
@@ -401,17 +613,17 @@ def inmuebles(window, last_window):
 
     #Contenido del top frame 2
 
-    crearliq = ctk.CTkButton(top_frame2, text="Asignar", command=lambda: ifasignar(bottom_frame), font=poppins14bold)
-    crearliq.pack(padx=5, pady=5, side="left")
+    crearinm = ctk.CTkButton(top_frame2, text="Asignar", command=lambda: ifasignar(bottom_frame), font=poppins14bold)
+    crearinm.pack(padx=5, pady=5, side="left")
 
-    gestionarliq = ctk.CTkButton(top_frame2, text="Gestionar", command=lambda: ifgestionar(bottom_frame), font=poppins14bold)
-    gestionarliq.pack(padx=5, pady=5, side="left")
+    gestionarinm = ctk.CTkButton(top_frame2, text="Gestionar", command=lambda: ifgestionar(window, bottom_frame), font=poppins14bold)
+    gestionarinm.pack(padx=5, pady=5, side="left")
 
-    eliminarliq = ctk.CTkButton(top_frame2, text="Eliminar", command=lambda: print("Example"), font=poppins14bold)
-    eliminarliq.pack(padx=5, pady=5, side="left")
+    busquedabtn = ctk.CTkButton(top_frame2, text="Buscar", font=poppins14bold, width=80, command=lambda: reload_treeviewsearch(my_tree, busquedainm))
+    busquedabtn.pack(padx=5, pady=5, side="right")
 
-    busquedaliq = ctk.CTkEntry(top_frame2, placeholder_text="Buscar por cedula", font=poppins14bold, width=200)
-    busquedaliq.pack(padx=5, pady=5, side="right")
+    busquedainm = ctk.CTkEntry(top_frame2, placeholder_text="Buscar por cedula", font=poppins14bold, width=200)
+    busquedainm.pack(padx=5, pady=5, side="right")
 
     #Contenido del bottom frame
 
@@ -463,19 +675,70 @@ def inmuebles(window, last_window):
                 my_tree.insert("", "end", values=row)
 
     except Exception as e:
+
         print(f"Error during database operation: {e}")
 
+    return window
+
+# def reload_treeview(treeview):
+#     try:
+#         with connection() as conn:
+#             cursor = conn.cursor()
+#             cursor.execute('''
+#             SELECT c.ci_contribuyente, c.nombres || ' ' || c.apellidos AS contribuyente, i.nom_inmueble, i.cod_catastral, i.uso, s.nom_sector AS sector
+#             FROM inmuebles i
+#             JOIN contribuyentes c ON i.id_contribuyente = c.id_contribuyente
+#             JOIN sectores s ON i.id_sector = s.id_sector
+#             ''')
+#             results = cursor.fetchall()
+
+#             # Clear existing rows
+#             for row in treeview.get_children():
+#                 treeview.delete(row)
+
+#             # Insert updated rows
+#             for row in results:
+#                 treeview.insert("", "end", values=row)
+#     except Exception as e:
+#         print(f"Error refreshing Treeview: {e}")
 
 def reload_treeview(treeview):
     try:
         with connection() as conn:
             cursor = conn.cursor()
-            cursor.execute('''
+            sql = """
+            SELECT i.id_inmueble, c.ci_contribuyente, c.nombres || ' ' || c.apellidos AS contribuyente, i.nom_inmueble, i.cod_catastral, i.uso, s.nom_sector AS sector
+            FROM inmuebles i
+            JOIN contribuyentes c ON i.id_contribuyente = c.id_contribuyente
+            JOIN sectores s ON i.id_sector = s.id_sector
+            """
+            cursor.execute(sql)
+            results = cursor.fetchall()
+
+            # Clear existing rows
+            for row in treeview.get_children():
+                treeview.delete(row)
+
+            # Insert updated rows
+            for row in results:
+                treeview.insert("", "end", iid=row[0], values=row[1:])
+
+    except Exception as e:
+        print(f"Error fetching data: {e}")
+
+def reload_treeviewsearch(treeview, ci):
+    ci = ci.get()
+    try:
+        with connection() as conn:
+            cursor = conn.cursor()
+            sql = ''' 
             SELECT c.ci_contribuyente, c.nombres || ' ' || c.apellidos AS contribuyente, i.nom_inmueble, i.cod_catastral, i.uso, s.nom_sector AS sector
             FROM inmuebles i
             JOIN contribuyentes c ON i.id_contribuyente = c.id_contribuyente
             JOIN sectores s ON i.id_sector = s.id_sector
-            ''')
+            WHERE c.ci_contribuyente = ?
+            '''
+            cursor.execute(sql,(ci,))
             results = cursor.fetchall()
 
             # Clear existing rows
