@@ -1,31 +1,70 @@
 import customtkinter as ctk
-from tkinter import Menu
+import tkinter as tk
 
 # Function to create the toolbar menu
 def menubar(window):
     
-    # Create a Menu Bar with black background
-    menu_bar = Menu(window, bg="black", fg="white")
+    
 
-    # Menu Menu (replaces File)
-    menu_menu = Menu(menu_bar, tearoff=0, bg="black", fg="white")
-    menu_menu.add_separator()
-    menu_menu.add_command(label="Salir del programa", command=window.quit)
+    poppins12bold = ("Poppins", 12)
 
-    # Config Menu (replaces Edit)
-    config_menu = Menu(menu_bar, tearoff=0, bg="black", fg="white")
-    config_menu.add_separator()
-    config_menu.add_command(label="Preferencias", command=lambda: print("Preferences"))
+    
+    fg="#202020"
+    fg2="#d10000"
+    # Crear el marco superior que simula el menubar
+    menubar_frame = ctk.CTkFrame(window, height=30, corner_radius=0, fg_color=fg)
+    menubar_frame.pack(fill="x", side="top")
 
-    # Soporte Menu (replaces Help)
-    soporte_menu = Menu(menu_bar, tearoff=0, bg="black", fg="white")
-    soporte_menu.add_command(label="Contactar Soporte", command=lambda: print("Contact Support"))
-    soporte_menu.add_command(label="FAQ", command=lambda: print("FAQ"))
+    # Botón "Menu"
+    menu_button = ctk.CTkButton(
+        menubar_frame,
+        text="Menu",
+        font= poppins12bold,
+        width=100,
+        fg_color=fg,
+        hover_color="gray",
+        text_color="white",
+        command=lambda: print("Menu clicked")
+    )
+    menu_button.pack(side="left", padx=5, pady=5)
 
-    # Add Menus to the Menu Bar
-    menu_bar.add_cascade(label="Menu", menu=menu_menu)
-    menu_bar.add_cascade(label="Configuracion", menu=config_menu)
-    menu_bar.add_cascade(label="Soporte", menu=soporte_menu)
+    # Botón "Configuracion"
+    config_button = ctk.CTkButton(
+        menubar_frame,
+        text="Configuracion",
+        font= poppins12bold,
+        width=120,
+        fg_color=fg,
+        hover_color="gray",
+        text_color="white",
+        command=lambda: print("Configuracion clicked")
+    )
+    config_button.pack(side="left", padx=5, pady=5)
 
-    # Attach the Menu Bar to the window
-    window.config(menu=menu_bar)
+    # Botón "Soporte"
+    support_button = ctk.CTkButton(
+        menubar_frame,
+        text="Soporte",
+        font= poppins12bold,
+        width=100,
+        fg_color=fg,
+        hover_color="gray",
+        text_color="white",
+        command=lambda: print("Soporte clicked")
+    )
+    support_button.pack(side="left", padx=5, pady=5)
+
+    # Botón "Salir"
+    exit_button = ctk.CTkButton(
+        menubar_frame,
+        text="Cerrar sesión",
+        font= poppins12bold,
+        width=100,
+        fg_color=fg,
+        hover_color="darkred",
+        text_color="white",
+        command=window.quit
+    )
+    exit_button.pack(side="right", padx=5, pady=5)
+    
+    

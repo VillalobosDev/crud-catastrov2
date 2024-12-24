@@ -18,6 +18,6 @@ window = ctk.CTk()
 window.title("Menu")
 window.geometry("1080x720")
 
-inmuebles(window, menu)
-
+# inmuebles(window, menu)
+menu(window)
 window.mainloop()
