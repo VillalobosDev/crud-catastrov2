@@ -3,7 +3,11 @@ from menubar import menubar
 from functions import * 
 from calendario import create_date_range_selector
 from tkinter import ttk
+from tkinter import filedialog
 from rango_fecha import *
+from openpyxl import Workbook
+from tkinter import messagebox
+import tkinter
 
 # Global flags
 search_filter_shown = False
@@ -208,6 +212,9 @@ def consulta(window, last_window):
 
     searchbtn = display_search_filter(top_frame3, my_tree, original_data)
     print(type(searchbtn)) 
+
+    export = ctk.CTkButton(bottom_frame2, text="Exportar a Excel", font=poppins12, command=lambda: export_treeview_to_xlsx(my_tree, "consulta_general.xlsx"))
+    export.pack(side="right", padx=10, pady=5)
 
     # create_date_range_selector(top_frame4, searchbtn, my_tree, original_data)
 
@@ -415,3 +422,27 @@ def inmueble_search(my_tree, original_data, inmueble_entry):
 
     # Update Treeview
     update_treeview(my_tree, filtered_data)
+
+def export_treeview_to_xlsx(treeview, filename):
+    # Create a new workbook and select the active worksheet
+
+    filename = filedialog.asksaveasfilename(defaultextension=".xlsx", filetypes=[("Excel files", "*.xlsx"), ("All files", "*.*")])
+    if not filename:
+        tkinter.messagebox.showinfo("Export Cancelled", "Debe elegir un nombre de archivo para exportar los datos.")
+        return
+
+    workbook = Workbook()
+    sheet = workbook.active
+
+    # Get the column headings from the Treeview
+    headings = treeview["columns"]
+    sheet.append(headings)  # Append headings as the first row
+
+    # Iterate through the Treeview items and append them to the worksheet
+    for item in treeview.get_children():
+        row = treeview.item(item)["values"]
+        sheet.append(row)
+
+    # Save the workbook to the specified filename
+    workbook.save(filename)
+    print(f"Data exported to {filename} successfully.")

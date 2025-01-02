@@ -6,6 +6,7 @@ from menu import menu
 from consulta_general import consulta
 from inmuebles import inmuebles
 from liquidacion import liquidacion
+from contribuyentes import contribuyentes
 
 # Configuración de CustomTkinter
 ctk.set_appearance_mode("dark")
@@ -19,7 +20,7 @@ window = ctk.CTk()
 window.title("Menu")
 window.geometry("1080x720")
 
-liquidacion(window, menu)
+contribuyentes(window, menu)
 # inmuebles(window, menu)
 
 window.mainloop()
