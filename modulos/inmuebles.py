@@ -1,8 +1,8 @@
 import customtkinter as ctk
-from menubar import menubar
-from functions import * 
+from .menubar import menubar
+from functions.functions import * 
 from tkinter import ttk
-from rectangle import rectangle
+from functions.rectangle import rectangle
 
 def inmuebles(window, last_window):
     global busquedabtn, busquedainm

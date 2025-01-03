@@ -1,10 +1,10 @@
 import customtkinter as ctk
 import tkinter as tk
-from menubar import menubar
-from contribuyentes import contribuyentes
-from inmuebles import inmuebles
-from liquidacion import liquidacion
-from consulta_general import consulta
+from modulos.menubar import menubar
+from modulos.contribuyentes import contribuyentes
+from modulos.inmuebles import inmuebles
+from modulos.liquidacion import liquidacion
+from modulos.consulta_general import consulta
 from PIL import Image, ImageTk
 
 

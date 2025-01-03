@@ -1,5 +1,5 @@
 from datetime import datetime
-from functions import connection
+from functions.functions import connection
 
 def rango_fecha_search(my_tree, original_data, start_date, end_date):
     """Filter treeview data based on Date Range (Rango Fecha) via DB query."""

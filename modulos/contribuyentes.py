@@ -1,13 +1,10 @@
 import customtkinter as ctk
 import tkinter as tk
-from menubar import menubar
-from functions import * 
+from modulos.menubar import menubar
+from functions.functions import * 
 from tkinter import ttk, messagebox
-from rectangle import rectangle
+from functions.rectangle import rectangle
 import tkinter
-
-
-
 
 
 def ifagregar(bottom_frame, top_frame2):
@@ -30,7 +27,7 @@ def ifagregar(bottom_frame, top_frame2):
     frame_right = ctk.CTkFrame(bottom_frame, corner_radius=15)
     frame_right.pack(padx=5, pady=5, side="right", fill="both", expand=True)
 
-    text = ctk.CTkLabel(frame_left, text="Nuevo Contribuyente",font=poppins14bold,width=250)
+    text = ctk.CTkLabel(frame_left, text="Nuevo Contribuyente", font=poppins14bold, width=250)
     text.pack(padx=10, pady=10)
 
     # Contenido del frame left
@@ -88,10 +85,6 @@ def ifagregar(bottom_frame, top_frame2):
 
     correo = ctk.CTkEntry(correo_frame, placeholder_text="ejemplo@gmail.com", font=poppins14bold, width=250)
     correo.pack(pady=5, padx=5, side="left")
-    
-
-    
-    
 
     def cargar_datos():
         for item in my_tree.get_children():
@@ -100,7 +93,7 @@ def ifagregar(bottom_frame, top_frame2):
         try:
             with connection() as conn:
                 cursor = conn.cursor()
-                sql = 'SELECT id_contribuyente, nombres, apellidos, ci_contribuyente, rif, telefono, correo FROM contribuyentes'
+                sql = 'SELECT id_contribuyente, nombres, apellidos, v_e || "-" || ci_contribuyente AS cedula_completa, j_c_g || "-" || rif AS rif_completo, telefono, correo FROM contribuyentes'
                 cursor.execute(sql)
                 results = cursor.fetchall()
                 for row in results:
@@ -109,34 +102,32 @@ def ifagregar(bottom_frame, top_frame2):
             print(f"Error during database operation: {e}")
 
     def guardar_datos():
-        
-        
-
         try:
             with connection() as conn:
                 cursor = conn.cursor()
-                cedula_completa = f"{cedula_indicator.get()}-{cedula.get()}"
                 
                 # Verificar si la cédula ya existe
-                cursor.execute("SELECT COUNT(*) FROM contribuyentes WHERE ci_contribuyente = ?", (cedula_completa,))
+                cursor.execute("SELECT COUNT(*) FROM contribuyentes WHERE ci_contribuyente = ?", (cedula.get(),))
                 if cursor.fetchone()[0] > 0:
                     text = ctk.CTkLabel(frame_left, text="La cédula de identidad ya existe", text_color="red", font=poppins14bold)
                     text.place(x=20, y=430)
                     return
                 
-                sql = """INSERT INTO contribuyentes (nombres, apellidos, ci_contribuyente, rif, telefono, correo)
-                        VALUES (?, ?, ?, ?, ?, ?)"""
+                sql = """INSERT INTO contribuyentes (nombres, apellidos, v_e, ci_contribuyente, j_c_g, rif, telefono, correo)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?)"""
                 datos = (
                     nombre.get(),
                     apellido.get(),
-                    cedula_completa,
-                    f"{rif_indicator.get()}-{rif.get()}",
+                    cedula_indicator.get(), 
+                    cedula.get(),
+                    rif_indicator.get(),
+                    rif.get(),
                     telefono.get(),
                     correo.get()
                 )
                 cursor.execute(sql, datos)
                 conn.commit()                        
-                text = ctk.CTkLabel(frame_left, text="Contribuyente agregado", text_color="green", font=poppins14bold,width=250)
+                text = ctk.CTkLabel(frame_left, text="Contribuyente agregado", text_color="green", font=poppins14bold, width=250)
                 text.place(x=10, y=430)
                 cargar_datos()  # Llamar a la función para actualizar el Treeview
         except Exception as e:
@@ -144,7 +135,6 @@ def ifagregar(bottom_frame, top_frame2):
 
     btnsave = ctk.CTkButton(frame_left, text="Guardar", command=guardar_datos, font=poppins14bold)
     btnsave.pack(padx=10, pady=10, anchor="e", side="bottom")
-    
 
     # Contenido del RIGHT FRAME
 
@@ -165,15 +155,13 @@ def ifagregar(bottom_frame, top_frame2):
 
     horizontal_scrollbar.pack(side="bottom", fill="x")
 
-    my_tree['columns'] = ( 'nombre', 'apellido', 'cedula', 'rif', 'telefono', 'correo')
+    my_tree['columns'] = ('nombre', 'apellido', 'cedula', 'rif', 'telefono', 'correo')
 
     for col in my_tree['columns']:
         my_tree.heading(col, text=col.capitalize(), anchor='center')  # Con el metodo de string capitalize() mostramos el texto en mayusculas
         my_tree.column(col, anchor='center')
 
     cargar_datos()  # Llamar a la función para cargar los datos inicialmente
-
-# Acomoda los entrys del modifica para que el placeholder tenga los mismos textos como en el agregar   
 
 def ifgestionar(bottom_frame, top_frame2):
     global busquedainm, busquedabtn
@@ -230,11 +218,19 @@ def ifgestionar(bottom_frame, top_frame2):
 
     correo = ctk.CTkEntry(correo_frame, placeholder_text="", font=poppins14bold, width=250)
     correo.pack(pady=5, padx=5, side="left")
+    
+    cedula_values = ["V", "E"]    
+    cedula_indicator = ctk.CTkOptionMenu(cedula_frame, values=cedula_values, width=50, font=poppins14bold)
+    cedula_indicator.pack(padx=5, pady=5, side="left")
 
-    cedula = ctk.CTkEntry(cedula_frame, placeholder_text="", font=poppins14bold, width=250)
+    cedula = ctk.CTkEntry(cedula_frame, placeholder_text="", font=poppins14bold, width=200)
     cedula.pack(pady=5, padx=5, side="left")
+    
+    rif_values = ["J", "C", "G"]    
+    rif_indicator = ctk.CTkOptionMenu(rif_frame, values=rif_values, width=50, font=poppins14bold)
+    rif_indicator.pack(padx=5, pady=5, side="left")
 
-    rif = ctk.CTkEntry(rif_frame, placeholder_text="", font=poppins14bold, width=250)
+    rif = ctk.CTkEntry(rif_frame, placeholder_text="", font=poppins14bold, width=200)
     rif.pack(pady=5, padx=5, side="left")
 
     telefono = ctk.CTkEntry(telefono_frame, placeholder_text="", font=poppins14bold, width=250)
@@ -255,7 +251,7 @@ def ifgestionar(bottom_frame, top_frame2):
         try:
             with connection() as conn:
                 cursor = conn.cursor()
-                sql = 'SELECT id_contribuyente, nombres, apellidos, ci_contribuyente, rif, telefono, correo FROM contribuyentes'
+                sql = 'SELECT id_contribuyente, nombres, apellidos, v_e || "-" || ci_contribuyente AS cedula_completa, j_c_g || "-" || rif AS rif_completo, telefono, correo FROM contribuyentes'
                 cursor.execute(sql)
                 results = cursor.fetchall()
                 for row in results:
@@ -263,7 +259,7 @@ def ifgestionar(bottom_frame, top_frame2):
         except Exception as e:
             print(f"Error during database operation: {e}")
 
-    def save_changes(cedula_entry, nombre_entry, apellido_entry, rif_entry, telefono_entry, correo_entry):
+    def save_changes(cedula_entry, nombre_entry, apellido_entry, rif_entry, telefono_entry, correo_entry, cedula_indicator, rif_indicator):
         selected_item = my_tree.selection()
         if selected_item:
             item = my_tree.item(selected_item)
@@ -281,7 +277,7 @@ def ifgestionar(bottom_frame, top_frame2):
                     sql = '''
                     SELECT COUNT(*) FROM contribuyentes WHERE ci_contribuyente=?
                     '''
-                    cursor.execute(sql, (cedula,))
+                    cursor.execute(sql, (cedula, ))
                     count = cursor.fetchone()[0]
 
                     if count > 1:
@@ -291,10 +287,9 @@ def ifgestionar(bottom_frame, top_frame2):
                         print(f'error print: {cedula}')
                         return
                     
-
-                    sql = '''UPDATE contribuyentes SET nombres=?, apellidos=?, ci_contribuyente=?, rif=?, telefono=?, correo=?
+                    sql = '''UPDATE contribuyentes SET nombres=?, apellidos=?, v_e=?, ci_contribuyente=?, j_c_g=?, rif=?, telefono=?, correo=?
                              WHERE id_contribuyente=?'''
-                    cursor.execute(sql, (nombre_entry.get(), apellido_entry.get(), cedula, rif_entry.get(), telefono_entry.get(), correo_entry.get(), values[0]))
+                    cursor.execute(sql, (nombre_entry.get(), apellido_entry.get(), cedula_indicator.get(), cedula, rif_indicator.get(), rif_entry.get(), telefono_entry.get(), correo_entry.get(), values[0]))
                     conn.commit()
                     text = ctk.CTkLabel(frame_left, text="Datos actualizados correctamente", text_color="green", font=poppins14bold, width=250)
                     text.place(x=10, y=400)
@@ -333,11 +328,12 @@ def ifgestionar(bottom_frame, top_frame2):
                 except Exception as e:
                     print(f"Error al eliminar datos: {e}")
 
-    btnsave = ctk.CTkButton(frame_left, text="Actualizar", command=lambda: save_changes(cedula, nombre_contribuyente, apellido_contribuyente, rif, telefono, correo), font=poppins14bold)
+    btnsave = ctk.CTkButton(frame_left, text="Actualizar", command=lambda: save_changes(cedula, nombre_contribuyente, apellido_contribuyente, rif, telefono, correo, cedula_indicator, rif_indicator), font=poppins14bold)
     btnsave.pack(padx=10, pady=10, anchor="e", side="bottom")
     
     btndelete = ctk.CTkButton(frame_left, text="Eliminar", command=delete_record, font=poppins14bold)
     btndelete.pack(padx=10, pady=10, anchor="e", side="bottom")
+    
     
     frame_tree = ctk.CTkFrame(frame_right, fg_color="white")
     frame_tree.pack(pady=10, padx=10, expand=True, fill="both")
@@ -373,17 +369,18 @@ def ifgestionar(bottom_frame, top_frame2):
             ced = values[3]
 
             if isinstance(ced, str):
+                cedula_indicator.set(ced[0])
                 ced = ced[2:]
                 print(ced)
                 cedula.delete(0, tk.END)
                 cedula.insert(0, ced)
-
             else:
                 cedula.delete(0, tk.END)
                 cedula.insert(0, values[3])
 
             rif.delete(0, tk.END)
-            rif.insert(0, values[4])
+            rif.insert(0, values[4][2:])
+            rif_indicator.set(values[4][0])
             telefono.delete(0, tk.END)
             telefono.insert(0, values[5])
             correo.delete(0, tk.END)
@@ -397,7 +394,7 @@ def ifgestionar(bottom_frame, top_frame2):
     try:
         with connection() as conn:
             cursor = conn.cursor()
-            sql = 'SELECT id_contribuyente, nombres, apellidos, ci_contribuyente, rif, telefono, correo FROM contribuyentes'
+            sql = 'SELECT id_contribuyente, nombres, apellidos, v_e || "-" || ci_contribuyente AS cedula_completa, j_c_g || "-" || rif AS rif_completo, telefono, correo FROM contribuyentes'
             cursor.execute(sql)
             results = cursor.fetchall()
             for row in results:
@@ -405,7 +402,6 @@ def ifgestionar(bottom_frame, top_frame2):
 
     except Exception as e:
         print(f"Error fetching data: {e}")
-
 
 def contribuyentes(window, last_window):
     global busquedabtn, busquedainm
@@ -491,7 +487,7 @@ def contribuyentes(window, last_window):
         with connection() as conn:
             print("Database connection established.")
             cursor = conn.cursor()
-            sql = 'SELECT id_contribuyente, nombres, apellidos, ci_contribuyente, rif, telefono, correo FROM contribuyentes'
+            sql = 'SELECT id_contribuyente, nombres, apellidos, v_e || "-" || ci_contribuyente AS cedula_completa, j_c_g || "-" || rif AS rif_completo, telefono, correo FROM contribuyentes'
             cursor.execute(sql)
             results = cursor.fetchall()
 
@@ -505,14 +501,13 @@ def contribuyentes(window, last_window):
     
     return window
 
-
 def reload_treeviewsearch(treeview, ci):
     ci = ci.get()
     try:
         with connection() as conn:
             cursor = conn.cursor()
             sql = ''' 
-            SELECT id_contribuyente, nombres, apellidos, ci_contribuyente, rif,
+            SELECT id_contribuyente, nombres, apellidos, v_e || "-" || ci_contribuyente AS cedula_completa, j_c_g || "-" || rif AS rif_completo,
             telefono, correo FROM contribuyentes where ci_contribuyente = ?
             '''
             cursor.execute(sql,(ci,))
@@ -527,4 +522,6 @@ def reload_treeviewsearch(treeview, ci):
                 treeview.insert("", "end", iid=row[0], values=row[1:])
     except Exception as e:
         print(f"Error refreshing Treeview: {e}")
+        
+
 

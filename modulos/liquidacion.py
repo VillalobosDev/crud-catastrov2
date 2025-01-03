@@ -2,9 +2,9 @@ import tkinter as tk
 from tkinter import messagebox
 from tkinter import ttk
 import customtkinter as ctk
-from functions import *
-from menubar import menubar
-from calendario import open_calendar_popup  # Import the calendar popup function
+from functions.functions import *
+from modulos.menubar import menubar
+from functions.calendario import open_calendar_popup  # Import the calendar popup function
 
 def setup_treeview(frame):
     style = ttk.Style()

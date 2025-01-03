@@ -1,7 +1,7 @@
 import tkinter as tk
 import customtkinter as ctk
 from PIL import Image, ImageTk
-from menu import menu
+from modulos.menu import menu
 
 # Configuración de CustomTkinter
 ctk.set_appearance_mode("dark")

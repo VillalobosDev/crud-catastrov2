@@ -1,12 +1,12 @@
 import tkinter as tk
 import customtkinter as ctk
 from PIL import ImageTk, Image
-from login_fun import login
-from menu import menu
-from consulta_general import consulta
-from inmuebles import inmuebles
-from liquidacion import liquidacion
-from contribuyentes import contribuyentes
+from modulos.login_fun import login
+from modulos.menu import menu
+from modulos.consulta_general import consulta
+from modulos.inmuebles import inmuebles
+from modulos.liquidacion import liquidacion
+from modulos.contribuyentes import contribuyentes
 
 # Configuración de CustomTkinter
 ctk.set_appearance_mode("dark")
@@ -20,7 +20,6 @@ window = ctk.CTk()
 window.title("Menu")
 window.geometry("1080x720")
 
-contribuyentes(window, menu)
-# inmuebles(window, menu)
+liquidacion(window, menu)
 
 window.mainloop()
