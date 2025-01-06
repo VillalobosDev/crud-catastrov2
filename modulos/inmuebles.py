@@ -106,8 +106,6 @@ def inmuebles(window, last_window):
 
     return window
 
-
-
 def ifasignar(bottom_frame, top_frame2):
     global busquedainm, busquedabtn
 
@@ -331,7 +329,6 @@ def ifasignar(bottom_frame, top_frame2):
         except Exception as e:
             print(f"Error: {e}")
 
-
 def ifgestionar(window, bottom_frame, top_frame2):
     global busquedainm, busquedabtn
 
@@ -530,7 +527,6 @@ def ifgestionar(window, bottom_frame, top_frame2):
 
     my_tree.bind("<ButtonRelease-1>", on_tree_select)
 
-
 def reload_treeview(treeview):
     try:
         with connection() as conn:
@@ -554,7 +550,6 @@ def reload_treeview(treeview):
 
     except Exception as e:
         print(f"Error fetching data: {e}")
-
 
 def reload_treeviewsearch(treeview, ci):
     ci = ci.get()

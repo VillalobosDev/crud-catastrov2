@@ -51,7 +51,7 @@ def reload_treeviewsearch(treeview, ci_contribuyente):
         with connection() as conn:
             cursor = conn.cursor()
             sql = ''' 
-            SELECT l.id_liquidacion, c.nombres || ' ' || c.apellidos AS contribuyente_nombre, i.nom_inmueble, l.monto_1, l.monto_2, l.fecha_Liquidacion_1, l.fecha_Liquidacion_2
+            SELECT  l.id_liquidacion, c.ci_contribuyente, c.nombres || ' ' || c.apellidos AS contribuyente_nombre, i.nom_inmueble, l.monto_1, l.monto_2, l.fecha_Liquidacion_1, l.fecha_Liquidacion_2
             FROM liquidaciones l
             JOIN inmuebles i ON l.id_inmueble = i.id_inmueble
             JOIN contribuyentes c ON l.id_contribuyente = c.id_contribuyente
@@ -120,6 +120,7 @@ def save_liquidacion(my_tree, ci_entry, nombre_entry, inmueble_menu, monto1_entr
                         conn.commit()
                         load_liquidaciones_data(my_tree)
                         print("Liquidación guardada exitosamente.")
+                        clearentrys(ci_entry, nombre_entry, inmueble_menu, monto1_entry, monto2_entry, fecha1_entry, fecha2_entry)
                 else:
                     print("Inmueble no encontrado.")
             else:
@@ -146,7 +147,28 @@ def gestionar_liquidacion(treeview, ci_entry, nombre_entry, inmueble_menu, monto
         fecha2_entry.delete(0, tk.END)
         fecha2_entry.insert(0, values[6])
 
-def update_liquidacion(ci_entry, nombre_entry, inmueble_menu, monto1_entry, monto2_entry, fecha1_entry, fecha2_entry):
+def clearentrys(ci_entry, nombre_entry, inmueble_menu, monto1_entry, monto2_entry, fecha1_entry, fecha2_entry):
+        ci_entry.delete(0, tk.END)
+        ci_entry.configure(placeholder_text="Cedula Contribuyente")
+
+        nombre_entry.delete(0, tk.END)
+        nombre_entry.configure(placeholder_text="Nombre Contribuyente")
+
+        monto1_entry.delete(0, tk.END)
+        monto1_entry.configure(placeholder_text="Monto 1")
+
+        monto2_entry.delete(0, tk.END)
+        monto2_entry.configure(placeholder_text="Monto 2")
+        
+        fecha1_entry.delete(0, tk.END)
+        fecha1_entry.configure(placeholder_text="Fecha Liquidación 1")
+
+        fecha2_entry.delete(0, tk.END)
+        fecha2_entry.configure(placeholder_text="Fecha Liquidación 2")
+
+        inmueble_menu.set("Inmuebles")
+
+def update_liquidacion(tree, ci_entry, nombre_entry, inmueble_menu, monto1_entry, monto2_entry, fecha1_entry, fecha2_entry):
     ci_contribuyente = ci_entry.get()
     inmueble = inmueble_menu.get()
     monto1 = monto1_entry.get()
@@ -168,6 +190,9 @@ def update_liquidacion(ci_entry, nombre_entry, inmueble_menu, monto1_entry, mont
                     cursor.execute("UPDATE liquidaciones SET monto_1 = ?, monto_2 = ?, fecha_Liquidacion_1 = ?, fecha_Liquidacion_2 = ? WHERE id_inmueble = ?",
                                    (monto1, monto2, fecha1, fecha2, id_inmueble))
                     conn.commit()
+                    load_liquidaciones_data(tree)
+                    clearentrys(ci_entry, nombre_entry, inmueble_menu, monto1_entry, monto2_entry, fecha1_entry, fecha2_entry)
+
                     print("Liquidación actualizada exitosamente.")
                 else:
                     print("Inmueble no encontrado.")
@@ -241,6 +266,10 @@ def liquidacion(window, last_window):
     window_title.pack(padx=10, pady=10, side="left")
 
     # Contenido del top frame 2
+
+    
+    refreshtreeview = ctk.CTkButton(top_frame2, text="Refrescar Arbol", font=poppins14bold, width=80, command=lambda: load_liquidaciones_data(my_tree, ))
+    refreshtreeview.pack(padx=5, pady=5, side="right")
 
     busquedabtn = ctk.CTkButton(top_frame2, text="Buscar", font=poppins14bold, width=80, command=lambda: reload_treeviewsearch(my_tree, busquedaliq))
     busquedabtn.pack(padx=5, pady=5, side="right")
@@ -334,19 +363,20 @@ def ifgestionar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold
     fecha2_btn = ctk.CTkButton(fecha2_frame, text="📅", command=lambda: open_calendar_popup(fecha2), font=poppins14bold, width=30)
     fecha2_btn.pack(pady=5, padx=5, side="left")
 
-    inmueble_menu = ctk.CTkOptionMenu(inmueble_frame, values=[], font=poppins14bold)
+    inmueble_menu = ctk.CTkOptionMenu(inmueble_frame, values=["Inmuebles"], font=poppins14bold)
     inmueble_menu.pack(pady=5, padx=5, side="left", fill="x", expand=True)
 
     ci_entry.bind("<FocusOut>", lambda e: update_contribuyente_info(ci_entry, nombre_entry, inmueble_menu))
 
-    btnsave = ctk.CTkButton(frame_left, text="Guardar", command=lambda: update_liquidacion(ci_entry, nombre_entry, inmueble_menu, monto1, monto2, fecha1, fecha2), font=poppins14bold)
-    btnsave.pack(padx=10, pady=10, anchor="e", side="bottom")
+
+    btncancel = ctk.CTkButton(frame_left, text="Cancelar", command=lambda: clearentrys(ci_entry, nombre_entry, inmueble_menu, monto1, monto2, fecha1, fecha2), font=poppins14bold)
+    btncancel.pack(padx=10, pady=10, anchor="e", side="bottom")
 
     btndelete = ctk.CTkButton(frame_left, text="Eliminar", command=lambda: delete_liquidacion(ci_entry, inmueble_menu, my_tree), font=poppins14bold)
     btndelete.pack(padx=10, pady=10, anchor="e", side="bottom")
 
-    btncancel = ctk.CTkButton(frame_left, text="Cancelar", command=lambda: gestionar_liquidacion(my_tree, ci_entry, nombre_entry, inmueble_menu, monto1, monto2, fecha1, fecha2), font=poppins14bold)
-    btncancel.pack(padx=10, pady=10, anchor="e", side="bottom")
+    btnsave = ctk.CTkButton(frame_left, text="Guardar", command=lambda: update_liquidacion(my_tree, ci_entry, nombre_entry, inmueble_menu, monto1, monto2, fecha1, fecha2), font=poppins14bold)
+    btnsave.pack(padx=10, pady=10, anchor="e", side="bottom")
 
     # Add Treeview for the right frame
     frame_tree = ctk.CTkFrame(frame_right, fg_color="white")
@@ -431,7 +461,7 @@ def ifasignar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold):
     fecha2_btn = ctk.CTkButton(fecha2_frame, text="📅", command=lambda: open_calendar_popup(fecha2), font=poppins14bold, width=30)
     fecha2_btn.pack(pady=5, padx=5, side="left")
 
-    inmueble_menu = ctk.CTkOptionMenu(inmueble_frame, values=[], font=poppins14bold)
+    inmueble_menu = ctk.CTkOptionMenu(inmueble_frame, values=["Inmuebles"], font=poppins14bold)
     inmueble_menu.pack(pady=5, padx=5, side="left", fill="x", expand=True)
 
     ci_entry.bind("<FocusOut>", lambda e: update_contribuyente_info( ci_entry, nombre_entry, inmueble_menu))
@@ -444,6 +474,10 @@ def ifasignar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold):
     my_tree = setup_treeview(frame_tree)
     ######################################
     
+    btncancel = ctk.CTkButton(frame_left, text="Cancelar", command=lambda: clearentrys(ci_entry, nombre_entry, inmueble_menu, monto1, monto2, fecha1, fecha2), font=poppins14bold)
+    btncancel.pack(padx=10, pady=10, anchor="e", side="bottom")
+
+    
     btnsave = ctk.CTkButton(frame_left, text="Guardar", command=lambda: save_liquidacion(my_tree, ci_entry, nombre_entry, inmueble_menu, monto1, monto2, fecha1, fecha2), font=poppins14bold)
     btnsave.pack(padx=10, pady=10, anchor="e", side="bottom")
 
@@ -454,4 +488,3 @@ def ifasignar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold):
 
     busquedaliq = ctk.CTkEntry(top_frame2, placeholder_text="Buscar por cedula", font=poppins14bold, width=200)
     busquedaliq.pack(padx=5, pady=5, side="right")
-
