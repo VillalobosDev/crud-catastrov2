@@ -8,14 +8,12 @@ import tkinter
 
 
 def ifagregar(bottom_frame, top_frame2):
-    global busquedainm, busquedabtn, refrescarbtn
+    global busquedainm, busquedabtn
 
     if busquedabtn:
         busquedabtn.pack_forget()
     if busquedainm:
         busquedainm.pack_forget()
-    if refrescarbtn:
-        refrescarbtn.pack_forget()
 
     poppins14bold = ("Poppins", 14, "bold")
     poppins14 = ("Poppins", 14)
@@ -33,7 +31,6 @@ def ifagregar(bottom_frame, top_frame2):
     text.pack(padx=10, pady=10)
 
     # Contenido del frame left
-
     nombre_frame = ctk.CTkFrame(frame_left)
     nombre_frame.pack(padx=10, pady=5, fill="x")
 
@@ -53,9 +50,6 @@ def ifagregar(bottom_frame, top_frame2):
     correo_frame.pack(padx=10, pady=5, fill="x")
 
     #############################################
-
-    refrescarbtn = ctk.CTkButton(top_frame2, text="Refrescar Tabla", font=poppins14bold, width=80, command=lambda: cargar_datos())
-    refrescarbtn.pack(padx=5, pady=5, side="right")
 
     busquedabtn = ctk.CTkButton(top_frame2, text="Buscar", font=poppins14bold, width=80, command=lambda: reload_treeviewsearch(my_tree, busquedainm))
     busquedabtn.pack(padx=5, pady=5, side="right")
@@ -91,25 +85,6 @@ def ifagregar(bottom_frame, top_frame2):
 
     correo = ctk.CTkEntry(correo_frame, placeholder_text="ejemplo@gmail.com", font=poppins14bold, width=250)
     correo.pack(pady=5, padx=5, side="left")
-    def clear():
-        nombre.delete(0, tk.END)
-        nombre.configure(placeholder_text="Nombre")
-
-        apellido.delete(0, tk.END)
-        apellido.configure(placeholder_text="Apellido")
-
-        cedula.delete(0, tk.END)
-        cedula.configure(placeholder_text="Cédula de Identidad")
-
-        rif.delete(0, tk.END)
-        rif.configure(placeholder_text="RIF")
-
-        telefono.delete(0, tk.END)
-        telefono.configure(placeholder_text="Teléfono")
-
-        correo.delete(0, tk.END)
-        correo.configure(placeholder_text="ejemplo@gmail.com")
-
 
     def cargar_datos():
         for item in my_tree.get_children():
@@ -155,7 +130,6 @@ def ifagregar(bottom_frame, top_frame2):
                 text = ctk.CTkLabel(frame_left, text="Contribuyente agregado", text_color="green", font=poppins14bold, width=250)
                 text.place(x=10, y=430)
                 cargar_datos()  # Llamar a la función para actualizar el Treeview
-                clear()
         except Exception as e:
             print(f"Error al guardar los datos: {e}")
 
@@ -190,14 +164,12 @@ def ifagregar(bottom_frame, top_frame2):
     cargar_datos()  # Llamar a la función para cargar los datos inicialmente
 
 def ifgestionar(bottom_frame, top_frame2):
-    global busquedainm, busquedabtn, refrescarbtn
+    global busquedainm, busquedabtn
 
     if busquedabtn:
         busquedabtn.pack_forget()
     if busquedainm:
         busquedainm.pack_forget()
-    if refrescarbtn:
-        refrescarbtn.pack_forget()
 
     poppins14bold = ("Poppins", 14, "bold")
     poppins14 = ("Poppins", 14)
@@ -213,8 +185,6 @@ def ifgestionar(bottom_frame, top_frame2):
     
     text = ctk.CTkLabel(frame_left, text="Modificar Contribuyentes", font=poppins14, width=250)
     text.pack(padx=10, pady=10)
-
-    #Contenido del frame left
 
     nombre_contribuyente_frame = ctk.CTkFrame(frame_left)
     nombre_contribuyente_frame.pack(padx=10, pady=5, fill="x")
@@ -232,12 +202,7 @@ def ifgestionar(bottom_frame, top_frame2):
     telefono_frame.pack(padx=10, pady=5, fill="x")
 
     correo_frame = ctk.CTkFrame(frame_left)
-    correo_frame.pack(padx=10, pady=5, fill="x")
-
-    ##############################################
-    
-    refrescarbtn = ctk.CTkButton(top_frame2, text="Refrescar Tabla", font=poppins14bold, width=80, command=lambda: cargar_datos())
-    refrescarbtn.pack(padx=5, pady=5, side="right")
+    correo_frame.pack(padx=10, pady=5, anchor="w")
 
     busquedabtn = ctk.CTkButton(top_frame2, text="Buscar", font=poppins14bold, width=80, command=lambda: reload_treeviewsearch(my_tree, busquedainm))
     busquedabtn.pack(padx=5, pady=5, side="right")
@@ -245,52 +210,39 @@ def ifgestionar(bottom_frame, top_frame2):
     busquedainm = ctk.CTkEntry(top_frame2, placeholder_text="Buscar por cedula", font=poppins14bold, width=200)
     busquedainm.pack(padx=5, pady=5, side="right")
 
-    ##############################################
-
     nombre_contribuyente = ctk.CTkEntry(nombre_contribuyente_frame, placeholder_text="Selecciona un Contribuyente", font=poppins14bold, width=250)
     nombre_contribuyente.pack(pady=5, padx=5, side="left")
 
-    apellido_contribuyente = ctk.CTkEntry(apellido_contribuyente_frame, placeholder_text="Apellido Contribuyente", font=poppins14bold, width=250)
+    apellido_contribuyente = ctk.CTkEntry(apellido_contribuyente_frame, placeholder_text="", font=poppins14bold, width=250)
     apellido_contribuyente.pack(pady=5, padx=5, side="left")
 
-    correo = ctk.CTkEntry(correo_frame, placeholder_text="correo@gmail.com", font=poppins14bold, width=250)
+    correo = ctk.CTkEntry(correo_frame, placeholder_text="", font=poppins14bold, width=250)
     correo.pack(pady=5, padx=5, side="left")
     
     cedula_values = ["V", "E"]    
     cedula_indicator = ctk.CTkOptionMenu(cedula_frame, values=cedula_values, width=50, font=poppins14bold)
     cedula_indicator.pack(padx=5, pady=5, side="left")
 
-    cedula = ctk.CTkEntry(cedula_frame, placeholder_text="Cédula de Identidad", font=poppins14bold, width=190)
+    cedula = ctk.CTkEntry(cedula_frame, placeholder_text="", font=poppins14bold, width=200)
     cedula.pack(pady=5, padx=5, side="left")
     
     rif_values = ["J", "C", "G"]    
     rif_indicator = ctk.CTkOptionMenu(rif_frame, values=rif_values, width=50, font=poppins14bold)
     rif_indicator.pack(padx=5, pady=5, side="left")
 
-    rif = ctk.CTkEntry(rif_frame, placeholder_text="RIF", font=poppins14bold, width=190)
+    rif = ctk.CTkEntry(rif_frame, placeholder_text="", font=poppins14bold, width=200)
     rif.pack(pady=5, padx=5, side="left")
 
-    telefono = ctk.CTkEntry(telefono_frame, placeholder_text="Teléfono", font=poppins14bold, width=250)
+    telefono = ctk.CTkEntry(telefono_frame, placeholder_text="", font=poppins14bold, width=250)
     telefono.pack(pady=5, padx=5, side="left")
 
     def clear():
         nombre_contribuyente.delete(0, tk.END)
-        nombre_contribuyente.configure(placeholder_text="Nombre")
-
         apellido_contribuyente.delete(0, tk.END)
-        apellido_contribuyente.configure(placeholder_text="Apellido")
-
         cedula.delete(0, tk.END)
-        cedula.configure(placeholder_text="Cédula de Identidad")
-
         rif.delete(0, tk.END)
-        rif.configure(placeholder_text="RIF")
-
         telefono.delete(0, tk.END)
-        telefono.configure(placeholder_text="Teléfono")
-
         correo.delete(0, tk.END)
-        correo.configure(placeholder_text="ejemplo@gmail.com")
 
     def cargar_datos():
         for item in my_tree.get_children():
@@ -299,15 +251,7 @@ def ifgestionar(bottom_frame, top_frame2):
         try:
             with connection() as conn:
                 cursor = conn.cursor()
-                sql = '''SELECT
-                id_contribuyente, 
-                nombres, 
-                apellidos, v_e || "-" || ci_contribuyente AS cedula_completa,
-                j_c_g || "-" || rif AS rif_completo,
-                telefono, 
-                correo 
-                FROM contribuyentes
-                '''
+                sql = 'SELECT id_contribuyente, nombres, apellidos, v_e || "-" || ci_contribuyente AS cedula_completa, j_c_g || "-" || rif AS rif_completo, telefono, correo FROM contribuyentes'
                 cursor.execute(sql)
                 results = cursor.fetchall()
                 for row in results:
@@ -372,7 +316,14 @@ def ifgestionar(bottom_frame, top_frame2):
                         text = ctk.CTkLabel(frame_left, text="Registro eliminado correctamente", text_color="green", font=poppins14bold, width=250)
                         text.place(x=10, y=400)
                         cargar_datos()
-                        clear()
+                        
+                        # Vaciar los campos de entrada
+                        nombre_contribuyente.delete(0, tk.END)
+                        apellido_contribuyente.delete(0, tk.END)
+                        cedula.delete(0, tk.END)
+                        rif.delete(0, tk.END)
+                        telefono.delete(0, tk.END)
+                        correo.delete(0, tk.END)
                         
                 except Exception as e:
                     print(f"Error al eliminar datos: {e}")
@@ -438,41 +389,22 @@ def ifgestionar(bottom_frame, top_frame2):
             text.place(x=0, y=400)
 
     my_tree.bind("<<TreeviewSelect>>", on_tree_select)
-    cargar_datos()
-    # def cargartreeview():
-    #     try:
-    #         # Establish a database connection
-    #         with connection() as conn:
-    #             cursor = conn.cursor()
-    #             # SQL query to fetch data
-    #             sql = '''
-    #                 SELECT 
-    #                     id_contribuyente, 
-    #                     nombres, 
-    #                     apellidos, 
-    #                     v_e || "-" || ci_contribuyente AS cedula_completa, 
-    #                     j_c_g || "-" || rif AS rif_completo, 
-    #                     telefono, 
-    #                     correo 
-    #                 FROM contribuyentes
-    #             '''
-    #             cursor.execute(sql)
-    #             results = cursor.fetchall()
 
-    #             # Clear the Treeview before populating
-    #             for item in my_tree.get_children():
-    #                 my_tree.delete(item)
+    # Fetch data to populate Treeview
+    try:
+        with connection() as conn:
+            cursor = conn.cursor()
+            sql = 'SELECT id_contribuyente, nombres, apellidos, v_e || "-" || ci_contribuyente AS cedula_completa, j_c_g || "-" || rif AS rif_completo, telefono, correo FROM contribuyentes'
+            cursor.execute(sql)
+            results = cursor.fetchall()
+            for row in results:
+                my_tree.insert("", "end", iid=row[0], values=row)
 
-    #             # Populate the Treeview with fetched data
-    #             for row in results:
-    #                 my_tree.insert("", "end", iid=row[0], values=row)
-
-    #     except Exception as e:
-    #         print(f"Error fetching data: {e}")
-    # cargartreeview()
+    except Exception as e:
+        print(f"Error fetching data: {e}")
 
 def contribuyentes(window, last_window):
-    global busquedainm, busquedabtn, refrescarbtn
+    global busquedabtn, busquedainm
     
     for widget in window.winfo_children():
         widget.destroy()
@@ -512,8 +444,6 @@ def contribuyentes(window, last_window):
     gestionarliq = ctk.CTkButton(top_frame2, text="Modificar", command=lambda:ifgestionar(bottom_frame, top_frame2), font=poppins14bold)
     gestionarliq.pack(padx=5, pady=5, side="left")
 
-    refrescarbtn = ctk.CTkButton(top_frame2, text="Refrescar Tabla", font=poppins14bold, width=80, command=lambda: loaddata(my_tree))
-    refrescarbtn.pack(padx=5, pady=5, side="right")
 
     busquedabtn = ctk.CTkButton(top_frame2, text="Buscar", font=poppins14bold, width=80, command=lambda: reload_treeviewsearch(my_tree, busquedainm))
     busquedabtn.pack(padx=5, pady=5, side="right")
@@ -553,7 +483,21 @@ def contribuyentes(window, last_window):
     canvas.pack()  # Posicionamos el canvas
     rectangle(canvas, 10, 10, 0, 0, r=5, fill='lightgray', outline='black')
     
-    loaddata(my_tree)
+    try:
+        with connection() as conn:
+            print("Database connection established.")
+            cursor = conn.cursor()
+            sql = 'SELECT id_contribuyente, nombres, apellidos, v_e || "-" || ci_contribuyente AS cedula_completa, j_c_g || "-" || rif AS rif_completo, telefono, correo FROM contribuyentes'
+            cursor.execute(sql)
+            results = cursor.fetchall()
+
+            # Ensure data fits Treeview structure
+            for row in results:
+                my_tree.insert("", "end", iid=row[0], values=row[1:])
+
+    except Exception as e:
+
+        print(f"Error during database operation: {e}")
     
     return window
 
@@ -579,20 +523,5 @@ def reload_treeviewsearch(treeview, ci):
     except Exception as e:
         print(f"Error refreshing Treeview: {e}")
         
-def loaddata(treeview):
-    try:
-        with connection() as conn:
-            cursor = conn.cursor()
-            sql = 'SELECT id_contribuyente, nombres, apellidos, v_e || "-" || ci_contribuyente AS cedula_completa, j_c_g || "-" || rif AS rif_completo, telefono, correo FROM contribuyentes'
-            cursor.execute(sql)
-            results = cursor.fetchall()
 
-            # Clear existing rows
-            for row in treeview.get_children():
-                treeview.delete(row)
 
-            # Insert updated rows
-            for row in results:
-                treeview.insert("", "end", iid=row[0], values=row[1:])
-    except Exception as e:
-        print(f'Ocurrio un error: {e}')

@@ -7,6 +7,7 @@ from modulos.consulta_general import consulta
 from modulos.inmuebles import inmuebles
 from modulos.liquidacion import liquidacion
 from modulos.contribuyentes import contribuyentes
+from modulos.sectores import sectores
 
 # Configuración de CustomTkinter
 ctk.set_appearance_mode("dark")
@@ -20,6 +21,6 @@ window = ctk.CTk()
 window.title("Menu")
 window.geometry("1080x720")
 
-liquidacion(window, menu)
+sectores(window, menu)
 
 window.mainloop()

@@ -5,7 +5,7 @@ from tkinter import ttk
 from functions.rectangle import rectangle
 
 def inmuebles(window, last_window):
-    global busquedabtn, busquedainm, refrescartabla
+    global busquedabtn, busquedainm
     
     for widget in window.winfo_children():
         widget.destroy()
@@ -45,9 +45,6 @@ def inmuebles(window, last_window):
     gestionarinm = ctk.CTkButton(top_frame2, text="Gestionar", command=lambda: ifgestionar(window, bottom_frame, top_frame2), font=poppins14bold)
     gestionarinm.pack(padx=5, pady=5, side="left")
 
-    refrescartabla = ctk.CTkButton(top_frame2, text="Refrescar Tabla", font=poppins14bold, width=80, command=lambda: loaddata())
-    refrescartabla.pack(padx=5, pady=5, side="right")
-
     busquedabtn = ctk.CTkButton(top_frame2, text="Buscar", font=poppins14bold, width=80, command=lambda: reload_treeviewsearch(my_tree, busquedainm))
     busquedabtn.pack(padx=5, pady=5, side="right")
 
@@ -85,39 +82,38 @@ def inmuebles(window, last_window):
     canvas = ctk.CTkCanvas(frame_tree, width=0, height=0, highlightthickness=0, bg='white')
     canvas.pack()  # Posicionamos el canvas
     rectangle(canvas, 10, 10, 0, 0, r=5, fill='lightgray', outline='black')
-    def loaddata():    
-        try:
-            with connection() as conn:
-                print("Database connection established.")
-                cursor = conn.cursor()
-                sql = """
-                SELECT c.ci_contribuyente, c.nombres || ' ' || c.apellidos AS contribuyente, i.nom_inmueble, i.cod_catastral, i.uso, s.nom_sector AS sector
-                FROM inmuebles i
-                JOIN contribuyentes c ON i.id_contribuyente = c.id_contribuyente
-                JOIN sectores s ON i.id_sector = s.id_sector
-                """
-                cursor.execute(sql)
-                results = cursor.fetchall()
+    
+    try:
+        with connection() as conn:
+            print("Database connection established.")
+            cursor = conn.cursor()
+            sql = """
+            SELECT c.ci_contribuyente, c.nombres || ' ' || c.apellidos AS contribuyente, i.nom_inmueble, i.cod_catastral, i.uso, s.nom_sector AS sector
+            FROM inmuebles i
+            JOIN contribuyentes c ON i.id_contribuyente = c.id_contribuyente
+            JOIN sectores s ON i.id_sector = s.id_sector
+            """
+            cursor.execute(sql)
+            results = cursor.fetchall()
 
-                # Ensure data fits Treeview structure
-                for row in results:
-                    my_tree.insert("", "end", values=row)
+            # Ensure data fits Treeview structure
+            for row in results:
+                my_tree.insert("", "end", values=row)
 
-        except Exception as e:
+    except Exception as e:
 
-            print(f"Error during database operation: {e}")
-    loaddata()
+        print(f"Error during database operation: {e}")
+
     return window
 
 def ifasignar(bottom_frame, top_frame2):
-    global busquedainm, busquedabtn, refrescartabla
+    global busquedainm, busquedabtn
 
     if busquedabtn:
         busquedabtn.pack_forget()
     if busquedainm:
         busquedainm.pack_forget()
-    if refrescartabla:
-        refrescartabla.pack_forget()    
+    
     poppins14bold = ("Poppins", 14, "bold")
 
     for widget in bottom_frame.winfo_children():
@@ -150,9 +146,6 @@ def ifasignar(bottom_frame, top_frame2):
     sector_frame.pack(padx=10, pady=5, fill="x")
 
     #############################################
-
-    refrescartabla = ctk.CTkButton(top_frame2, text="Refrescar tabla", font=poppins14bold, width=80, command=lambda: loaddata())
-    refrescartabla.pack(padx=5, pady=5, side="right")
 
     busquedabtn = ctk.CTkButton(top_frame2, text="Buscar", font=poppins14bold, width=80, command=lambda: reload_treeviewsearch(my_tree, busquedainm))
     busquedabtn.pack(padx=5, pady=5, side="right")
@@ -253,24 +246,23 @@ def ifasignar(bottom_frame, top_frame2):
     canvas = ctk.CTkCanvas(frame_tree, width=0, height=0, highlightthickness=0, bg='white')
     canvas.pack()  # Posicionamos el canvas
     rectangle(canvas, 10, 10, 0, 0, r=5, fill='lightgray', outline='black')
-    def loaddata():    
-        try:
-            with connection() as conn:
-                cursor = conn.cursor()
-                sql = """
-                SELECT c.ci_contribuyente, c.nombres || ' ' || c.apellidos AS contribuyente, i.nom_inmueble, i.cod_catastral, i.uso, s.nom_sector AS sector
-                FROM inmuebles i
-                JOIN contribuyentes c ON i.id_contribuyente = c.id_contribuyente
-                JOIN sectores s ON i.id_sector = s.id_sector
-                """
-                cursor.execute(sql)
-                results = cursor.fetchall()
-                for row in results:
-                    my_tree.insert("", "end", values=row)
+    
+    try:
+        with connection() as conn:
+            cursor = conn.cursor()
+            sql = """
+            SELECT c.ci_contribuyente, c.nombres || ' ' || c.apellidos AS contribuyente, i.nom_inmueble, i.cod_catastral, i.uso, s.nom_sector AS sector
+            FROM inmuebles i
+            JOIN contribuyentes c ON i.id_contribuyente = c.id_contribuyente
+            JOIN sectores s ON i.id_sector = s.id_sector
+            """
+            cursor.execute(sql)
+            results = cursor.fetchall()
+            for row in results:
+                my_tree.insert("", "end", values=row)
 
-        except Exception as e:
-            print(f"Error fetching data: {e}")
-    loaddata()
+    except Exception as e:
+        print(f"Error fetching data: {e}")
 
     def asignar_inmueble(contribuyenteci, contribuyentenombre, inmueble, inmueblecod, uso, sector):
         # Get values from entry fields
@@ -338,14 +330,13 @@ def ifasignar(bottom_frame, top_frame2):
             print(f"Error: {e}")
 
 def ifgestionar(window, bottom_frame, top_frame2):
-    global busquedainm, busquedabtn, refrescartabla
+    global busquedainm, busquedabtn
 
     if busquedabtn:
         busquedabtn.pack_forget()
     if busquedainm:
         busquedainm.pack_forget()
-    if refrescartabla:
-        refrescartabla.pack_forget()
+
 
     poppins14bold = ("Poppins", 14, "bold")
 
@@ -377,9 +368,6 @@ def ifgestionar(window, bottom_frame, top_frame2):
     sector_frame.pack(padx=10, pady=5, fill="x")
 
     ################################
-    refrescartabla = ctk.CTkButton(top_frame2, text="Refrescar Tabla", font=poppins14bold, width=80, command=lambda: reload_treeview(my_tree))
-    refrescartabla.pack(padx=5, pady=5, side="right")
-
     busquedabtn = ctk.CTkButton(top_frame2, text="Buscar", font=poppins14bold, width=80, command=lambda: reload_treeviewsearch(my_tree, busquedainm))
     busquedabtn.pack(padx=5, pady=5, side="right")
 
