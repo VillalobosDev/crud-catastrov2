@@ -35,10 +35,10 @@ window.geometry("1080x720")
 
 #Este es para usuarios
 
-menu2(window)
+#menu2(window)
 
 
-#Para iniciar desde el login
+#Para iniciar desde el login, la contraseña es 1234
 
 #login(window)
 
