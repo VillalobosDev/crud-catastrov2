@@ -63,8 +63,11 @@ def menubar(window):
         fg_color=fg,
         hover_color="darkred",
         text_color="white",
-        command=window.quit
+        command= lambda: logout(window)
     )
     exit_button.pack(side="right", padx=5, pady=5)
     
-    
+
+def logout(window):
+    from modulos.login_fun import login
+    login(window)

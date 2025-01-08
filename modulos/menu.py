@@ -5,6 +5,7 @@ from modulos.contribuyentes import contribuyentes
 from modulos.inmuebles import inmuebles
 from modulos.liquidacion import liquidacion
 from modulos.consulta_general import consulta
+from modulos.sectores import sectores
 from PIL import Image, ImageTk
 
 
@@ -47,7 +48,7 @@ def menu(window):
     inmuebles_btn = ctk.CTkButton(left_frame, text="Inmuebles", command=lambda: inmuebles(window, menu), width=190, font=poppins20bold)
     inmuebles_btn.pack(pady=30, padx=50, anchor="center", expand=True)
 
-    sector_btn = ctk.CTkButton(left_frame, text="Sectores", command=lambda: print("Aca va la funcion de la ventana sectores"), width=190, font=poppins20bold)
+    sector_btn = ctk.CTkButton(left_frame, text="Sectores", command=lambda: sectores(window, menu), width=190, font=poppins20bold)
     sector_btn.pack(pady=30, padx=50, anchor="center", expand=True)
     
     liquidacion_btn = ctk.CTkButton(left_frame, text="Liquidación", command=lambda: liquidacion(window, menu), width=190, font=poppins20bold)

@@ -1,14 +1,15 @@
 import customtkinter as ctk
 import tkinter as tk
-from modulos.menubar import menubar
-from modulos.contribuyentes import contribuyentes
-from modulos.inmuebles import inmuebles
-from modulos.liquidacion import liquidacion
-from modulos.consulta_general import consulta
+from modulos2.menubar import menubar
+from modulos2.contribuyentes import contribuyentes
+from modulos2.inmuebles import inmuebles
+from modulos2.liquidacion import liquidacion
+from modulos2.consulta_general import consulta
+from modulos2.sectores import sectores
 from PIL import Image, ImageTk
 
 
-def menu(window):
+def menu2(window):
 
     poppins30bold = ("Poppins", 30, "bold")
     poppins20bold = ("Poppins", 20, "bold")
@@ -41,19 +42,19 @@ def menu(window):
 
     #Contenido del frame left
 
-    contribuyente_btn = ctk.CTkButton(left_frame, text="Contribuyentes", command=lambda: contribuyentes(window, menu), width=190, font=poppins20bold)
+    contribuyente_btn = ctk.CTkButton(left_frame, text="Contribuyentes", command=lambda: contribuyentes(window, menu2), width=190, font=poppins20bold)
     contribuyente_btn.pack(pady=30, padx=50, anchor="center", expand=True)
 
-    inmuebles_btn = ctk.CTkButton(left_frame, text="Inmuebles", command=lambda: inmuebles(window, menu), width=190, font=poppins20bold)
+    inmuebles_btn = ctk.CTkButton(left_frame, text="Inmuebles", command=lambda: inmuebles(window, menu2), width=190, font=poppins20bold)
     inmuebles_btn.pack(pady=30, padx=50, anchor="center", expand=True)
 
-    sector_btn = ctk.CTkButton(left_frame, text="Sectores", command=lambda: print("Aca va la funcion de la ventana sectores"), width=190, font=poppins20bold)
+    sector_btn = ctk.CTkButton(left_frame, text="Sectores", command=lambda: sectores(window, menu2), width=190, font=poppins20bold)
     sector_btn.pack(pady=30, padx=50, anchor="center", expand=True)
     
-    liquidacion_btn = ctk.CTkButton(left_frame, text="Liquidación", command=lambda: liquidacion(window, menu), width=190, font=poppins20bold)
+    liquidacion_btn = ctk.CTkButton(left_frame, text="Liquidación", command=lambda: liquidacion(window, menu2), width=190, font=poppins20bold)
     liquidacion_btn.pack(pady=30, padx=50, anchor="center", expand=True)
     
-    consulta_btn = ctk.CTkButton(left_frame, text="Consultar", command=lambda: consulta(window, menu), width=190, font=poppins20bold)
+    consulta_btn = ctk.CTkButton(left_frame, text="Consultar", command=lambda: consulta(window, menu2), width=190, font=poppins20bold)
     consulta_btn.pack(pady=30, padx=50, anchor="center", expand=True)
 
  # Define main window

@@ -9,6 +9,7 @@ import tkinter
 
 def ifagregar(bottom_frame, top_frame2):
     global busquedainm, busquedabtn, refrescarbtn
+    
 
     if busquedabtn:
         busquedabtn.pack_forget()
@@ -127,6 +128,8 @@ def ifagregar(bottom_frame, top_frame2):
             print(f"Error during database operation: {e}")
 
     def guardar_datos():
+        text = ctk.CTkLabel(frame_left, text="", text_color="red", font=poppins14bold)
+        text.place(x=30, y=450)
         try:
             with connection() as conn:
                 cursor = conn.cursor()
@@ -134,12 +137,23 @@ def ifagregar(bottom_frame, top_frame2):
                 # Verificar si la cédula ya existe
                 cursor.execute("SELECT COUNT(*) FROM contribuyentes WHERE ci_contribuyente = ?", (cedula.get(),))
                 if cursor.fetchone()[0] > 0:
-                    text = ctk.CTkLabel(frame_left, text="La cédula de identidad ya existe", text_color="red", font=poppins14bold)
-                    text.place(x=20, y=430)
+                    text = ctk.CTkLabel(text="La cédula de identidad ya existe", text_color="red")
                     return
                 
+                if len(cedula.get()) == 0:
+                    text.configure(text="Ingrese la cedula de identidad", text_color="red")
+                    return
+                    
+                elif len(nombre.get()) == 0:
+                    text.configure(text="Ingrese el nombre", text_color="red")
+                    return
+                elif len(apellido.get()) == 0:
+                    text.configure(text="Ingrese el apellido", text_color="red")
+                    return
+
                 sql = """INSERT INTO contribuyentes (nombres, apellidos, v_e, ci_contribuyente, j_c_g, rif, telefono, correo)
                         VALUES (?, ?, ?, ?, ?, ?, ?, ?)"""
+                
                 datos = (
                     nombre.get(),
                     apellido.get(),
@@ -150,10 +164,10 @@ def ifagregar(bottom_frame, top_frame2):
                     telefono.get(),
                     correo.get()
                 )
+                
                 cursor.execute(sql, datos)
-                conn.commit()                        
-                text = ctk.CTkLabel(frame_left, text="Contribuyente agregado", text_color="green", font=poppins14bold, width=250)
-                text.place(x=10, y=430)
+                conn.commit()
+                text.configure(text="Contribuyente agregado", text_color="green")
                 cargar_datos()  # Llamar a la función para actualizar el Treeview
                 clear()
         except Exception as e:
@@ -316,16 +330,20 @@ def ifgestionar(bottom_frame, top_frame2):
             print(f"Error during database operation: {e}")
 
     def save_changes(cedula_entry, nombre_entry, apellido_entry, rif_entry, telefono_entry, correo_entry, cedula_indicator, rif_indicator):
+        
+        text = ctk.CTkLabel(frame_left, text="La cédula de identidad ya existe", text_color="red", font=poppins14bold, width=250)
+        text.place(x=10, y=400)
+        
         selected_item = my_tree.selection()
         if selected_item:
             item = my_tree.item(selected_item)
             values = item['values']
             print(f"Selected item values: {values}")  # Debug print statement
-
+            
             if len(values) < 7:
                 print("Error: Selected item does not have enough values.")
                 return
-
+                
             try:
                 with connection() as conn:
                     cursor = conn.cursor()
@@ -337,8 +355,9 @@ def ifgestionar(bottom_frame, top_frame2):
                     count = cursor.fetchone()[0]
 
                     if count > 1:
-                        text = ctk.CTkLabel(frame_left, text="La cédula de identidad ya existe", text_color="red", font=poppins14bold, width=250)
-                        text.place(x=10, y=400)
+                        
+                        
+                        text.configure(text="La cédula de identidad ya existe", text_color="red")
                         tkinter.messagebox.showerror("Error", "La cédula de identidad ya existe")
                         print(f'error print: {cedula}')
                         return
@@ -347,7 +366,7 @@ def ifgestionar(bottom_frame, top_frame2):
                              WHERE id_contribuyente=?'''
                     cursor.execute(sql, (nombre_entry.get(), apellido_entry.get(), cedula_indicator.get(), cedula, rif_indicator.get(), rif_entry.get(), telefono_entry.get(), correo_entry.get(), values[0]))
                     conn.commit()
-                    text = ctk.CTkLabel(frame_left, text="Datos actualizados correctamente", text_color="green", font=poppins14bold, width=250)
+                    text.configure(text="Datos actualizados correctamente", text_color="green")
                     text.place(x=10, y=400)
                     cargar_datos()
                     clear()
@@ -357,6 +376,7 @@ def ifgestionar(bottom_frame, top_frame2):
             print("Error: No item selected in the Treeview.")
 
     def delete_record():
+        text = ctk.CTkLabel(frame_left, text="", text_color="green", font=poppins14bold, width=250)
         selected_item = my_tree.selection()
         if selected_item:
             item = my_tree.item(selected_item)
@@ -368,12 +388,12 @@ def ifgestionar(bottom_frame, top_frame2):
                         cursor = conn.cursor()
                         sql = 'DELETE FROM contribuyentes WHERE id_contribuyente=?'
                         cursor.execute(sql, (values[0],))
-                        conn.commit()
-                        text = ctk.CTkLabel(frame_left, text="Registro eliminado correctamente", text_color="green", font=poppins14bold, width=250)
+                        conn.commit()    
+                        text.configure(text="Registro eliminado correctamente", text_color="green")
                         text.place(x=10, y=400)
                         cargar_datos()
                         clear()
-                        
+                    
                 except Exception as e:
                     print(f"Error al eliminar datos: {e}")
 

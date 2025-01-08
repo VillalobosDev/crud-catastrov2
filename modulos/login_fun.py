@@ -2,6 +2,7 @@ import tkinter as tk
 import customtkinter as ctk
 from PIL import Image, ImageTk
 from modulos.menu import menu
+from modulos2.menu import menu2
 
 # Configuración de CustomTkinter
 ctk.set_appearance_mode("dark")
@@ -29,7 +30,7 @@ def login(window):
     poppins16bold = ("Poppins", 16, "bold")
 
     # Load the original background image
-    original_image = Image.open("login.png")
+    original_image = Image.open("assets/login.png")
 
     # Create a Label for the background image
     background_label = tk.Label(window)
@@ -66,7 +67,7 @@ def login(window):
     usuario = ctk.CTkButton(
         left_frame,
         text="Usuario",
-        command=lambda: print(":v"),
+        command=lambda: menu2(window),
         width=200,
         font=poppins16bold,
     )
