@@ -15,6 +15,7 @@ from modulos2.inmuebles import inmuebles
 from modulos2.liquidacion import liquidacion
 from modulos2.contribuyentes import contribuyentes
 from modulos2.sectores import sectores
+from modulos.transitions import transition_to_next_ui
 
 # Configuración de CustomTkinter
 ctk.set_appearance_mode("dark")
@@ -30,7 +31,7 @@ window.geometry("1080x720")
 
 #Este es para admin
 
-#menu(window)
+menu(window)
 
 
 #Este es para usuarios
@@ -40,7 +41,7 @@ window.geometry("1080x720")
 
 #Para iniciar desde el login, la contraseña es 1234
 
-#login(window)
+# login(window)
 
 
 

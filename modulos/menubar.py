@@ -1,5 +1,6 @@
 import customtkinter as ctk
 import tkinter as tk
+from modulos.transitions import transition_to_next_ui
 
 # Function to create the toolbar menu
 def menubar(window):
@@ -70,4 +71,4 @@ def menubar(window):
 
 def logout(window):
     from modulos.login_fun import login
-    login(window)
+    transition_to_next_ui(window, None, login, duration=4000)
