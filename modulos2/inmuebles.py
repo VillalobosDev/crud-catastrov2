@@ -1,5 +1,5 @@
 import customtkinter as ctk
-from .menubar import menubar
+from modulos.menubar import menubar
 from functions.functions import * 
 from tkinter import ttk
 from functions.rectangle import rectangle

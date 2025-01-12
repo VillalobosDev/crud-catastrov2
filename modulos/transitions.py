@@ -1,7 +1,7 @@
 import time
 import customtkinter as ctk
 
-def transition_to_next_ui(window, current_ui, next_ui_func, duration=1000, **kwargs):
+def transition_to_next_ui(window, current_ui, next_ui_func, duration=500, **kwargs):
     """
     Handles the transition between UIs while ensuring the next UI is fully loaded in the background.
     Tracks the time taken for each part to understand where the delay or flicker might be coming from.
@@ -9,7 +9,7 @@ def transition_to_next_ui(window, current_ui, next_ui_func, duration=1000, **kwa
     start_time = time.time()  # Record start time of the transition
     
     # Step 1: Create transition frame
-    transition_frame = ctk.CTkFrame(window, fg_color="gray")
+    transition_frame = ctk.CTkFrame(window, fg_color="black")  # Set transition frame background to black
     transition_frame.place(relwidth=1, relheight=1)
 
     loading_label = ctk.CTkLabel(transition_frame, text="Loading...", font=("Poppins", 30))
@@ -23,8 +23,8 @@ def transition_to_next_ui(window, current_ui, next_ui_func, duration=1000, **kwa
         ui_start_time = time.time()  # Measure UI load time
         
         # Step 3: Clear the previous UI (if any)
-        if current_ui:
-            current_ui.destroy()
+        for widget in window.winfo_children():
+            widget.destroy()
 
         # Load the next UI (you can pass any required arguments)
         next_ui_func(window, **kwargs)

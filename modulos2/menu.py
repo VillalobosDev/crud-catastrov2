@@ -1,6 +1,6 @@
 import customtkinter as ctk
 import tkinter as tk
-from modulos2.menubar import menubar
+from modulos.menubar import menubar
 from modulos2.contribuyentes import contribuyentes
 from modulos2.inmuebles import inmuebles
 from modulos2.liquidacion import liquidacion

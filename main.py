@@ -1,6 +1,4 @@
-import tkinter as tk
 import customtkinter as ctk
-from PIL import ImageTk, Image
 from modulos.menu import menu
 from modulos.login_fun import login
 from modulos.consulta_general import consulta
@@ -28,21 +26,18 @@ def close_after_timeout(root, timeout):
 window = ctk.CTk()
 window.title("Menu")
 window.geometry("1080x720")
+window.configure(bg="black")  # Set initial background color
 
 #Este es para admin
 
-menu(window)
-
+# menu(window)
 
 #Este es para usuarios
 
 #menu2(window)
 
-
 #Para iniciar desde el login, la contraseña es 1234
 
-# login(window)
-
-
+window.after(200, lambda: transition_to_next_ui(window, None, login, duration=500))  # Show loading transition before login
 
 window.mainloop()

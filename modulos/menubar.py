@@ -4,14 +4,10 @@ from modulos.transitions import transition_to_next_ui
 
 # Function to create the toolbar menu
 def menubar(window):
-    
-    
-
     poppins12bold = ("Poppins", 12)
-
-    
     fg="#202020"
     fg2="#d10000"
+    
     # Crear el marco superior que simula el menubar
     menubar_frame = ctk.CTkFrame(window, height=30, corner_radius=0, fg_color=fg)
     menubar_frame.pack(fill="x", side="top")
@@ -20,7 +16,7 @@ def menubar(window):
     menu_button = ctk.CTkButton(
         menubar_frame,
         text="Menu",
-        font= poppins12bold,
+        font=poppins12bold,
         width=100,
         fg_color=fg,
         hover_color="gray",
@@ -33,7 +29,7 @@ def menubar(window):
     config_button = ctk.CTkButton(
         menubar_frame,
         text="Configuracion",
-        font= poppins12bold,
+        font=poppins12bold,
         width=120,
         fg_color=fg,
         hover_color="gray",
@@ -46,7 +42,7 @@ def menubar(window):
     support_button = ctk.CTkButton(
         menubar_frame,
         text="Soporte",
-        font= poppins12bold,
+        font=poppins12bold,
         width=100,
         fg_color=fg,
         hover_color="gray",
@@ -59,16 +55,18 @@ def menubar(window):
     exit_button = ctk.CTkButton(
         menubar_frame,
         text="Cerrar sesión",
-        font= poppins12bold,
+        font=poppins12bold,
         width=100,
         fg_color=fg,
         hover_color="darkred",
         text_color="white",
-        command= lambda: logout(window)
+        command=lambda: logout(window)
     )
     exit_button.pack(side="right", padx=5, pady=5)
-    
 
 def logout(window):
     from modulos.login_fun import login
-    transition_to_next_ui(window, None, login, duration=4000)
+    # Clear existing widgets
+    for widget in window.winfo_children():
+        widget.destroy()
+    transition_to_next_ui(window, None, login, duration=500)
