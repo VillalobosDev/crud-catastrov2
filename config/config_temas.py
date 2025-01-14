@@ -1,6 +1,7 @@
 import customtkinter as ctk
 import tkinter as tk
 from modulos.transitions import transition_to_next_ui
+from config.config import centrar_ventana
 import json
 
 
@@ -40,7 +41,7 @@ def open_config_window(parent):
     config_window = ctk.CTkToplevel(parent)
     config_window.title("Configuración")
     config_window.geometry("800x500")
-    config_window.grab_set() # Bloquear la interacción con la ventana principal
+    config_window.grab_set() 
     config_window.resizable(False, False)
 
     left_frame = ctk.CTkFrame(config_window, corner_radius=15)

@@ -4,6 +4,7 @@ from modulos.menubar import menubar
 from functions.functions import * 
 from tkinter import ttk, messagebox
 from functions.rectangle import rectangle
+from config.config import centrar_ventana
 import tkinter
 
 
@@ -492,6 +493,37 @@ def ifgestionar(bottom_frame, top_frame2):
     #         print(f"Error fetching data: {e}")
     # cargartreeview()
 
+
+def mostrar_modal_contribuyente(treeview):
+    # Obtener el elemento seleccionado
+    seleccion = treeview.selection()
+    if seleccion:
+        item = treeview.item(seleccion[0])  # Obtener datos del elemento
+        datos = item['values']  # Recuperar los valores de las columnas
+        
+        # Crear la ventana modal
+        modal = ctk.CTkToplevel()
+        modal.title("Detalles del Contribuyente")
+        modal.geometry("500x400")  
+        modal.grab_set()  # Hacer la ventana modal
+        modal.resizable(False, False)
+        
+        centrar_ventana(modal, 400, 300)
+
+        
+        # Agregar contenido a la ventana modal
+        labels = ["Nombre", "Apellido", "Cédula", "RIF", "Teléfono", "Correo"]
+        for i, dato in enumerate(datos):
+            label = ctk.CTkLabel(modal, text=f"{labels[i]}: {dato}", font=("Poppins", 14))
+            label.pack(pady=5, anchor="w")
+        
+        # Botón para cerrar la ventana modal
+        cerrar_btn = ctk.CTkButton(modal, text="Cerrar", command=modal.destroy, font=("Poppins", 14))
+        cerrar_btn.pack(pady=20)
+        
+        
+        
+
 def contribuyentes(window, last_window):
     global busquedainm, busquedabtn, refrescarbtn
     
@@ -573,9 +605,15 @@ def contribuyentes(window, last_window):
     canvas.pack()  # Posicionamos el canvas
     rectangle(canvas, 10, 10, 0, 0, r=5, fill='lightgray', outline='black')
     
-    loaddata(my_tree)
     
+
+    my_tree.bind("<<TreeviewSelect>>")  # Selección básica
+    my_tree.bind("<Double-1>", lambda event: mostrar_modal_contribuyente(my_tree))  # Doble clic
+    my_tree.bind("<Return>", lambda event: mostrar_modal_contribuyente(my_tree))  # Tecla Enter
+
+    loaddata(my_tree)
     return window
+
 
 def reload_treeviewsearch(treeview, ci):
     ci = ci.get()
