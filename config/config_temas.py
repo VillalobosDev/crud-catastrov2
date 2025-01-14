@@ -27,7 +27,7 @@ def apply_color(color):
     config["color"] = color
     save_config(config)
 
-def open_config_window(parent):
+def open_config_window(parent):  
     fg = "#202020"
     poppins12bold = ("Poppins", 12, "bold")
     poppins14bold = ("Poppins", 14, "bold")
@@ -43,6 +43,8 @@ def open_config_window(parent):
     config_window.geometry("800x500")
     config_window.grab_set() 
     config_window.resizable(False, False)
+    
+    centrar_ventana(config_window, 800, 500)
 
     left_frame = ctk.CTkFrame(config_window, corner_radius=15)
     left_frame.pack(fill="y", side="left", pady=5, padx=5)

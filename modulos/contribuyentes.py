@@ -495,12 +495,16 @@ def ifgestionar(bottom_frame, top_frame2):
 
 
 def mostrar_modal_contribuyente(treeview):
+    poppins14bold = ("Poppins", 14, "bold")
     # Obtener el elemento seleccionado
     seleccion = treeview.selection()
     if seleccion:
         item = treeview.item(seleccion[0])  # Obtener datos del elemento
         datos = item['values']  # Recuperar los valores de las columnas
         
+        id = datos[0] 
+        arbolinnesesario, datosdelcontri = cargar_datoss(treeview, id)
+        print(datosdelcontri)
         # Crear la ventana modal
         modal = ctk.CTkToplevel()
         modal.title("Detalles del Contribuyente")
@@ -514,11 +518,11 @@ def mostrar_modal_contribuyente(treeview):
         # Agregar contenido a la ventana modal
         labels = ["Nombre", "Apellido", "Cédula", "RIF", "Teléfono", "Correo"]
         for i, dato in enumerate(datos):
-            label = ctk.CTkLabel(modal, text=f"{labels[i]}: {dato}", font=("Poppins", 14))
+            label = ctk.CTkLabel(modal, text=f"{labels[i]}: {dato}", font=poppins14bold)
             label.pack(pady=5, anchor="w")
         
         # Botón para cerrar la ventana modal
-        cerrar_btn = ctk.CTkButton(modal, text="Cerrar", command=modal.destroy, font=("Poppins", 14))
+        cerrar_btn = ctk.CTkButton(modal, text="Cerrar", command=modal.destroy, font=poppins14bold)
         cerrar_btn.pack(pady=20)
         
         
@@ -595,8 +599,12 @@ def contribuyentes(window, last_window):
 
     horizontal_scrollbar.pack(side="bottom", fill="x")
 
-    my_tree['columns'] = ('nombre', 'apellido', 'cedula', 'rif', 'telefono', 'correo')
-
+    my_tree['columns'] = ('ID', 'nombre', 'apellido', 'cedula', 'rif', 'telefono', 'correo')
+    
+    my_tree.column('ID', width=0, stretch=tk.NO)
+    my_tree.heading('ID', text='', anchor='center')
+    
+    
     for col in my_tree['columns']:
         my_tree.heading(col, text=col.capitalize(), anchor='center')  # Con el metodo de string capitalize() mostramos el texto en mayusculas
         my_tree.column(col, anchor='center')
@@ -604,7 +612,6 @@ def contribuyentes(window, last_window):
     canvas = ctk.CTkCanvas(frame_tree, width=0, height=0, highlightthickness=0, bg='white')
     canvas.pack()  # Posicionamos el canvas
     rectangle(canvas, 10, 10, 0, 0, r=5, fill='lightgray', outline='black')
-    
     
 
     my_tree.bind("<<TreeviewSelect>>")  # Selección básica
@@ -633,7 +640,7 @@ def reload_treeviewsearch(treeview, ci):
 
             # Insert updated rows
             for row in results:
-                treeview.insert("", "end", iid=row[0], values=row[1:])
+                treeview.insert("", "end", iid=row[0], values=row)
     except Exception as e:
         print(f"Error refreshing Treeview: {e}")
         
@@ -651,6 +658,53 @@ def loaddata(treeview):
 
             # Insert updated rows
             for row in results:
-                treeview.insert("", "end", iid=row[0], values=row[1:])
+                treeview.insert("", "end", iid=row[0], values=row)
+            
     except Exception as e:
         print(f'Ocurrio un error: {e}')
+
+
+
+def cargar_datoss(my_tree, ID):
+    original_data = []
+    try:
+        with connection() as conn:
+            cursor = conn.cursor()
+            sql = ''' SELECT 
+            inmuebles.nom_inmueble,
+            inmuebles.cod_catastral,
+            inmuebles.uso,
+            contribuyentes.nombres || ' ' || contribuyentes.apellidos AS contribuyente,
+            contribuyentes.ci_contribuyente,
+            contribuyentes.rif,
+            contribuyentes.telefono,
+            contribuyentes.correo,
+            sectores.nom_sector,
+            sectores.ubic_sector,
+            liquidaciones.id_liquidacion,
+            liquidaciones.monto_1,
+            liquidaciones.monto_2,
+            liquidaciones.fecha_Liquidacion_1,
+            liquidaciones.fecha_Liquidacion_2
+        FROM
+            inmuebles
+        JOIN contribuyentes ON inmuebles.id_contribuyente = contribuyentes.id_contribuyente
+        JOIN sectores ON inmuebles.id_sector = sectores.id_sector
+        JOIN liquidaciones ON inmuebles.id_inmueble = liquidaciones.id_inmueble WHERE id_contribuyente = ?
+        ORDER BY contribuyentes.ci_contribuyente ASC
+        '''
+            cursor.execute(sql, (ID,))
+            original_data = cursor.fetchall()
+            
+            print(f"Fetched {len(original_data)} rows from the database.")
+            for row in original_data:
+                print(row) 
+
+            # Insert all data into Treeview initially
+            for row in original_data:
+                my_tree.insert("", "end", values=row)
+
+    except Exception as e:
+        print(f"Error during database operation: {e}")
+
+    return my_tree, original_data

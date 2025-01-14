@@ -16,6 +16,7 @@ from modulos2.contribuyentes import contribuyentes
 from modulos2.sectores import sectores
 from modulos.transitions import transition_to_next_ui
 from config.config_temas import load_config, apply_theme, apply_color
+from config.config import centrar_ventana
 
 # Cargar configuración
 config = load_config()
@@ -29,6 +30,8 @@ apply_color(color)
 window = ctk.CTk()
 window.title("Menu")
 window.geometry("1080x720")
+
+centrar_ventana(window, 1080, 720)
 
 def close_after_timeout(root, timeout):
     """Close the window after a specified timeout (in milliseconds)."""
