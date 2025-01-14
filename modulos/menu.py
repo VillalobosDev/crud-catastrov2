@@ -37,7 +37,7 @@ def menu(window):
     window_title.pack(padx=10, pady=10, side="left")
 
     #Contenido del frame left
-    contribuyente_btn = ctk.CTkButton(left_frame, text="Contribuyentes", command=lambda: transition_to_next_ui(window, left_frame, contribuyentes, duration=500, current_ui=menu), width=190, font=poppins20bold)
+    contribuyente_btn = ctk.CTkButton(left_frame, text="Contribuyentes", command=lambda: transition_to_next_ui(window, contribuyentes, duration=500, current_ui=menu), width=190, font=poppins20bold)
     contribuyente_btn.pack(pady=30, padx=50, anchor="center", expand=True)
 
     inmuebles_btn = ctk.CTkButton(left_frame, text="Inmuebles", command=lambda: transition_to_next_ui(window, left_frame, inmuebles, duration=500, current_ui=menu), width=190, font=poppins20bold)
