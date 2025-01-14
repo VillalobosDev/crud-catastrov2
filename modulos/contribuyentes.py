@@ -505,6 +505,11 @@ def mostrar_modal_contribuyente(treeview):
         id = datos[0] 
         arbolinnesesario, datosdelcontri = cargar_datoss(treeview, id)
         print(datosdelcontri)
+        inmueble = datosdelcontri[0]
+        
+
+
+
         # Crear la ventana modal
         modal = ctk.CTkToplevel()
         modal.title("Detalles del Contribuyente")
@@ -516,7 +521,7 @@ def mostrar_modal_contribuyente(treeview):
 
         
         # Agregar contenido a la ventana modal
-        labels = ["Nombre", "Apellido", "Cédula", "RIF", "Teléfono", "Correo"]
+        labels = ["id", "Nombre", "Apellido", "Cédula", "RIF", "Teléfono", "Correo"]
         for i, dato in enumerate(datos):
             label = ctk.CTkLabel(modal, text=f"{labels[i]}: {dato}", font=poppins14bold)
             label.pack(pady=5, anchor="w")
@@ -690,19 +695,17 @@ def cargar_datoss(my_tree, ID):
             inmuebles
         JOIN contribuyentes ON inmuebles.id_contribuyente = contribuyentes.id_contribuyente
         JOIN sectores ON inmuebles.id_sector = sectores.id_sector
-        JOIN liquidaciones ON inmuebles.id_inmueble = liquidaciones.id_inmueble WHERE id_contribuyente = ?
+        JOIN liquidaciones ON inmuebles.id_inmueble = liquidaciones.id_inmueble WHERE contribuyentes.id_contribuyente = ?
         ORDER BY contribuyentes.ci_contribuyente ASC
         '''
             cursor.execute(sql, (ID,))
             original_data = cursor.fetchall()
             
             print(f"Fetched {len(original_data)} rows from the database.")
-            for row in original_data:
-                print(row) 
+            
 
             # Insert all data into Treeview initially
-            for row in original_data:
-                my_tree.insert("", "end", values=row)
+           
 
     except Exception as e:
         print(f"Error during database operation: {e}")
