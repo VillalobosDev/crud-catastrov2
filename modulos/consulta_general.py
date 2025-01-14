@@ -157,9 +157,6 @@ def consulta(window, last_window):
     global search_filter_created
     search_filter_created = False
 
-    ctk.set_appearance_mode('dark')
-    ctk.set_default_color_theme('dark-blue')
-
     # Fonts
     poppins30bold = ("Poppins", 30, "bold")
     poppins20bold = ("Poppins", 20, "bold")

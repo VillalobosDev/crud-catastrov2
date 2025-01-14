@@ -496,9 +496,6 @@ def contribuyentes(window, last_window):
     
     for widget in window.winfo_children():
         widget.destroy()
-
-    ctk.set_appearance_mode('dark')
-    ctk.set_default_color_theme('dark-blue')
     
     poppins30bold = ("Poppins", 30, "bold")
     poppins20bold = ("Poppins", 20, "bold")
