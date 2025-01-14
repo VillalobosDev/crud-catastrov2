@@ -39,8 +39,7 @@ def close_after_timeout(root, timeout):
 #menu(window)
 
 #Este es para usuarios
-menu(window)
-
+consulta(window, menu)
 #Para iniciar desde el login, la contraseña es 1234
 # login(window)
 
