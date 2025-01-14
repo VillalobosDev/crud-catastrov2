@@ -45,6 +45,3 @@ menu(window)
 # login(window)
 
 window.mainloop()
-
-
-#ooooo

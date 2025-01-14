@@ -238,9 +238,6 @@ def liquidacion(window, last_window):
     for widget in window.winfo_children():
         widget.destroy()
 
-    ctk.set_appearance_mode('dark')
-    ctk.set_default_color_theme('dark-blue')
-
     poppins30bold = ("Poppins", 30, "bold")
     poppins20bold = ("Poppins", 20, "bold")
     poppins14bold = ("Poppins", 14, "bold")
@@ -339,7 +336,7 @@ def ifgestionar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold
     inmueble_frame = ctk.CTkFrame(frame_left)
     inmueble_frame.pack(padx=10, pady=5, fill="x")
 
-    ci_entry = ctk.CTkEntry(ci_frame, placeholder_text="Cedula Contribuyente", font=poppins14bold)
+    ci_entry = ctk.CTkEntry(ci_frame, placeholder_text="Cedula Contribuyente", font=poppins14bold, width=250)
     ci_entry.pack(pady=5, padx=5, side="left", fill="x", expand=True)
 
     nombre_entry = ctk.CTkEntry(nombre_frame, placeholder_text="Nombre Contribuyente", font=poppins14bold)
@@ -406,8 +403,8 @@ def ifasignar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold):
         widget.destroy()
 
     frame_left = ctk.CTkFrame(bottom_frame, corner_radius=15, width=400)
-    frame_left.pack(padx=5, pady=5, side="left", fill="both", expand=True)
-
+    frame_left.pack(padx=5, pady=5, side="left", fill="y")
+    
     frame_right = ctk.CTkFrame(bottom_frame, corner_radius=15)
     frame_right.pack(padx=5, pady=5, side="right", fill="both", expand=True)
 
@@ -437,7 +434,7 @@ def ifasignar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold):
     inmueble_frame = ctk.CTkFrame(frame_left)
     inmueble_frame.pack(padx=10, pady=5, fill="x")
 
-    ci_entry = ctk.CTkEntry(ci_frame, placeholder_text="Cedula Contribuyente", font=poppins14bold)
+    ci_entry = ctk.CTkEntry(ci_frame, placeholder_text="Cedula Contribuyente", font=poppins14bold, width=250)
     ci_entry.pack(pady=5, padx=5, side="left", fill="x", expand=True)
 
     nombre_entry = ctk.CTkEntry(nombre_frame, placeholder_text="Nombre Contribuyente", font=poppins14bold)

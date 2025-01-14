@@ -10,8 +10,6 @@ def inmuebles(window, last_window):
     for widget in window.winfo_children():
         widget.destroy()
 
-    ctk.set_appearance_mode('dark')
-    ctk.set_default_color_theme('dark-blue')
     
     poppins30bold = ("Poppins", 30, "bold")
     poppins20bold = ("Poppins", 20, "bold")
@@ -122,14 +120,14 @@ def ifasignar(bottom_frame, top_frame2):
 
     for widget in bottom_frame.winfo_children():
         widget.destroy()
-
+        
+    frame_left = ctk.CTkFrame(bottom_frame, corner_radius=15, width=400)
+    frame_left.pack(padx=5, pady=5, side="left", fill="y")
+    
     frame_right = ctk.CTkFrame(bottom_frame, corner_radius=15)
     frame_right.pack(padx=5, pady=5, side="right", fill="both", expand=True)
 
-    frame_left = ctk.CTkFrame(bottom_frame, corner_radius=15, width=300)
-    frame_left.pack(padx=5, pady=5, side="left", fill="y")
-
-    #Contenido del frame left #########################################################################
+    # Contenido del frame left #########################################################################
 
     contribuyenteci_frame = ctk.CTkFrame(frame_left)
     contribuyenteci_frame.pack(padx=10, pady=5, fill="x")
@@ -207,13 +205,13 @@ def ifasignar(bottom_frame, top_frame2):
     uso = ctk.CTkOptionMenu(uso_frame, values=usovalues, font=poppins14bold, width=250)
     uso.pack(pady=5, padx=5, side="left")
 
+    sector_names = []
     try:
         with connection() as conn:
             cursor = conn.cursor()
             cursor.execute("SELECT nom_sector FROM sectores")
             sector_results = cursor.fetchall()
             sector_names = [row[0] for row in sector_results]
-            sector.configure(values=sector_names)  # Update dropdown options
     except Exception as e:
         print(f"Error loading sectors: {e}")
 
@@ -405,8 +403,17 @@ def ifgestionar(window, bottom_frame, top_frame2):
     uso = ctk.CTkOptionMenu(uso_frame, values=usovalues, font=poppins14bold, width=250)
     uso.pack(pady=5, padx=5, side="left")
 
-    valuesector = ["Sector"]
-    sector = ctk.CTkOptionMenu(sector_frame, values=valuesector, font=poppins14bold, width=250)
+    sector_names = []
+    try:
+        with connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT nom_sector FROM sectores")
+            sector_results = cursor.fetchall()
+            sector_names = [row[0] for row in sector_results]
+    except Exception as e:
+        print(f"Error loading sectors: {e}")
+
+    sector = ctk.CTkOptionMenu(sector_frame, values=sector_names, font=poppins14bold, width=250)
     sector.pack(pady=5, padx=5, side="left")
 
     selected_item = None  # Initialize selected_item
@@ -528,6 +535,11 @@ def ifgestionar(window, bottom_frame, top_frame2):
 
     my_tree = ttk.Treeview(frame_tree, style="Custom.Treeview", show="headings")
     my_tree.pack(pady=10, padx=10, fill="both", expand=True)
+    
+    horizontal_scrollbar = ttk.Scrollbar(frame_tree, orient="horizontal", command=my_tree.xview)
+    my_tree.configure(xscrollcommand=horizontal_scrollbar.set)
+    horizontal_scrollbar.pack(side="bottom", fill="x")
+
 
     my_tree["columns"] = ("CI", "Contribuyente", "Inmueble", "Codigo Catastral", "Uso", "Sector")
     for col in my_tree["columns"]:
@@ -587,4 +599,3 @@ def reload_treeviewsearch(treeview, ci):
                 treeview.insert("", "end", values=row)
     except Exception as e:
         print(f"Error refreshing Treeview: {e}")
-

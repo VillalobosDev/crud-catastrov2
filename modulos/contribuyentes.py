@@ -20,6 +20,7 @@ def ifagregar(bottom_frame, top_frame2):
 
     poppins14bold = ("Poppins", 14, "bold")
     poppins14 = ("Poppins", 14)
+    poppins18 = ("Poppins", 18, "bold")
 
     for widget in bottom_frame.winfo_children():
         widget.destroy()
@@ -30,7 +31,7 @@ def ifagregar(bottom_frame, top_frame2):
     frame_right = ctk.CTkFrame(bottom_frame, corner_radius=15)
     frame_right.pack(padx=5, pady=5, side="right", fill="both", expand=True)
 
-    text = ctk.CTkLabel(frame_left, text="Nuevo Contribuyente", font=poppins14bold, width=250)
+    text = ctk.CTkLabel(frame_left, text="Nuevo Contribuyente", font=poppins18, width=250)
     text.pack(padx=10, pady=10)
 
     # Contenido del frame left
@@ -214,7 +215,7 @@ def ifgestionar(bottom_frame, top_frame2):
         refrescarbtn.pack_forget()
 
     poppins14bold = ("Poppins", 14, "bold")
-    poppins14 = ("Poppins", 14)
+    poppins18 = ("Poppins", 18, "bold")
 
     for widget in bottom_frame.winfo_children():
         widget.destroy()
@@ -225,7 +226,7 @@ def ifgestionar(bottom_frame, top_frame2):
     frame_right = ctk.CTkFrame(bottom_frame, corner_radius=15)
     frame_right.pack(padx=5, pady=5, side="right", fill="both", expand=True)
     
-    text = ctk.CTkLabel(frame_left, text="Modificar Contribuyentes", font=poppins14, width=250)
+    text = ctk.CTkLabel(frame_left, text="Modificar Contribuyentes", font=poppins18, width=250)
     text.pack(padx=10, pady=10)
 
     #Contenido del frame left
@@ -497,8 +498,7 @@ def contribuyentes(window, last_window):
     for widget in window.winfo_children():
         widget.destroy()
 
-    ctk.set_appearance_mode('dark')
-    ctk.set_default_color_theme('dark-blue')
+
     
     poppins30bold = ("Poppins", 30, "bold")
     poppins20bold = ("Poppins", 20, "bold")

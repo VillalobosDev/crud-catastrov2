@@ -4,8 +4,6 @@ from PIL import ImageTk, Image
 from login_fun import login
 
 # Configuración de CustomTkinter
-ctk.set_appearance_mode("dark")
-ctk.set_default_color_theme("dark-blue")
 
 
 
