@@ -31,6 +31,7 @@ window = ctk.CTk()
 window.title("Menu")
 window.geometry("1080x720")
 
+
 centrar_ventana(window, 1080, 720)
 
 def close_after_timeout(root, timeout):

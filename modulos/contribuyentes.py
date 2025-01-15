@@ -493,46 +493,6 @@ def ifgestionar(bottom_frame, top_frame2):
     #         print(f"Error fetching data: {e}")
     # cargartreeview()
 
-
-def mostrar_modal_contribuyente(treeview):
-    poppins14bold = ("Poppins", 14, "bold")
-    # Obtener el elemento seleccionado
-    seleccion = treeview.selection()
-    if seleccion:
-        item = treeview.item(seleccion[0])  # Obtener datos del elemento
-        datos = item['values']  # Recuperar los valores de las columnas
-        
-        id = datos[0] 
-        arbolinnesesario, datosdelcontri = cargar_datoss(treeview, id)
-        print(datosdelcontri)
-        inmueble = datosdelcontri[0]
-        
-
-
-
-        # Crear la ventana modal
-        modal = ctk.CTkToplevel()
-        modal.title("Detalles del Contribuyente")
-        modal.geometry("500x400")  
-        modal.grab_set()  # Hacer la ventana modal
-        modal.resizable(False, False)
-        
-        centrar_ventana(modal, 400, 300)
-
-        
-        # Agregar contenido a la ventana modal
-        labels = ["id", "Nombre", "Apellido", "Cédula", "RIF", "Teléfono", "Correo"]
-        for i, dato in enumerate(datos):
-            label = ctk.CTkLabel(modal, text=f"{labels[i]}: {dato}", font=poppins14bold)
-            label.pack(pady=5, anchor="w")
-        
-        # Botón para cerrar la ventana modal
-        cerrar_btn = ctk.CTkButton(modal, text="Cerrar", command=modal.destroy, font=poppins14bold)
-        cerrar_btn.pack(pady=20)
-        
-        
-        
-
 def contribuyentes(window, last_window):
     global busquedainm, busquedabtn, refrescarbtn
     
@@ -670,44 +630,120 @@ def loaddata(treeview):
 
 
 
-def cargar_datoss(my_tree, ID):
+def mostrar_modal_contribuyente(treeview):
+    poppins14bold = ("Poppins", 14, "bold")
+    poppins30bold = ("Poppins", 30, "bold")
+    poppins20bold = ("Poppins", 25, "bold")
+    
+    # Obtener el elemento seleccionado
+    seleccion = treeview.selection()
+    if seleccion:
+        item = treeview.item(seleccion[0])  # Obtener datos del elemento
+        datos = item['values']  # Recuperar los valores de las columnas
+        if not datos:
+            print("No hay datos seleccionados.")
+            return
+        
+        id_contribuyente = datos[0]
+        datos_contribuyente = cargar_datoss(id_contribuyente)
+        
+        if not datos_contribuyente:
+            print("No se encontraron datos del contribuyente.")
+            return
+
+
+
+
+
+
+
+        # config
+        modal = ctk.CTkToplevel()
+        modal.title("Contribuyente")
+        modal.geometry("600x500")  
+        modal.grab_set()  
+        modal.resizable(False, False)
+        centrar_ventana(modal, 600, 500)
+        
+        
+        cerrar_btn = ctk.CTkButton(modal, text="Cerrar", command=modal.destroy, font=poppins14bold)
+        cerrar_btn.pack(pady=10, padx=10, side="bottom", anchor="e") 
+        
+               
+        frame_left = ctk.CTkFrame(modal, corner_radius=15, width=250)
+        frame_left.pack(padx=5, pady=5, side="left", fill="both", expand=True)
+        
+
+        # Mostrar datos en la ventana modal
+        nombre = datos_contribuyente[0][0]
+        cedula = datos_contribuyente[0][1]
+        rif = datos_contribuyente[0][2]
+        telefono = datos_contribuyente[0][3]
+        correo = datos_contribuyente[0][4]
+        
+        text= ctk.CTkLabel(frame_left, text="Datos del Contribuyente", font=poppins20bold)
+        text.pack(pady=5)
+        
+        frame_nombre= ctk.CTkFrame(frame_left, corner_radius=15)
+        frame_nombre.pack(fill="both", anchor="s", pady=5, padx=5, expand=True)
+        
+        frame_cedula=ctk.CTkFrame(frame_left, corner_radius=15)
+        frame_cedula.pack(fill="both", anchor="s", pady=5, padx=5, expand=True)
+        
+        frame_rif=ctk.CTkFrame(frame_left, corner_radius=15)
+        frame_rif.pack(fill="both", anchor="s", pady=5, padx=5, expand=True)
+        
+        frame_telefono=ctk.CTkFrame(frame_left, corner_radius=15)
+        frame_telefono.pack(fill="both", anchor="s", pady=5, padx=5, expand=True)
+        
+        frame_correo=ctk.CTkFrame(frame_left, corner_radius=15)
+        frame_correo.pack(fill="both", anchor="s", pady=5, padx=5, expand=True)
+        
+        
+        
+        ###############labels##########
+        
+        label_nombre = ctk.CTkLabel(frame_nombre, text=(f"Nombre: {nombre}"), font=poppins14bold)
+        label_nombre.pack(pady=10, padx=10)
+        
+        label_cedula = ctk.CTkLabel(frame_cedula, text=(f"Cédula: {cedula}"), font=poppins14bold)
+        label_cedula.pack(pady=10)
+        
+        label_rif = ctk.CTkLabel(frame_rif, text=(f"RIF: {rif}"), font=poppins14bold)
+        label_rif.pack(pady=10)
+        
+        label_telefono = ctk.CTkLabel(frame_telefono, text=(f"Teléfono: {telefono}"), font=poppins14bold)
+        label_telefono.pack(pady=10)
+        
+        label_correo = ctk.CTkLabel(frame_correo, text=(f"Correo: {correo}"), font=poppins14bold)
+        label_correo.pack(pady=10)
+        
+        # Botón para cerrar la ventana modal
+
+    else:
+        print("No se ha seleccionado ningún elemento en el Treeview.")
+
+def cargar_datoss(ID):
     original_data = []
     try:
         with connection() as conn:
             cursor = conn.cursor()
-            sql = ''' SELECT 
-            inmuebles.nom_inmueble,
-            inmuebles.cod_catastral,
-            inmuebles.uso,
-            contribuyentes.nombres || ' ' || contribuyentes.apellidos AS contribuyente,
-            contribuyentes.ci_contribuyente,
-            contribuyentes.rif,
-            contribuyentes.telefono,
-            contribuyentes.correo,
-            sectores.nom_sector,
-            sectores.ubic_sector,
-            liquidaciones.id_liquidacion,
-            liquidaciones.monto_1,
-            liquidaciones.monto_2,
-            liquidaciones.fecha_Liquidacion_1,
-            liquidaciones.fecha_Liquidacion_2
-        FROM
-            inmuebles
-        JOIN contribuyentes ON inmuebles.id_contribuyente = contribuyentes.id_contribuyente
-        JOIN sectores ON inmuebles.id_sector = sectores.id_sector
-        JOIN liquidaciones ON inmuebles.id_inmueble = liquidaciones.id_inmueble WHERE contribuyentes.id_contribuyente = ?
-        ORDER BY contribuyentes.ci_contribuyente ASC
-        '''
+            sql = '''
+            SELECT 
+                contribuyentes.nombres || ' ' || contribuyentes.apellidos AS contribuyente,
+                v_e || "-" || ci_contribuyente AS cedula_completa,
+                j_c_g || "-" || rif AS rif_completo,
+                contribuyentes.telefono,
+                contribuyentes.correo
+            FROM contribuyentes
+            WHERE id_contribuyente = ?
+            ORDER BY contribuyentes.ci_contribuyente ASC
+            '''
             cursor.execute(sql, (ID,))
             original_data = cursor.fetchall()
             
             print(f"Fetched {len(original_data)} rows from the database.")
-            
-
-            # Insert all data into Treeview initially
-           
-
     except Exception as e:
         print(f"Error during database operation: {e}")
 
-    return my_tree, original_data
+    return original_data
