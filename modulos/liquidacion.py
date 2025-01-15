@@ -366,8 +366,13 @@ def ifgestionar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold
     ci_entry.bind("<FocusOut>", lambda e: update_contribuyente_info(ci_entry, nombre_entry, inmueble_menu))
 
 
+<<<<<<< Updated upstream
     btncancel = ctk.CTkButton(frame_left, text="Cancelar", command=lambda: clearentrys(ci_entry, nombre_entry, inmueble_menu, monto1, monto2, fecha1, fecha2), font=poppins14bold)
     btncancel.pack(padx=10, pady=10, anchor="e", side="bottom")
+=======
+    btnvolver = ctk.CTkButton(frame_left, text="Volver", command=lambda: liquidacion(window, last_window), font=poppins14bold)
+    btnvolver.pack(padx=10, pady=10, anchor="e", side="bottom")
+>>>>>>> Stashed changes
 
     btndelete = ctk.CTkButton(frame_left, text="Eliminar", command=lambda: delete_liquidacion(ci_entry, inmueble_menu, my_tree), font=poppins14bold)
     btndelete.pack(padx=10, pady=10, anchor="e", side="bottom")
