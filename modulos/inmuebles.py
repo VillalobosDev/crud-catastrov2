@@ -37,10 +37,10 @@ def inmuebles(window, last_window):
 
     #Contenido del top frame 2
 
-    crearinm = ctk.CTkButton(top_frame2, text="Asignar", command=lambda: ifasignar(bottom_frame, top_frame2), font=poppins14bold)
+    crearinm = ctk.CTkButton(top_frame2, text="Asignar", command=lambda: ifasignar(bottom_frame, top_frame2, window, last_window), font=poppins14bold)
     crearinm.pack(padx=5, pady=5, side="left")
 
-    gestionarinm = ctk.CTkButton(top_frame2, text="Gestionar", command=lambda: ifgestionar(window, bottom_frame, top_frame2), font=poppins14bold)
+    gestionarinm = ctk.CTkButton(top_frame2, text="Gestionar", command=lambda: ifgestionar(window, bottom_frame, top_frame2, last_window), font=poppins14bold)
     gestionarinm.pack(padx=5, pady=5, side="left")
 
     refrescartabla = ctk.CTkButton(top_frame2, text="Refrescar Tabla", font=poppins14bold, width=80, command=lambda: loaddata())
@@ -107,7 +107,7 @@ def inmuebles(window, last_window):
     loaddata()
     return window
 
-def ifasignar(bottom_frame, top_frame2):
+def ifasignar(bottom_frame, top_frame2, window, last_window):
     global busquedainm, busquedabtn, refrescartabla
 
     if busquedabtn:
@@ -220,6 +220,9 @@ def ifasignar(bottom_frame, top_frame2):
 
     btnsave = ctk.CTkButton(frame_left, text="Guardar", command=lambda: asignar_inmueble(contribuyenteci, contribuyentenombre, inmueble, inmueblecod, uso, sector), font=poppins14bold)
     btnsave.pack(padx=10, pady=10, anchor="e", side="bottom")
+
+    btnvolver = ctk.CTkButton(frame_left, text="Volver", command=lambda: inmuebles(window, last_window), font=poppins14bold)
+    btnvolver.pack(padx=10, pady=10, anchor="e", side="bottom")
 
     # Fin del contenido del left frame #########################################################################
 
@@ -335,7 +338,7 @@ def ifasignar(bottom_frame, top_frame2):
         except Exception as e:
             print(f"Error: {e}")
 
-def ifgestionar(window, bottom_frame, top_frame2):
+def ifgestionar(window, bottom_frame, top_frame2, last_window):
     global busquedainm, busquedabtn, refrescartabla
 
     if busquedabtn:
@@ -520,11 +523,11 @@ def ifgestionar(window, bottom_frame, top_frame2):
     btnsave = ctk.CTkButton(frame_left, text="Guardar", command=lambda: save_changes(selected_item), font=poppins14bold)
     btnsave.pack(padx=10, pady=10, anchor="e", side="bottom")
 
-    btncancel = ctk.CTkButton(frame_left, text="Cancelar", command=cancel_action, font=poppins14bold)
-    btncancel.pack(padx=10, pady=10, anchor="e", side="bottom")
-
-    btndelete = ctk.CTkButton(frame_left, text="Eliminar", command=confirm_delete, font=poppins14bold)
+    btndelete = ctk.CTkButton(frame_left, text="Eliminar", command=lambda: confirm_delete, font=poppins14bold)
     btndelete.pack(padx=10, pady=10, anchor="e", side="bottom")
+
+    btnvolver = ctk.CTkButton(frame_left, text="Volver", command=lambda: inmuebles(window, last_window), font=poppins14bold)
+    btnvolver.pack(padx=10, pady=10, anchor="e", side="bottom")
 
     frame_tree = ctk.CTkFrame(frame_right, fg_color="white")
     frame_tree.pack(pady=10, padx=10, expand=True, fill="both")
