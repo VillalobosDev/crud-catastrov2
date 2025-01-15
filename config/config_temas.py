@@ -67,7 +67,7 @@ def open_config_window(parent):
     pass_button = ctk.CTkButton(left_frame, text="Contraseñas", font=poppins12bold)
     pass_button.pack(padx=20, pady=10, side="top")
 
-    accept_button = ctk.CTkButton(left_frame, text="Aceptar", command=config_window.destroy, font=poppins12bold)
+    accept_button = ctk.CTkButton(left_frame, text="Atrás", command=config_window.destroy, font=poppins12bold)
     accept_button.pack(padx=20, pady=10, side="bottom")
 
     ########## Temas ########

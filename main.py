@@ -31,6 +31,7 @@ window.title("Menu")
 window.geometry("1080x720")
 
 
+
 centrar_ventana(window, 1080, 720)
 
 def close_after_timeout(root, timeout):
@@ -41,8 +42,8 @@ def close_after_timeout(root, timeout):
 #menu(window)
 
 #Este es para usuarios
-# menu(window)
-inmuebles(window, menu)
+menu(window)
+#inmuebles(window, menu)
 #Para iniciar desde el login, la contraseña es 1234
 # login(window)
 

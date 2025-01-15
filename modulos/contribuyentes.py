@@ -20,7 +20,7 @@ def ifagregar(bottom_frame, top_frame2, window, last_window):
         refrescarbtn.pack_forget()
 
     poppins14bold = ("Poppins", 14, "bold")
-    poppins14 = ("Poppins", 14)
+    poppins10 = ("Poppins", 10)
     poppins18 = ("Poppins", 18, "bold")
 
     for widget in bottom_frame.winfo_children():

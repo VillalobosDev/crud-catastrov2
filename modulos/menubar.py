@@ -2,6 +2,7 @@ import customtkinter as ctk
 import tkinter as tk
 from modulos.transitions import transition_to_next_ui
 from config.config_temas import open_config_window
+from config.config import centrar_ventana
 import json
 
 def set_menu_bar_color(menubar_frame, mode, menu_button, config_button, support_button, exit_button, window):
@@ -42,7 +43,7 @@ def menubar(window):
     menubar_frame.pack(fill="x", side="top")
 
     # Botón "Menu"
-    menu_button = ctk.CTkButton(menubar_frame, text="Menu", font=poppins12bold, width=100, hover_color="gray", command=lambda: print("Menu clicked"))
+    menu_button = ctk.CTkButton(menubar_frame, text="Creditos", font=poppins12bold, width=100, hover_color="gray", command=lambda: creditos(window))
     menu_button.pack(side="left", padx=5, pady=5)
 
     # Botón "Configuracion"
@@ -63,3 +64,60 @@ def menubar(window):
     #def logout(window):
     #    from modulos.login_fun import login
     #    transition_to_next_ui(window, None, login, duration=4000)
+    
+    
+    
+def creditos(parent):
+    poppins16 = ("Poppins", 16, "bold")
+    poppins12bold = ("Poppins", 12, "bold")
+    poppins10bold = ("Poppins", 10, "bold")
+    poppins14bold = ("Poppins", 14, "bold")
+    
+    config_window = ctk.CTkToplevel(parent)
+    config_window.title("Creditos")
+    config_window.geometry("700x400")
+    config_window.grab_set()
+    config_window.resizable(False, False)
+
+    centrar_ventana(config_window, 700, 400)
+    
+    left_frame = ctk.CTkFrame(config_window, corner_radius=15)
+    left_frame.pack(fill="y", side="left", pady=5, padx=5)
+    
+    
+    top = ctk.CTkLabel(left_frame, text="Desarrolladadores:", font=poppins16)
+    top.pack(pady=30, padx=70, side="top", anchor="w")
+
+    # Dimensiones uniformes para los frames
+    frame_width = 300
+    frame_height = 60
+
+    frame = ctk.CTkFrame(left_frame, corner_radius=15, width=frame_width, height=frame_height)
+    frame.pack(pady=5, padx=5, side="top", anchor="w")
+    frame.pack_propagate(False)  # Evita que el tamaño del frame cambie según su contenido
+
+    frame2 = ctk.CTkFrame(left_frame, corner_radius=15, width=frame_width, height=frame_height)
+    frame2.pack(pady=5, padx=5, side="top", anchor="w")
+    frame2.pack_propagate(False)
+
+    frame3 = ctk.CTkFrame(left_frame, corner_radius=15, width=frame_width, height=frame_height)
+    frame3.pack(pady=5, padx=5, side="top", anchor="w")
+    frame3.pack_propagate(False)
+
+    nombre1 = ctk.CTkLabel(frame, text="Nelson Villalobos CI:31.675.830", font=poppins14bold)
+    nombre1.pack(pady=10, padx=10)
+
+    nombre2 = ctk.CTkLabel(frame2, text="Cristhian Bracho  CI:31.625.272", font=poppins14bold)
+    nombre2.pack(pady=10, padx=10)
+
+    nombre3 = ctk.CTkLabel(frame3, text="José Lanz CI:31.760.396", font=poppins14bold)
+    nombre3.pack(pady=10, padx=10)
+    
+    nombre4 = ctk.CTkLabel(left_frame, text="Hecho en Python y CustomTkinter :)", font=poppins10bold)
+    nombre4.pack(pady=5, padx=20, side="left", anchor="s")
+    
+    
+    atras_button = ctk.CTkButton(config_window, text="Atrás", command=config_window.destroy, font=poppins12bold)
+    atras_button.pack(padx=10, pady=10, side="right", anchor="s")
+    
+
