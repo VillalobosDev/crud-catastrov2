@@ -15,8 +15,34 @@ column_switch_shown = False
 search_filter_created = False
 column_switches_created = False
 
-def display_column_switches(top_frame4, treeview, original_data):
+def toplevelwindow(window):
+
     
+    toplevel = ctk.CTkToplevel(window)
+    
+    mainframewrap = ctk.CTkFrame(toplevel, corner_radius=15)
+
+    mainframe = ctk.CTkFrame(mainframewrap, width=400, height=600, corner_radius=10)
+    mainframe.pack(fill="both", expand=True, padx=5, pady=5)
+
+    frameleft = ctk.CTkFrame(mainframe, corner_radius=10)
+    frameleft.pack(padx=5, pady=5, side="left", fill="y", expand=True)
+
+    frameright = ctk.CTkFrame(mainframe, corner_radius=10)
+    frameright.pack(padx=5, pady=5, side="right", fill="y", expand=True)
+    
+    framebot = ctk.CTkFrame(mainframewrap, corner_radius=10)
+    framebot.pack(padx=5, pady=5, side="bottom", fill="x", expand=True)
+
+    
+
+def display_column_switches(top_frame4, treeview, original_data, window):
+    ##############################################################
+    
+
+    
+    
+    ##############################################################
     poppins12 = ("Poppins", 12, "bold")    
 
     global column_switches_created
@@ -207,8 +233,11 @@ def consulta(window, last_window):
     show_filter_btn = ctk.CTkButton(top_frame2, text="Show Filter", width=100, font=poppins14bold, command=lambda: toggle_top_frame_visibility(top_frame4, top_frame3))
     show_filter_btn.pack(padx=10, pady=5, side="left")
 
+    showtoplevel = ctk.CTkButton(top_frame2, text="TopLevel", width=100, font=poppins14bold, command=lambda: toplevelwindow(window))
+    showtoplevel.pack(padx=10, pady=5, side="left")
+
     # Add column switch UI to top_frame4
-    display_column_switches(top_frame4, my_tree, original_data)
+    display_column_switches(top_frame4, my_tree, original_data, window)
 
     searchbtn = display_search_filter(top_frame3, my_tree, original_data)
     print(type(searchbtn)) 

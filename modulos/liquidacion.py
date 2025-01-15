@@ -366,7 +366,7 @@ def ifgestionar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold
     ci_entry.bind("<FocusOut>", lambda e: update_contribuyente_info(ci_entry, nombre_entry, inmueble_menu))
 
 
-    btnvolver = ctk.CTkButton(frame_left, text="Cancelar", command=lambda: liquidacion(window, last_window), font=poppins14bold)
+    btnvolver = ctk.CTkButton(frame_left, text="CancelPcopcar", command=lambda: liquidacion(window, last_window), font=poppins14bold)
     btnvolver.pack(padx=10, pady=10, anchor="e", side="bottom")
 
     btndelete = ctk.CTkButton(frame_left, text="Eliminar", command=lambda: delete_liquidacion(ci_entry, inmueble_menu, my_tree), font=poppins14bold)
