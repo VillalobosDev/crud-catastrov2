@@ -274,10 +274,10 @@ def liquidacion(window, last_window):
     busquedaliq = ctk.CTkEntry(top_frame2, placeholder_text="Buscar por cedula", font=poppins14bold, width=200)
     busquedaliq.pack(padx=5, pady=5, side="right")
 
-    crearinm = ctk.CTkButton(top_frame2, text="Asignar", command=lambda: ifasignar(window, bottom_frame, top_frame2, busquedabtn, busquedaliq), font=poppins14bold)
+    crearinm = ctk.CTkButton(top_frame2, text="Asignar", command=lambda: ifasignar(window, bottom_frame, top_frame2, busquedabtn, busquedaliq, last_window), font=poppins14bold)
     crearinm.pack(padx=5, pady=5, side="left")
 
-    gestionarinm = ctk.CTkButton(top_frame2, text="Gestionar", command=lambda: ifgestionar(window, bottom_frame, top_frame2, busquedabtn, busquedaliq), font=poppins14bold)
+    gestionarinm = ctk.CTkButton(top_frame2, text="Gestionar", command=lambda: ifgestionar(window, bottom_frame, top_frame2, busquedabtn, busquedaliq, last_window), font=poppins14bold)
     gestionarinm.pack(padx=5, pady=5, side="left")
 
     # Contenido del bottom frame
@@ -291,7 +291,7 @@ def liquidacion(window, last_window):
     my_tree = setup_treeview(frame_tree)
     load_liquidaciones_data(my_tree)
 
-def ifgestionar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold):
+def ifgestionar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold, last_window):
     global busquedabtn, busquedaliq
 
     if busquedabtnold:
@@ -366,8 +366,8 @@ def ifgestionar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold
     ci_entry.bind("<FocusOut>", lambda e: update_contribuyente_info(ci_entry, nombre_entry, inmueble_menu))
 
 
-    btncancel = ctk.CTkButton(frame_left, text="Cancelar", command=lambda: clearentrys(ci_entry, nombre_entry, inmueble_menu, monto1, monto2, fecha1, fecha2), font=poppins14bold)
-    btncancel.pack(padx=10, pady=10, anchor="e", side="bottom")
+    btnvolver = ctk.CTkButton(frame_left, text="Cancelar", command=lambda: liquidacion(window, last_window), font=poppins14bold)
+    btnvolver.pack(padx=10, pady=10, anchor="e", side="bottom")
 
     btndelete = ctk.CTkButton(frame_left, text="Eliminar", command=lambda: delete_liquidacion(ci_entry, inmueble_menu, my_tree), font=poppins14bold)
     btndelete.pack(padx=10, pady=10, anchor="e", side="bottom")
@@ -390,7 +390,7 @@ def ifgestionar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold
     busquedaliq = ctk.CTkEntry(top_frame2, placeholder_text="Buscar por cedula", font=poppins14bold, width=200)
     busquedaliq.pack(padx=5, pady=5, side="right")
 
-def ifasignar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold):
+def ifasignar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold, last_window):
     global busquedabtn, busquedaliq
     if busquedabtnold:
         busquedabtnold.pack_forget()
@@ -471,8 +471,8 @@ def ifasignar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold):
     my_tree = setup_treeview(frame_tree)
     ######################################
     
-    btncancel = ctk.CTkButton(frame_left, text="Cancelar", command=lambda: clearentrys(ci_entry, nombre_entry, inmueble_menu, monto1, monto2, fecha1, fecha2), font=poppins14bold)
-    btncancel.pack(padx=10, pady=10, anchor="e", side="bottom")
+    btnvolver = ctk.CTkButton(frame_left, text="Volver", command=lambda: liquidacion(window, last_window), font=poppins14bold)
+    btnvolver.pack(padx=10, pady=10, anchor="e", side="bottom")
 
     
     btnsave = ctk.CTkButton(frame_left, text="Guardar", command=lambda: save_liquidacion(my_tree, ci_entry, nombre_entry, inmueble_menu, monto1, monto2, fecha1, fecha2), font=poppins14bold)

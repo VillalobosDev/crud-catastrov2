@@ -8,7 +8,7 @@ from config.config import centrar_ventana
 import tkinter
 
 
-def ifagregar(bottom_frame, top_frame2):
+def ifagregar(bottom_frame, top_frame2, window, last_window):
     global busquedainm, busquedabtn, refrescarbtn
     
 
@@ -113,6 +113,9 @@ def ifagregar(bottom_frame, top_frame2):
         correo.delete(0, tk.END)
         correo.configure(placeholder_text="ejemplo@gmail.com")
 
+    def volver():
+        contribuyentes
+        print("back")
 
     def cargar_datos():
         for item in my_tree.get_children():
@@ -175,8 +178,11 @@ def ifagregar(bottom_frame, top_frame2):
         except Exception as e:
             print(f"Error al guardar los datos: {e}")
 
-    btnsave = ctk.CTkButton(frame_left, text="Guardar", command=guardar_datos, font=poppins14bold)
+    btnsave = ctk.CTkButton(frame_left, text="Guardar", command = guardar_datos, font=poppins14bold)
     btnsave.pack(padx=10, pady=10, anchor="e", side="bottom")
+
+    btncancelar = ctk.CTkButton(frame_left, text="Volver", command=lambda: contribuyentes(window, last_window), font=poppins14bold)
+    btncancelar.pack(padx=10, pady=10, anchor="e", side="bottom")
 
     # Contenido del RIGHT FRAME
 
@@ -205,7 +211,7 @@ def ifagregar(bottom_frame, top_frame2):
 
     cargar_datos()  # Llamar a la función para cargar los datos inicialmente
 
-def ifgestionar(bottom_frame, top_frame2):
+def ifgestionar(bottom_frame, top_frame2, window, last_window):
     global busquedainm, busquedabtn, refrescarbtn
 
     if busquedabtn:
@@ -404,6 +410,10 @@ def ifgestionar(bottom_frame, top_frame2):
     
     btndelete = ctk.CTkButton(frame_left, text="Eliminar", command=delete_record, font=poppins14bold)
     btndelete.pack(padx=10, pady=10, anchor="e", side="bottom")
+
+    
+    btncancelar = ctk.CTkButton(frame_left, text="Volver", command=lambda: contribuyentes(window, last_window), font=poppins14bold)
+    btncancelar.pack(padx=10, pady=10, anchor="e", side="bottom")
     
     
     frame_tree = ctk.CTkFrame(frame_right, fg_color="white")
@@ -527,10 +537,10 @@ def contribuyentes(window, last_window):
 
     #Contenido del top frame 2
 
-    crearliq = ctk.CTkButton(top_frame2, text="Agregar", command=lambda: ifagregar(bottom_frame, top_frame2), font=poppins14bold)
+    crearliq = ctk.CTkButton(top_frame2, text="Agregar", command=lambda: ifagregar(bottom_frame, top_frame2, window, last_window), font=poppins14bold)
     crearliq.pack(padx=5, pady=5, side="left")
 
-    gestionarliq = ctk.CTkButton(top_frame2, text="Modificar", command=lambda:ifgestionar(bottom_frame, top_frame2), font=poppins14bold)
+    gestionarliq = ctk.CTkButton(top_frame2, text="Modificar", command=lambda:ifgestionar(bottom_frame, top_frame2, window, last_window), font=poppins14bold)
     gestionarliq.pack(padx=5, pady=5, side="left")
 
     refrescarbtn = ctk.CTkButton(top_frame2, text="Refrescar Tabla", font=poppins14bold, width=80, command=lambda: loaddata(my_tree))
@@ -584,7 +594,7 @@ def contribuyentes(window, last_window):
     my_tree.bind("<Return>", lambda event: mostrar_modal_contribuyente(my_tree))  # Tecla Enter
 
     loaddata(my_tree)
-    return window
+    return window, last_window
 
 
 def reload_treeviewsearch(treeview, ci):

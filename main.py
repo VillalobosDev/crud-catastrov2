@@ -10,7 +10,6 @@ from modulos.contribuyentes import contribuyentes
 from modulos.sectores import sectores
 from modulos2.menu import menu2
 from modulos2.consulta_general import consulta
-from modulos2.inmuebles import inmuebles
 from modulos2.liquidacion import liquidacion
 from modulos2.contribuyentes import contribuyentes
 from modulos2.sectores import sectores
@@ -38,13 +37,12 @@ def close_after_timeout(root, timeout):
     """Close the window after a specified timeout (in milliseconds)."""
     root.after(timeout, root.destroy)
 
-
 #Este es para administradoresssssss
 #menu(window)
 
 #Este es para usuarios
-menu(window)
-
+# menu(window)
+inmuebles(window, menu)
 #Para iniciar desde el login, la contraseña es 1234
 # login(window)
 
