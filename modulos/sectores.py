@@ -445,7 +445,8 @@ def ifgestionar(bottom_frame, window, last_window):
         codigo = cod_sectores.get()
         
         if not nombre or not codigo:
-
+            text = ctk.CTkLabel(left_frame, text="Todos los campos son obligatorios", text_color="red", font=poppins14bold)
+            text.place(x=15, y=350)
             return
         
         try:
@@ -473,6 +474,8 @@ def ifgestionar(bottom_frame, window, last_window):
                 sql = 'UPDATE sectores SET nom_sector = ?, cod_sector = ?, image_path = ? WHERE id_sector = ?'
                 cursor.execute(sql, (nombre, codigo, image_save_path, id_sector))
                 conn.commit()
+                text = ctk.CTkLabel(left_frame, text="Datos Actualizados Correctamente", text_color="green", font=poppins14bold, width=250)
+                text.place(x=10, y=350)
                 print("Datos actualizados exitosamente.")
                 
                 # Actualizar el Treeview
@@ -602,7 +605,8 @@ def ifgestionar(bottom_frame, window, last_window):
                     nom_sectores.insert(0, sector_name)
                     cod_sectores.delete(0, tk.END)
                     cod_sectores.insert(0, sector_code)
-
+                    text = ctk.CTkLabel(left_frame, text="", text_color="green", font=poppins14bold, width=270)
+                    text.place(x=0, y=350)
             except Exception as e:
                 print(f"Error loading image: {e}")
 
