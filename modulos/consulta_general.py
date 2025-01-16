@@ -16,20 +16,35 @@ column_switch_shown = False
 search_filter_created = False
 column_switches_created = False
 
+# Global dictionary to store the switch states
+column_switch_states = {
+    'Inmueble': True,
+    'Codigo Catastral': True,
+    'Uso': True,
+    'Contribuyente': True,
+    'CI': True,
+    'RIF': True,
+    'Telefono': True,
+    'Correo': True,
+    'Sector': True,
+    'Ubicacion Sector': True,
+    'Liquidacion ID': True,
+    'Monto 1': True,
+    'Monto 2': True,
+    'Fecha Liquidacion 1': True,
+    'Fecha Liquidacion 2': True
+}
+
 def display_column_switches(top_frame4, treeview, original_data, window):
-    
     poppins12 = ("Poppins", 12, "bold")    
 
     global column_switches_created
     column_switches_created = False
     if column_switches_created:
-        print("Alredy exist")
+        print("Already exist")
         return  # Skip if already created
 
     # Frame to hold switches
-    # switches_frame = ctk.CTkFrame(top_frame4, corner_radius=15)
-    # switches_frame.pack(pady=5, padx=5, side="left", fill="x", expand=True)
-
     toplevel = ctk.CTkToplevel(window)
     toplevel.title("Column Switches")
     toplevel.geometry("400x400")
@@ -43,8 +58,7 @@ def display_column_switches(top_frame4, treeview, original_data, window):
     btnframe = ctk.CTkFrame(toplevel, corner_radius=15)
     btnframe.pack(pady=5, padx=5, fill="x", expand=True)
 
-
-    # Dictionary to store the switch states
+    # Dictionary to store the switch widgets
     column_switches = {}
 
     # Treeview columns
@@ -74,7 +88,12 @@ def display_column_switches(top_frame4, treeview, original_data, window):
         )
         switch.pack(side="left", padx=5, pady=5)  # Pack the switches side by side
         column_switches[col_name] = switch
-        switch.select() # Enable all columns by default
+
+        # Set the switch state based on the global dictionary
+        if column_switch_states[col_name]:
+            switch.select()
+        else:
+            switch.deselect()
 
         switch_count += 1
 
@@ -89,14 +108,18 @@ def display_column_switches(top_frame4, treeview, original_data, window):
         command=lambda: close_and_refresh(toplevel, treeview, column_switches)
     )
     refresh_button.pack(side="right", padx=5, pady=5)  # Place the button on the right inside the `button_frame`
-     # Place the button below the switches
 
     column_switches_created = True  # Mark column switches as created
 
 def toggle_column(column_switches, column):
     # Toggle the visibility of the column
-    column_switches[column] = not column_switches[column]
-    print(f"Column {column} visibility is now {column_switches[column]}")
+    switch = column_switches[column]
+    column_switch_states[column] = not column_switch_states[column]
+    if column_switch_states[column]:
+        switch.select()
+    else:
+        switch.deselect()
+    print(f"Column {column} visibility is now {column_switch_states[column]}")
 
 def refresh_treeview(treeview, column_switches):
     # Clear the Treeview before updating with new data
@@ -104,7 +127,7 @@ def refresh_treeview(treeview, column_switches):
         treeview.delete(item)
 
     # Select columns that are marked as visible in the column_switches
-    selected_columns = [col for col, is_visible in column_switches.items() if is_visible]
+    selected_columns = [col for col, switch in column_switches.items() if switch.get() == 1]
     
     # If no columns are selected, show an error and stop the function
     if not selected_columns:
