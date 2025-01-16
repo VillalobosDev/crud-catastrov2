@@ -125,8 +125,8 @@ def creditos(parent):
     frame_height = 60
 
     frame = ctk.CTkFrame(left_frame, corner_radius=15, width=frame_width, height=frame_height)
-    frame.pack(pady=5, padx=5, side="top", anchor="w")
-    frame.pack_propagate(False)  # Evita que el tamaño del frame cambie según su contenido
+    frame.pack(pady=5, padx=5, side="top", anchor="w", fill="y")
+    frame.pack_propagate(False)
 
     frame2 = ctk.CTkFrame(left_frame, corner_radius=15, width=frame_width, height=frame_height)
     frame2.pack(pady=5, padx=5, side="top", anchor="w")

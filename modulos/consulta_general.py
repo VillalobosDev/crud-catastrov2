@@ -36,7 +36,9 @@ column_switch_states = {
 }
 
 def display_column_switches(top_frame4, treeview, original_data, window):
-    poppins12 = ("Poppins", 12, "bold")    
+    poppins12 = ("Poppins", 12, "bold")
+    poppins20 = ("Poppins", 20, "bold")  
+    poppins16 = ("Poppins", 16, "bold")     
 
     global column_switches_created
     column_switches_created = False
@@ -46,17 +48,17 @@ def display_column_switches(top_frame4, treeview, original_data, window):
 
     # Frame to hold switches
     toplevel = ctk.CTkToplevel(window)
-    toplevel.title("Column Switches")
-    toplevel.geometry("400x400")
+    toplevel.title("Filtros")
+    toplevel.geometry("800x400")
     toplevel.grab_set()
     toplevel.resizable(False, False)
-    centrar_ventana(toplevel, 400, 400)
+    centrar_ventana(toplevel, 800, 500)
 
     switches_frame = ctk.CTkFrame(toplevel, corner_radius=15)
-    switches_frame.pack(pady=5, padx=5, fill="x", expand=True)
-
-    btnframe = ctk.CTkFrame(toplevel, corner_radius=15)
-    btnframe.pack(pady=5, padx=5, fill="x", expand=True)
+    switches_frame.pack(pady=5, padx=5, fill="both", expand=True)
+    
+    text_top = ctk.CTkLabel(switches_frame, text="Filtros de Busqueda", font=poppins20)
+    text_top.pack(pady=10, padx=10, side="top")
 
     # Dictionary to store the switch widgets
     column_switches = {}
@@ -68,25 +70,25 @@ def display_column_switches(top_frame4, treeview, original_data, window):
         'Liquidacion ID', 'Monto 1', 'Monto 2', 'Fecha Liquidacion 1', 'Fecha Liquidacion 2'
     ]
 
-    # Create switches in rows using pack
-    max_columns_per_row = 2  # Number of switches per row
-    current_row_frame = None  # To keep track of the current row
-    switch_count = 0
+    # Define a fixed width for all frames
+    frame_width = 186.5
 
-    for idx, col_name in enumerate(columns):
-        # Create a new row frame when needed
-        if idx % max_columns_per_row == 0:
-            current_row_frame = ctk.CTkFrame(switches_frame)
-            current_row_frame.pack(fill="x", padx=5, pady=5)
+    # Group 1: Inmueble, Codigo Catastral, Uso
+    group1_frame = ctk.CTkFrame(switches_frame, width=frame_width)
+    group1_frame.pack(side="left", padx=5, pady=5, fill="y")
+    group1_frame.pack_propagate(False)
+    text_1= ctk.CTkLabel(group1_frame, text="Inmuebles", font=poppins16)
+    text_1.pack(pady=10, side="top")
 
-        # Create the switch inside the current row frame
+
+    for col_name in ['Inmueble', 'Codigo Catastral', 'Uso']:
         switch = ctk.CTkSwitch(
-            current_row_frame,
+            group1_frame,
             text=col_name,
             font=poppins12,
             command=lambda c=col_name: toggle_column(column_switches, c)
         )
-        switch.pack(side="left", padx=5, pady=5)  # Pack the switches side by side
+        switch.pack(side="top", anchor="w", padx=5, pady=20)
         column_switches[col_name] = switch
 
         # Set the switch state based on the global dictionary
@@ -95,19 +97,88 @@ def display_column_switches(top_frame4, treeview, original_data, window):
         else:
             switch.deselect()
 
-        switch_count += 1
+    # Group 2: Contribuyente, CI, RIF, Telefono, Correo
+    group2_frame = ctk.CTkFrame(switches_frame, width=frame_width)
+    group2_frame.pack(side="left", padx=5, pady=5, fill="y")
+    group2_frame.pack_propagate(False)
+    text_2= ctk.CTkLabel(group2_frame, text="Contribuyentes", font=poppins16)
+    text_2.pack(pady=10, side="top")
 
+
+    for col_name in ['Contribuyente', 'CI', 'RIF', 'Telefono', 'Correo']:
+        switch = ctk.CTkSwitch(
+            group2_frame,
+            text=col_name,
+            font=poppins12,
+            command=lambda c=col_name: toggle_column(column_switches, c)
+        )
+        switch.pack(side="top", anchor="w", padx=5, pady=20)
+        column_switches[col_name] = switch
+
+        # Set the switch state based on the global dictionary
+        if column_switch_states[col_name]:
+            switch.select()
+        else:
+            switch.deselect()
+
+    # Group 3: Sector, Ubicacion Sector
+    group3_frame = ctk.CTkFrame(switches_frame, width=frame_width)
+    group3_frame.pack(side="left", padx=5, pady=5, fill="y")
+    group3_frame.pack_propagate(False)
+    text_3= ctk.CTkLabel(group3_frame, text="Sectores", font=poppins16)
+    text_3.pack(pady=10, side="top")
+
+
+    for col_name in ['Sector', 'Ubicacion Sector']:
+        switch = ctk.CTkSwitch(
+            group3_frame,
+            text=col_name,
+            font=poppins12,
+            command=lambda c=col_name: toggle_column(column_switches, c)
+        )
+        switch.pack(side="top", anchor="w", padx=5, pady=20)
+        column_switches[col_name] = switch
+
+        # Set the switch state based on the global dictionary
+        if column_switch_states[col_name]:
+            switch.select()
+        else:
+            switch.deselect()
+
+    # Group 4: Liquidacion ID, Monto 1, Monto 2, Fecha Liquidacion 1, Fecha Liquidacion 2
+    group4_frame = ctk.CTkFrame(switches_frame, width=frame_width)
+    group4_frame.pack(side="left", padx=5, pady=5, fill="y")
+    group4_frame.pack_propagate(False)
+    text_4= ctk.CTkLabel(group4_frame, text="Liquidaciones", font=poppins16)
+    text_4.pack(pady=10, side="top")
+
+    for col_name in ['Liquidacion ID', 'Monto 1', 'Monto 2', 'Fecha Liquidacion 1', 'Fecha Liquidacion 2']:
+        switch = ctk.CTkSwitch(
+            group4_frame,
+            text=col_name,
+            font=poppins12,
+            command=lambda c=col_name: toggle_column(column_switches, c)
+        )
+        switch.pack(side="top", anchor="w", padx=5, pady=20)
+        column_switches[col_name] = switch
+
+        # Set the switch state based on the global dictionary
+        if column_switch_states[col_name]:
+            switch.select()
+        else:
+            switch.deselect()
+            
     def close_and_refresh(toplevel, treeview, column_switches):
         toplevel.destroy()  # Close the toplevel window
         refresh_treeview(treeview, column_switches)  # Refresh the treeview
-    
+
     refresh_button = ctk.CTkButton(
-        btnframe,
-        text="Refresh Treeview",
+        toplevel,
+        text="Aplicar",
         font=poppins12,
         command=lambda: close_and_refresh(toplevel, treeview, column_switches)
     )
-    refresh_button.pack(side="right", padx=5, pady=5)  # Place the button on the right inside the `button_frame`
+    refresh_button.pack(side="bottom", anchor="e", padx=10, pady=10)  # Place the button on the right inside the `button_frame`
 
     column_switches_created = True  # Mark column switches as created
 
@@ -175,7 +246,7 @@ def refresh_treeview(treeview, column_switches):
             treeview["columns"] = selected_columns
             for col in selected_columns:
                 treeview.heading(col, text=col)
-                treeview.column(col, anchor="center", width=100)
+                treeview.column(col, anchor="center", width=200)  # Set the column width to 200
 
             # Insert the rows fetched from the query into the Treeview
             for row in filtered_data:
@@ -190,8 +261,7 @@ def toggle_top_frame_visibility(frame_to_show, frame_to_hide):
         frame_to_show.pack_forget()  # Hide it
     else:
         frame_to_show.pack(fill="x", padx=10, pady=5, after=top_frame2)  # Show it after top_frame2
-        frame_to_hide.pack_forget() 
-
+        frame_to_hide.pack_forget()
 def consulta(window, last_window):
     for widget in window.winfo_children():
         widget.destroy()
@@ -241,7 +311,7 @@ def consulta(window, last_window):
     busqueda = ctk.CTkButton(top_frame2, text="Buscar", width=80, font=poppins14bold, command=lambda: toggle_top_frame_visibility(top_frame3, top_frame4))
     busqueda.pack(padx=10, pady=5, side="left")
     
-    show_filter_btn = ctk.CTkButton(top_frame2, text="Show Filter", width=100, font=poppins14bold, command=lambda: display_column_switches(top_frame4, my_tree, original_data, window))
+    show_filter_btn = ctk.CTkButton(top_frame2, text="Filtros", width=100, font=poppins14bold, command=lambda: display_column_switches(top_frame4, my_tree, original_data, window))
     show_filter_btn.pack(padx=10, pady=5, side="left")    
 
     export = ctk.CTkButton(top_frame2, text="Exportar a Excel", font=poppins12, command=lambda: export_treeview_to_xlsx(my_tree, "consulta_general.xlsx"))
@@ -353,7 +423,7 @@ def bottom_treeview(frame):
     # Set column headers
     for col in columns:
         my_tree.heading(col, text=col)
-        my_tree.column(col, anchor="center", width=100)
+        my_tree.column(col, anchor="center", width=200)
 
     # Fetch data
     original_data = []
