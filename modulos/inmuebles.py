@@ -3,6 +3,9 @@ from .menubar import menubar
 from functions.functions import * 
 from tkinter import ttk
 from functions.rectangle import rectangle
+import tkinter.messagebox as messagebox
+
+
 
 def inmuebles(window, last_window):
     global busquedabtn, busquedainm, refrescartabla
@@ -489,18 +492,9 @@ def ifgestionar(window, bottom_frame, top_frame2):
 
     def confirm_delete():
         if selected_item:
-            confirm = ctk.CTkToplevel(window)
-            confirm.title("Confirm Delete")
-            confirm.geometry("300x150")
-
-            label = ctk.CTkLabel(confirm, text="Are you sure you want to delete this record?", font=poppins14bold)
-            label.pack(pady=20)
-
-            btn_yes = ctk.CTkButton(confirm, text="Yes", command=lambda: [delete_record(selected_item), confirm.destroy()], font=poppins14bold)
-            btn_yes.pack(side="left", padx=20, pady=20)
-
-            btn_no = ctk.CTkButton(confirm, text="No", command=confirm.destroy, font=poppins14bold)
-            btn_no.pack(side="right", padx=20, pady=20)
+            response = messagebox.askyesno("Confirm Delete", "Are you sure you want to delete this record?")
+            if response:
+                delete_record(selected_item)
 
     def reset_selection():
         nonlocal selected_item

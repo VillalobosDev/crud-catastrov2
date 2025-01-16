@@ -17,6 +17,35 @@ column_switches_created = False
 
 def display_column_switches(top_frame4, treeview, original_data):
     
+<<<<<<< Updated upstream
+=======
+    toplevel = ctk.CTkToplevel(window)
+    toplevel.title("Filtrar")
+    
+    mainframewrap = ctk.CTkFrame(toplevel, corner_radius=15)
+
+    mainframe = ctk.CTkFrame(mainframewrap, width=400, height=600, corner_radius=10)
+    mainframe.pack(fill="both", expand=True, padx=5, pady=5)
+
+    frameleft = ctk.CTkFrame(mainframe, corner_radius=10)
+    frameleft.pack(padx=5, pady=5, side="left", fill="y", expand=True)
+
+    frameright = ctk.CTkFrame(mainframe, corner_radius=10)
+    frameright.pack(padx=5, pady=5, side="right", fill="y", expand=True)
+    
+    framebot = ctk.CTkFrame(mainframewrap, corner_radius=10)
+    framebot.pack(padx=5, pady=5, side="bottom", fill="x", expand=True)
+
+    
+
+def display_column_switches(top_frame4, treeview, original_data, window):
+    ##############################################################
+    
+
+    
+    
+    ##############################################################
+>>>>>>> Stashed changes
     poppins12 = ("Poppins", 12, "bold")    
 
     global column_switches_created
