@@ -29,7 +29,7 @@ def inmuebles(window, last_window):
     bottom_frame = ctk.CTkFrame(window, corner_radius=15)
     bottom_frame.pack(padx=10, pady=10, fill="both", expand=True)
     
-    #Contenido del top frame
+    #Contenido del top frame.
     menu = last_window
     volver_btn = ctk.CTkButton(top_frame, text="Volver", command=lambda: menu(window), font=poppins20bold)
     volver_btn.pack(padx=10, pady=10, side="left")

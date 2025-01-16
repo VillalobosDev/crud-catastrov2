@@ -16,11 +16,14 @@ search_filter_created = False
 column_switches_created = False
 
 def toplevelwindow(window):
-
-    
     toplevel = ctk.CTkToplevel(window)
-    
+    toplevel.title("Toplevel Window")
+    toplevel.geometry("400x300")
+    toplevel.attributes('-topmost', True)  # Ensure the toplevel window stays on top
+    toplevel.grab_set()
+
     mainframewrap = ctk.CTkFrame(toplevel, corner_radius=15)
+    mainframewrap.pack(fill="both", expand=True, padx=5, pady=5)
 
     mainframe = ctk.CTkFrame(mainframewrap, width=400, height=600, corner_radius=10)
     mainframe.pack(fill="both", expand=True, padx=5, pady=5)
@@ -30,7 +33,7 @@ def toplevelwindow(window):
 
     frameright = ctk.CTkFrame(mainframe, corner_radius=10)
     frameright.pack(padx=5, pady=5, side="right", fill="y", expand=True)
-    
+
     framebot = ctk.CTkFrame(mainframewrap, corner_radius=10)
     framebot.pack(padx=5, pady=5, side="bottom", fill="x", expand=True)
 
