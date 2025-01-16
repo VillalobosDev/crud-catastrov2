@@ -288,8 +288,19 @@ def liquidacion(window, last_window):
     frame_tree = ctk.CTkFrame(treeframe, fg_color='white', width=580, height=360)
     frame_tree.pack(pady=10, padx=10, expand=True, fill="both")
 
+
     my_tree = setup_treeview(frame_tree)
     load_liquidaciones_data(my_tree)
+        # Configuración del estilo del Treeview (usando ttk dentro de CustomTkinter)
+    style = ttk.Style()
+    style.configure("Custom.Treeview", font=("Poppins", 12), rowheight=25)
+    style.configure("Custom.Treeview.Heading", font=("Poppins", 14, "bold"))
+
+    # Crear el scrollbar vertical con CustomTkinter
+
+    horizontal_scrollbar = ttk.Scrollbar(frame_tree, orient="horizontal", command=my_tree.xview)
+    my_tree.configure(xscrollcommand=horizontal_scrollbar.set)
+    horizontal_scrollbar.pack(side="bottom", fill="x")
 
 def ifgestionar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold, last_window):
     global busquedabtn, busquedaliq
