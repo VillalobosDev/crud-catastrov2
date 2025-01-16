@@ -16,6 +16,25 @@ column_switch_shown = False
 search_filter_created = False
 column_switches_created = False
 
+# Global dictionary to store the switch states
+column_switch_states = {
+    'Inmueble': True,
+    'Codigo Catastral': True,
+    'Uso': True,
+    'Contribuyente': True,
+    'CI': True,
+    'RIF': True,
+    'Telefono': True,
+    'Correo': True,
+    'Sector': True,
+    'Ubicacion Sector': True,
+    'Liquidacion ID': True,
+    'Monto 1': True,
+    'Monto 2': True,
+    'Fecha Liquidacion 1': True,
+    'Fecha Liquidacion 2': True
+}
+
 def display_column_switches(top_frame4, treeview, original_data, window):
     
     poppins12 = ("Poppins", 12, "bold")    
@@ -23,7 +42,7 @@ def display_column_switches(top_frame4, treeview, original_data, window):
     global column_switches_created
     column_switches_created = False
     if column_switches_created:
-        print("Alredy exist")
+        print("Already exist")
         return  # Skip if already created
 
     # Frame to hold switches
@@ -74,7 +93,12 @@ def display_column_switches(top_frame4, treeview, original_data, window):
         )
         switch.pack(side="left", padx=5, pady=5)  # Pack the switches side by side
         column_switches[col_name] = switch
-        switch.select() # Enable all columns by default
+
+        # Set the switch state based on the global dictionary
+        if column_switch_states[col_name]:
+            switch.select()
+        else:
+            switch.deselect()
 
         switch_count += 1
 
@@ -96,7 +120,8 @@ def display_column_switches(top_frame4, treeview, original_data, window):
 def toggle_column(column_switches, column):
     # Toggle the visibility of the column
     column_switches[column] = not column_switches[column]
-    print(f"Column {column} visibility is now {column_switches[column]}")
+    column_switch_states[column] = column_switches[column].get() == 1
+    print(f"Column {column} visibility is now {column_switches[column].get() == 1}")
 
 def refresh_treeview(treeview, column_switches):
     # Clear the Treeview before updating with new data
@@ -104,7 +129,7 @@ def refresh_treeview(treeview, column_switches):
         treeview.delete(item)
 
     # Select columns that are marked as visible in the column_switches
-    selected_columns = [col for col, is_visible in column_switches.items() if is_visible]
+    selected_columns = [col for col, switch in column_switches.items() if switch.get() == 1]
     
     # If no columns are selected, show an error and stop the function
     if not selected_columns:
@@ -360,10 +385,6 @@ def bottom_treeview(frame):
             cursor.execute(sql)
             original_data = cursor.fetchall()
 
-            print(f"Fetched {len(original_data)} rows from the database.")
-            for row in original_data:
-                print(row) 
-
             # Insert all data into Treeview initially
             for row in original_data:
                 my_tree.insert("", "end", values=row)
@@ -457,3 +478,4 @@ def export_treeview_to_xlsx(treeview, filename):
     # Save the workbook to the specified filename
     workbook.save(filename)
     print(f"Data exported to {filename} successfully.")
+```
