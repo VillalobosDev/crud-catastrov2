@@ -7,3 +7,6 @@ def centrar_ventana(ventana, ancho, alto):
     y = (ventana_alto // 2) - (alto // 2)
     
     ventana.geometry(f"{ancho}x{alto}+{x}+{y}")
+    
+    
+
