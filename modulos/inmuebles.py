@@ -9,6 +9,8 @@ def inmuebles(window, last_window):
     
     for widget in window.winfo_children():
         widget.destroy()
+        
+        #e
 
     
     poppins30bold = ("Poppins", 30, "bold")
@@ -500,7 +502,7 @@ def ifgestionar(window, bottom_frame, top_frame2, last_window):
         except Exception as e:
             print(f"Error deleting record: {e}")
 
-    def confirm_delete():
+    def confirm_delete(selected_item):
         if selected_item:
             confirm = ctk.CTkToplevel(window)
             confirm.title("Confirm Delete")
@@ -523,7 +525,7 @@ def ifgestionar(window, bottom_frame, top_frame2, last_window):
     btnsave = ctk.CTkButton(frame_left, text="Guardar", command=lambda: save_changes(selected_item), font=poppins14bold)
     btnsave.pack(padx=10, pady=10, anchor="e", side="bottom")
 
-    btndelete = ctk.CTkButton(frame_left, text="Eliminar", command=lambda: confirm_delete, font=poppins14bold)
+    btndelete = ctk.CTkButton(frame_left, text="Eliminar", command=lambda: confirm_delete(selected_item), font=poppins14bold)
     btndelete.pack(padx=10, pady=10, anchor="e", side="bottom")
 
     btnvolver = ctk.CTkButton(frame_left, text="Volver", command=lambda: inmuebles(window, last_window), font=poppins14bold)
