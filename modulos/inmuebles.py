@@ -287,25 +287,6 @@ def ifasignar(bottom_frame, top_frame2, window, last_window):
     loaddata()
 
 
-<<<<<<< Updated upstream
-    def guardar_inmueble(inmueble, inmueblecod, uso, sector, id_contr):
-        try:
-            with connection() as conn:
-                cursor = conn.cursor()
-                id_contribuyente = id_contr
-                cursor.execute('''
-                    INSERT INTO inmuebles (nom_inmueble, cod_catastral, uso, id_contribuyente, id_sector)
-                    VALUES (?, ?, ?, ?, ?)
-                    ''')
-                    cursor.execute(sql, (inmueble, inmueblecod, uso, id_contribuyente, id_sector))
-                    conn.commit()
-                    print("Inmueble successfully assigned!")
-                    # Inside asignar_inmueble
-                    reload_treeview(my_tree)
-
-        except Exception as e:
-                print(f"Error: {e}")
-=======
 def guardar_inmueble(inmueble, inmueblecod, uso, sector, id_contr):
     try:
         with connection() as conn:
@@ -319,7 +300,6 @@ def guardar_inmueble(inmueble, inmueblecod, uso, sector, id_contr):
             print("Inmueble guardado exitosamente.")
     except Exception as e:
         print(f"Error al guardar el inmueble: {e}")
->>>>>>> Stashed changes
 
 def ifgestionar(window, bottom_frame, top_frame2, last_window):
     global busquedainm, busquedabtn, refrescartabla
