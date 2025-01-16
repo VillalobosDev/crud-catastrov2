@@ -22,8 +22,6 @@ def ifagregar(bottom_frame, top_frame2, window, last_window):
     poppins14bold = ("Poppins", 14, "bold")
     poppins10 = ("Poppins", 10)
     poppins18 = ("Poppins", 18, "bold")
-    
-
 
     for widget in bottom_frame.winfo_children():
         widget.destroy()
@@ -34,8 +32,8 @@ def ifagregar(bottom_frame, top_frame2, window, last_window):
     frame_right = ctk.CTkFrame(bottom_frame, corner_radius=15)
     frame_right.pack(padx=5, pady=5, side="right", fill="both", expand=True)
 
-    text_top = ctk.CTkLabel(frame_left, text="Nuevo Contribuyente", font=poppins18, width=250)
-    text_top.pack(padx=10, pady=10)
+    text = ctk.CTkLabel(frame_left, text="Nuevo Contribuyente", font=poppins18, width=250)
+    text.pack(padx=10, pady=10)
 
     # Contenido del frame left
 
@@ -135,7 +133,8 @@ def ifagregar(bottom_frame, top_frame2, window, last_window):
             print(f"Error during database operation: {e}")
 
     def guardar_datos():
-
+        text = ctk.CTkLabel(frame_left, text="", text_color="red", font=poppins14bold)
+        text.place(x=30, y=450)
         try:
             with connection() as conn:
                 cursor = conn.cursor()
@@ -173,7 +172,7 @@ def ifagregar(bottom_frame, top_frame2, window, last_window):
                 
                 cursor.execute(sql, datos)
                 conn.commit()
-
+                text.configure(text="Contribuyente agregado", text_color="green")
                 cargar_datos()  # Llamar a la función para actualizar el Treeview
                 clear()
         except Exception as e:
@@ -182,7 +181,7 @@ def ifagregar(bottom_frame, top_frame2, window, last_window):
     btnsave = ctk.CTkButton(frame_left, text="Guardar", command = guardar_datos, font=poppins14bold)
     btnsave.pack(padx=10, pady=10, anchor="e", side="bottom")
 
-    btncancelar = ctk.CTkButton(frame_left, text="Atrás", command=lambda: contribuyentes(window, last_window), font=poppins14bold)
+    btncancelar = ctk.CTkButton(frame_left, text="Volver", command=lambda: contribuyentes(window, last_window), font=poppins14bold)
     btncancelar.pack(padx=10, pady=10, anchor="e", side="bottom")
 
     # Contenido del RIGHT FRAME
@@ -199,10 +198,12 @@ def ifagregar(bottom_frame, top_frame2, window, last_window):
     my_tree.pack(pady=10, padx=10, fill="both", expand=True)
         
     horizontal_scrollbar = ttk.Scrollbar(frame_tree, orient="horizontal", command=my_tree.xview)
+    vertical_scrollbar = ttk.Scrollbar(frame_tree, orient="vertical", command=my_tree.yview)
 
-    my_tree.configure(xscrollcommand=horizontal_scrollbar.set)
+    my_tree.configure(xscrollcommand=horizontal_scrollbar.set, yscrollcommand=vertical_scrollbar.set)
 
     horizontal_scrollbar.pack(side="bottom", fill="x")
+    vertical_scrollbar.pack(side="right", fill="y")
 
     my_tree['columns'] = ('nombre', 'apellido', 'cedula', 'rif', 'telefono', 'correo')
 
@@ -340,7 +341,8 @@ def ifgestionar(bottom_frame, top_frame2, window, last_window):
 
     def save_changes(cedula_entry, nombre_entry, apellido_entry, rif_entry, telefono_entry, correo_entry, cedula_indicator, rif_indicator):
         
-
+        text = ctk.CTkLabel(frame_left, text="La cédula de identidad ya existe", text_color="red", font=poppins14bold, width=250)
+        text.place(x=10, y=400)
         
         selected_item = my_tree.selection()
         if selected_item:
@@ -363,7 +365,9 @@ def ifgestionar(bottom_frame, top_frame2, window, last_window):
                     count = cursor.fetchone()[0]
 
                     if count > 1:
-                                               
+                        
+                        
+                        text.configure(text="La cédula de identidad ya existe", text_color="red")
                         tkinter.messagebox.showerror("Error", "La cédula de identidad ya existe")
                         print(f'error print: {cedula}')
                         return
@@ -372,7 +376,8 @@ def ifgestionar(bottom_frame, top_frame2, window, last_window):
                              WHERE id_contribuyente=?'''
                     cursor.execute(sql, (nombre_entry.get(), apellido_entry.get(), cedula_indicator.get(), cedula, rif_indicator.get(), rif_entry.get(), telefono_entry.get(), correo_entry.get(), values[0]))
                     conn.commit()
-
+                    text.configure(text="Datos actualizados correctamente", text_color="green")
+                    text.place(x=10, y=400)
                     cargar_datos()
                     clear()
             except Exception as e:
@@ -394,6 +399,8 @@ def ifgestionar(bottom_frame, top_frame2, window, last_window):
                         sql = 'DELETE FROM contribuyentes WHERE id_contribuyente=?'
                         cursor.execute(sql, (values[0],))
                         conn.commit()    
+                        text.configure(text="Registro eliminado correctamente", text_color="green")
+                        text.place(x=10, y=400)
                         cargar_datos()
                         clear()
                     
@@ -421,6 +428,14 @@ def ifgestionar(bottom_frame, top_frame2, window, last_window):
     my_tree = ttk.Treeview(frame_tree, style="Custom.Treeview", show="headings")
     my_tree.pack(pady=10, padx=10, fill="both", expand=True)
 
+    horizontal_scrollbar = ttk.Scrollbar(frame_tree, orient="horizontal", command=my_tree.xview)
+    vertical_scrollbar = ttk.Scrollbar(frame_tree, orient="vertical", command=my_tree.yview)
+
+    my_tree.configure(xscrollcommand=horizontal_scrollbar.set, yscrollcommand=vertical_scrollbar.set)
+
+    horizontal_scrollbar.pack(side="bottom", fill="x")
+    vertical_scrollbar.pack(side="right", fill="y")
+
     my_tree["columns"] = ('id_contribuyente', 'nombre', 'apellido', 'cedula', 'rif', 'telefono', 'correo')
     for col in my_tree["columns"]:
         my_tree.heading(col, text=col.capitalize(), anchor="center")
@@ -429,8 +444,12 @@ def ifgestionar(bottom_frame, top_frame2, window, last_window):
     my_tree.column('id_contribuyente', width=0, stretch=tk.NO)
 
     horizontal_scrollbar = ttk.Scrollbar(frame_tree, orient="horizontal", command=my_tree.xview)
-    my_tree.configure(xscrollcommand=horizontal_scrollbar.set)
+    vertical_scrollbar = ttk.Scrollbar(frame_tree, orient="vertical", command=my_tree.yview)
+
+    my_tree.configure(xscrollcommand=horizontal_scrollbar.set, yscrollcommand=vertical_scrollbar.set)
+
     horizontal_scrollbar.pack(side="bottom", fill="x")
+    vertical_scrollbar.pack(side="right", fill="y")
 
     def on_tree_select(event):
         selected_item = my_tree.selection()
@@ -553,21 +572,29 @@ def contribuyentes(window, last_window):
     treeframe.pack(padx=5, pady=5, fill="both", expand=True)
     
     # Creando el treeview para mostrar los registros
+
+
     frame_tree = ctk.CTkFrame(treeframe, fg_color='white', width=580, height=360)
-    frame_tree.pack(pady=10, padx=10, expand=True, fill="both")  
+    frame_tree.pack(pady=10, padx=10, expand=True, fill="both", side="left")
 
+    # Configuración del estilo del Treeview (usando ttk dentro de CustomTkinter)
     style = ttk.Style()
-    style.configure("Custom.Treeview", font=("Poppins", 12), rowheight=25)  
-    style.configure("Custom.Treeview.Heading", font=("Poppins", 14, "bold")) 
+    style.configure("Custom.Treeview", font=("Poppins", 12), rowheight=25)
+    style.configure("Custom.Treeview.Heading", font=("Poppins", 14, "bold"))
 
+    # Crear el Treeview
     my_tree = ttk.Treeview(frame_tree, style="Custom.Treeview", show="headings")
-    my_tree.pack(pady=10, padx=10, fill="both", expand=True)
-    
+    my_tree.pack(pady=10, padx=10, fill="both", expand=True, side="left")
+
+    # Crear el scrollbar vertical con CustomTkinter
+    vertical_scrollbar = ttk.Scrollbar(frame_tree, orient="vertical", command=my_tree.yview)
     horizontal_scrollbar = ttk.Scrollbar(frame_tree, orient="horizontal", command=my_tree.xview)
 
-    my_tree.configure(xscrollcommand=horizontal_scrollbar.set)
+    my_tree.configure(yscrollcommand=vertical_scrollbar.set,xscrollcommand=horizontal_scrollbar.set)
 
+    vertical_scrollbar.pack(side="right", fill="y")
     horizontal_scrollbar.pack(side="bottom", fill="x")
+
 
     my_tree['columns'] = ('ID', 'nombre', 'apellido', 'cedula', 'rif', 'telefono', 'correo')
     
@@ -671,10 +698,10 @@ def mostrar_modal_contribuyente(treeview):
         centrar_ventana(modal, 600, 500)
         
         
-        cerrar_btn = ctk.CTkButton(modal, text="Atrás", command=modal.destroy, font=poppins14bold)
+        cerrar_btn = ctk.CTkButton(modal, text="Cerrar", command=modal.destroy, font=poppins14bold)
         cerrar_btn.pack(pady=10, padx=10, side="bottom", anchor="e") 
         
-               
+        
         frame_left = ctk.CTkFrame(modal, corner_radius=15, width=250)
         frame_left.pack(padx=5, pady=5, side="left", fill="both", expand=True)
         
@@ -752,3 +779,4 @@ def cargar_datoss(ID):
         print(f"Error during database operation: {e}")
 
     return original_data
+1
