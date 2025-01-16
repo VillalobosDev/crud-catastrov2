@@ -300,6 +300,7 @@ def ifgestionar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold
         busquedaliqold.pack_forget()
 
     poppins14bold = ("Poppins", 14, "bold")
+    poppins18 = ("Poppins", 18, "bold")
 
     for widget in bottom_frame.winfo_children():
         widget.destroy()
@@ -313,6 +314,11 @@ def ifgestionar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold
 
     frame_right = ctk.CTkFrame(bottom_frame, corner_radius=15)
     frame_right.pack(padx=5, pady=5, side="right", fill="both", expand=True)
+
+
+    text = ctk.CTkLabel(frame_left, text="Gestionar Liquidación", font=poppins18, width=250)
+    text.pack(padx=10, pady=10)
+
 
     # Add UI elements for the left frame
     ci_frame = ctk.CTkFrame(frame_left)
@@ -398,6 +404,7 @@ def ifasignar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold, 
         busquedaliqold.pack_forget()
 
     poppins14bold = ("Poppins", 14, "bold")
+    poppins18 = ("Poppins", 18, "bold")
 
     for widget in bottom_frame.winfo_children():
         widget.destroy()
@@ -408,7 +415,8 @@ def ifasignar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold, 
     frame_right = ctk.CTkFrame(bottom_frame, corner_radius=15)
     frame_right.pack(padx=5, pady=5, side="right", fill="both", expand=True)
 
-
+    text = ctk.CTkLabel(frame_left, text="Asignar Liquidación", font=poppins18, width=250)
+    text.pack(padx=10, pady=10)
 
 
 
