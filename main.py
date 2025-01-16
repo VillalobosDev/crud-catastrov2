@@ -28,7 +28,7 @@ apply_color(color)
 
 window = ctk.CTk()
 window.title("Axio")
-window.geometry("1080x720")
+window.geometry("1920x1080")
 
 
 
