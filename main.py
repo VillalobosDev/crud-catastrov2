@@ -9,7 +9,7 @@ from modulos.liquidacion import liquidacion
 from modulos.contribuyentes import contribuyentes
 from modulos.sectores import sectores
 from modulos2.menu import menu2
-from modulos2.consulta_general import consulta
+# from modulos2.consulta_general import consulta
 from modulos2.liquidacion import liquidacion
 from modulos2.contribuyentes import contribuyentes
 from modulos2.sectores import sectores
@@ -33,10 +33,6 @@ window.geometry("1080x720")
 
 
 centrar_ventana(window, 1080, 720)
-
-def close_after_timeout(root, timeout):
-    """Close the window after a specified timeout (in milliseconds)."""
-    root.after(timeout, root.destroy)
 
 #Este es para administradoresssssss
 

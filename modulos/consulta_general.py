@@ -2,6 +2,7 @@ import customtkinter as ctk
 from modulos.menubar import menubar
 from functions.functions import * 
 from functions.calendario import create_date_range_selector
+from config.config import centrar_ventana
 from tkinter import ttk
 from tkinter import filedialog
 from functions.rango_fecha import *
@@ -15,7 +16,7 @@ column_switch_shown = False
 search_filter_created = False
 column_switches_created = False
 
-def display_column_switches(top_frame4, treeview, original_data):
+def display_column_switches(top_frame4, treeview, original_data, window):
     
     poppins12 = ("Poppins", 12, "bold")    
 
@@ -26,8 +27,22 @@ def display_column_switches(top_frame4, treeview, original_data):
         return  # Skip if already created
 
     # Frame to hold switches
-    switches_frame = ctk.CTkFrame(top_frame4, corner_radius=15)
-    switches_frame.pack(pady=5, padx=5, side="left", fill="x", expand=True)
+    # switches_frame = ctk.CTkFrame(top_frame4, corner_radius=15)
+    # switches_frame.pack(pady=5, padx=5, side="left", fill="x", expand=True)
+
+    toplevel = ctk.CTkToplevel(window)
+    toplevel.title("Column Switches")
+    toplevel.geometry("400x400")
+    toplevel.grab_set()
+    toplevel.resizable(False, False)
+    centrar_ventana(toplevel, 400, 400)
+
+    switches_frame = ctk.CTkFrame(toplevel, corner_radius=15)
+    switches_frame.pack(pady=5, padx=5, fill="x", expand=True)
+
+    btnframe = ctk.CTkFrame(toplevel, corner_radius=15)
+    btnframe.pack(pady=5, padx=5, fill="x", expand=True)
+
 
     # Dictionary to store the switch states
     column_switches = {}
@@ -40,7 +55,7 @@ def display_column_switches(top_frame4, treeview, original_data):
     ]
 
     # Create switches in rows using pack
-    max_columns_per_row = 10  # Number of switches per row
+    max_columns_per_row = 2  # Number of switches per row
     current_row_frame = None  # To keep track of the current row
     switch_count = 0
 
@@ -62,12 +77,16 @@ def display_column_switches(top_frame4, treeview, original_data):
         switch.select() # Enable all columns by default
 
         switch_count += 1
+
+    def close_and_refresh(toplevel, treeview, column_switches):
+        toplevel.destroy()  # Close the toplevel window
+        refresh_treeview(treeview, column_switches)  # Refresh the treeview
     
     refresh_button = ctk.CTkButton(
-        current_row_frame,
+        btnframe,
         text="Refresh Treeview",
         font=poppins12,
-        command=lambda: refresh_treeview(treeview, column_switches)
+        command=lambda: close_and_refresh(toplevel, treeview, column_switches)
     )
     refresh_button.pack(side="right", padx=5, pady=5)  # Place the button on the right inside the `button_frame`
      # Place the button below the switches
@@ -184,9 +203,6 @@ def consulta(window, last_window):
     bottom_frame = ctk.CTkFrame(window, corner_radius=15)
     bottom_frame.pack(padx=10, pady=5, fill="both", expand=True)
 
-    bottom_frame2 = ctk.CTkFrame(window, corner_radius=15, height=60)
-    bottom_frame2.pack(padx=10, pady=5, fill="x")
-
     # Top Frame Content
     menu = last_window
     volver_btn = ctk.CTkButton(top_frame, text="Volver", command=lambda: menu(window), font=poppins20bold)
@@ -202,17 +218,14 @@ def consulta(window, last_window):
     busqueda = ctk.CTkButton(top_frame2, text="Buscar", width=80, font=poppins14bold, command=lambda: toggle_top_frame_visibility(top_frame3, top_frame4))
     busqueda.pack(padx=10, pady=5, side="left")
     
-    show_filter_btn = ctk.CTkButton(top_frame2, text="Show Filter", width=100, font=poppins14bold, command=lambda: toggle_top_frame_visibility(top_frame4, top_frame3))
-    show_filter_btn.pack(padx=10, pady=5, side="left")
+    show_filter_btn = ctk.CTkButton(top_frame2, text="Show Filter", width=100, font=poppins14bold, command=lambda: display_column_switches(top_frame4, my_tree, original_data, window))
+    show_filter_btn.pack(padx=10, pady=5, side="left")    
 
-    # Add column switch UI to top_frame4
-    display_column_switches(top_frame4, my_tree, original_data)
+    export = ctk.CTkButton(top_frame2, text="Exportar a Excel", font=poppins12, command=lambda: export_treeview_to_xlsx(my_tree, "consulta_general.xlsx"))
+    export.pack(side="right", padx=10, pady=5)
 
     searchbtn = display_search_filter(top_frame3, my_tree, original_data)
     print(type(searchbtn)) 
-
-    export = ctk.CTkButton(bottom_frame2, text="Exportar a Excel", font=poppins12, command=lambda: export_treeview_to_xlsx(my_tree, "consulta_general.xlsx"))
-    export.pack(side="right", padx=10, pady=5)
 
     # create_date_range_selector(top_frame4, searchbtn, my_tree, original_data)
 
