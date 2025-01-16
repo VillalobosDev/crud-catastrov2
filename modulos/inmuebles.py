@@ -339,6 +339,19 @@ def ifgestionar(window, bottom_frame, top_frame2, last_window):
     sector_frame = ctk.CTkFrame(frame_left)
     sector_frame.pack(padx=10, pady=5, fill="x")
 
+    infodelcontribuyente = ctk.CTkFrame(frame_left)
+    infodelcontribuyente.pack(padx=10, pady=5, fill="x")
+
+    ###############################
+    # Label para el contribuyente
+    frame2 = ctk.CTkFrame(infodelcontribuyente, corner_radius=10, width=240, height=40)
+    frame2.pack(pady=8, padx=10)
+    frame2.pack_propagate(False)
+    
+    text_label2=ctk.CTkLabel(frame2, text="", font=poppins14bold)
+    text_label2.pack(pady=5)
+    
+
     ################################
     refrescartabla = ctk.CTkButton(top_frame2, text="Refrescar Tabla", font=poppins14bold, width=80, command=lambda: reload_treeview(my_tree))
     refrescartabla.pack(padx=5, pady=5, side="right")

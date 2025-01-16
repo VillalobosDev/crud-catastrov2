@@ -41,7 +41,7 @@ def close_after_timeout(root, timeout):
 
 
 #inmuebles(window, menu)
-liquidacion(window, menu)
+inmuebles(window, menu)
 #Este es para usuarios
 # menu(window)
 #inmuebles(window, menu)

@@ -335,6 +335,8 @@ def bottom_treeview(frame):
     my_tree = ttk.Treeview(frame_tree, style="Custom.Treeview", show="headings")
     my_tree.pack(pady=10, padx=10, fill="both", expand=True)
 
+
+    ################SCROLLBAR X
     horizontal_scrollbar = ttk.Scrollbar(frame_tree, orient="horizontal", command=my_tree.xview)
     my_tree.configure(xscrollcommand=horizontal_scrollbar.set)
     horizontal_scrollbar.pack(side="bottom", fill="x")
