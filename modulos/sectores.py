@@ -38,7 +38,7 @@ def ifasignar(bottom_frame, window, last_window):
     image_path = ""  # Inicializar image_path
 
     poppins14bold = ("Poppins", 14, "bold")
-    poppins30bold = ("Poppins", 30, "bold")
+    poppins18bold = ("Poppins", 18, "bold")
     poppins20bold = ("Poppins", 20, "bold")
     poppins12 = ("Poppins", 12)
 
@@ -55,7 +55,7 @@ def ifasignar(bottom_frame, window, last_window):
     right_frame_bajo = ctk.CTkFrame(bottom_frame, corner_radius=15)
     right_frame_bajo.pack(side="right", padx=10, pady=10, fill="both")    
 
-    text = ctk.CTkLabel(left_frame, text="Nuevo Sector", font=poppins14bold, width=250)
+    text = ctk.CTkLabel(left_frame, text="Nuevo Sector", font=poppins18bold, width=250)
     text.pack(padx=10, pady=10)    
   
     nom_sectores_frame = ctk.CTkFrame(left_frame)
@@ -224,7 +224,7 @@ def sectores(window, last_window):
     volver_btn = ctk.CTkButton(top_frame, text="Volver", command=lambda: menu(window), font=poppins20bold)
     volver_btn.pack(padx=10, pady=10, side="left")
     
-    window_title = ctk.CTkLabel(top_frame, text="Explorador de Sectores", font=poppins30bold)
+    window_title = ctk.CTkLabel(top_frame, text="Gestión de Sectores", font=poppins30bold)
     window_title.pack(padx=10, pady=10, side="left")
 
     # Contenido del top frame 2
@@ -376,6 +376,7 @@ def ifgestionar(bottom_frame, window, last_window):
     id_sector = None  # Inicializar id_sector
 
     poppins14bold = ("Poppins", 14, "bold")
+    poppins18bold = ("Poppins", 18, "bold")
     poppins30bold = ("Poppins", 30, "bold")
     poppins20bold = ("Poppins", 20, "bold")
     poppins12 = ("Poppins", 12)
@@ -393,7 +394,7 @@ def ifgestionar(bottom_frame, window, last_window):
     right_frame_bajo = ctk.CTkFrame(bottom_frame, corner_radius=15)
     right_frame_bajo.pack(side="right", padx=10, pady=10, fill="both")    
 
-    text = ctk.CTkLabel(left_frame, text="Modificar Sector", font=poppins14bold, width=250)
+    text = ctk.CTkLabel(left_frame, text="Modificar Sector", font=poppins18bold, width=250)
     text.pack(padx=10, pady=10)    
   
     nom_sectores_frame = ctk.CTkFrame(left_frame)

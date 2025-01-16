@@ -65,11 +65,11 @@ def menu(window):
     inmuebles_btn = ctk.CTkButton(left_frame, text="Inmuebles", command=lambda: inmuebles(window, menu), width=190, font=poppins20bold)
     inmuebles_btn.pack(pady=30, padx=50, anchor="center", expand=True)
 
-    sector_btn = ctk.CTkButton(left_frame, text="Sectores", command=lambda: sectores(window, menu), width=190, font=poppins20bold)
-    sector_btn.pack(pady=30, padx=50, anchor="center", expand=True)
-    
     liquidacion_btn = ctk.CTkButton(left_frame, text="Liquidación", command=lambda: liquidacion(window, menu), width=190, font=poppins20bold)
     liquidacion_btn.pack(pady=30, padx=50, anchor="center", expand=True)
+    
+    sector_btn = ctk.CTkButton(left_frame, text="Sectores", command=lambda: sectores(window, menu), width=190, font=poppins20bold)
+    sector_btn.pack(pady=30, padx=50, anchor="center", expand=True)    
     
     consulta_btn = ctk.CTkButton(left_frame, text="Consultar", command=lambda: consulta(window, menu), width=190, font=poppins20bold)
     consulta_btn.pack(pady=30, padx=50, anchor="center", expand=True)

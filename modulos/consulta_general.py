@@ -301,7 +301,7 @@ def consulta(window, last_window):
     volver_btn = ctk.CTkButton(top_frame, text="Volver", command=lambda: menu(window), font=poppins20bold)
     volver_btn.pack(padx=10, pady=10, side="left")
 
-    window_title = ctk.CTkLabel(top_frame, text="Sección de Gestión Liquidación", font=poppins30bold)
+    window_title = ctk.CTkLabel(top_frame, text="Consulta General", font=poppins30bold)
     window_title.pack(padx=10, pady=10, side="left")
 
     # Bottom Frame Content
