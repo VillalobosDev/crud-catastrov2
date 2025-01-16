@@ -328,8 +328,7 @@ def ifgestionar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold
     monto1_frame = ctk.CTkFrame(frame_left)
     monto1_frame.pack(padx=10, pady=5, fill="x")
 
-    monto2_frame = ctk.CTkFrame(frame_left)
-    monto2_frame.pack(padx=10, pady=5, fill="x")
+
 
     fecha1_frame = ctk.CTkFrame(frame_left)
     fecha1_frame.pack(padx=10, pady=5, fill="x")
@@ -346,11 +345,11 @@ def ifgestionar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold
     nombre_entry = ctk.CTkEntry(nombre_frame, placeholder_text="Nombre Contribuyente", font=poppins14bold, width=250)
     nombre_entry.pack(pady=5, padx=5, side="left", fill="x", expand=True)
 
-    monto1 = ctk.CTkEntry(monto1_frame, placeholder_text="Monto 1", font=poppins14bold, width=250)
+    monto1 = ctk.CTkEntry(monto1_frame, placeholder_text="Monto 1", font=poppins14bold, width=120)
     monto1.pack(pady=5, padx=5, side="left", fill="x", expand=True)
 
-    monto2 = ctk.CTkEntry(monto2_frame, placeholder_text="Monto 2", font=poppins14bold, width=250)
-    monto2.pack(pady=5, padx=5, side="left", fill="x", expand=True)
+    monto2 = ctk.CTkEntry(monto1_frame, placeholder_text="Monto 2", font=poppins14bold, width=120)
+    monto2.pack(pady=5, padx=5, side="left", fill="x", anchor="e", expand=True)
 
     fecha1 = ctk.CTkEntry(fecha1_frame, placeholder_text="Fecha Liquidacion 1", font=poppins14bold, width=190)
     fecha1.pack(pady=5, padx=5, side="left", fill="x", expand=True)
@@ -430,9 +429,6 @@ def ifasignar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold, 
     monto1_frame = ctk.CTkFrame(frame_left)
     monto1_frame.pack(padx=10, pady=5, fill="x")
 
-    monto2_frame = ctk.CTkFrame(frame_left)
-    monto2_frame.pack(padx=10, pady=5, fill="x")
-
     fecha1_frame = ctk.CTkFrame(frame_left)
     fecha1_frame.pack(padx=10, pady=5, fill="x")
 
@@ -448,11 +444,11 @@ def ifasignar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold, 
     nombre_entry = ctk.CTkEntry(nombre_frame, placeholder_text="Nombre Contribuyente", font=poppins14bold)
     nombre_entry.pack(pady=5, padx=5, side="left", fill="x", expand=True)
 
-    monto1 = ctk.CTkEntry(monto1_frame, placeholder_text="Monto 1", font=poppins14bold)
+    monto1 = ctk.CTkEntry(monto1_frame, placeholder_text="Monto 1", font=poppins14bold, width=120)
     monto1.pack(pady=5, padx=5, side="left", fill="x", expand=True)
 
-    monto2 = ctk.CTkEntry(monto2_frame, placeholder_text="Monto 2", font=poppins14bold)
-    monto2.pack(pady=5, padx=5, side="left", fill="x", expand=True)
+    monto2 = ctk.CTkEntry(monto1_frame, placeholder_text="Monto 2", font=poppins14bold, width=120)
+    monto2.pack(pady=5, padx=5, side="left", fill="x", anchor="e", expand=True)
 
     fecha1 = ctk.CTkEntry(fecha1_frame, placeholder_text="Fecha Liquidacion 1", font=poppins14bold)
     fecha1.pack(pady=5, padx=5, side="left", fill="x", expand=True)
