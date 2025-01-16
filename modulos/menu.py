@@ -8,6 +8,8 @@ from modulos.consulta_general import consulta
 from modulos.sectores import sectores
 from PIL import Image, ImageTk
 
+#q
+
 
 def menu(window):
 

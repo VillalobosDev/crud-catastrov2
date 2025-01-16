@@ -28,7 +28,7 @@ apply_color(color)
 
 window = ctk.CTk()
 window.title("Axio")
-window.geometry("1920x1080")
+window.geometry("1080x720")
 
 
 
@@ -49,3 +49,6 @@ menu(window)
 # login(window)
 
 window.mainloop()
+#02
+
+#!11e2
