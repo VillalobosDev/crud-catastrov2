@@ -161,7 +161,6 @@ def ifasignar(bottom_frame, top_frame2, window, last_window):
     frame2.pack(pady=8, padx=10)
     frame2.pack_propagate(False)
     
-    
     text_label2=ctk.CTkLabel(frame2, text="", font=poppins14bold)
     text_label2.pack(pady=5)
     
