@@ -2,6 +2,7 @@ import customtkinter as ctk
 from modulos.menubar import menubar
 from functions.functions import * 
 from functions.calendario import create_date_range_selector
+from config.config import centrar_ventana
 from tkinter import ttk
 from tkinter import filedialog
 from functions.rango_fecha import *
@@ -15,12 +16,24 @@ column_switch_shown = False
 search_filter_created = False
 column_switches_created = False
 
-def toplevelwindow(window):
+def toggle_column(column_switches, column):
+    # Toggle the visibility of the column
+    switch = column_switches[column]
+    current_state = switch.get()
+    if current_state == 1:
+        switch.deselect()
+    else:
+        switch.select()
+    print(f"Column {column} visibility is now {switch.get() == 1}")
+
+def toplevelwindow(window, treeview, original_data):
     toplevel = ctk.CTkToplevel(window)
     toplevel.title("Toplevel Window")
-    toplevel.geometry("400x300")
+    toplevel.geometry("350x400")
     toplevel.attributes('-topmost', True)  # Ensure the toplevel window stays on top
     toplevel.grab_set()
+    toplevel.resizable(False,False)
+    centrar_ventana(toplevel, 350, 400)
 
     mainframewrap = ctk.CTkFrame(toplevel, corner_radius=15)
     mainframewrap.pack(fill="both", expand=True, padx=5, pady=5)
@@ -37,76 +50,37 @@ def toplevelwindow(window):
     framebot = ctk.CTkFrame(mainframewrap, corner_radius=10)
     framebot.pack(padx=5, pady=5, side="bottom", fill="x", expand=True)
 
-    
-
-def display_column_switches(top_frame4, treeview, original_data, window):
-    ##############################################################
-    
-
-    
-    
-    ##############################################################
-    poppins12 = ("Poppins", 12, "bold")    
-
-    global column_switches_created
-    column_switches_created = False
-    if column_switches_created:
-        print("Alredy exist")
-        return  # Skip if already created
-
-    # Frame to hold switches
-    switches_frame = ctk.CTkFrame(top_frame4, corner_radius=15)
-    switches_frame.pack(pady=5, padx=5, side="left", fill="x", expand=True)
-
-    # Dictionary to store the switch states
+    # Move the switch creation logic here
+    poppins12 = ("Poppins", 12, "bold")
     column_switches = {}
 
-    # Treeview columns
     columns = [
         'Inmueble', 'Codigo Catastral', 'Uso', 'Contribuyente', 'CI', 'RIF', 
         'Telefono', 'Correo', 'Sector', 'Ubicacion Sector', 
         'Liquidacion ID', 'Monto 1', 'Monto 2', 'Fecha Liquidacion 1', 'Fecha Liquidacion 2'
     ]
 
-    # Create switches in rows using pack
-    max_columns_per_row = 10  # Number of switches per row
-    current_row_frame = None  # To keep track of the current row
-    switch_count = 0
-
+    # Distribute switches between frameleft and frameright
     for idx, col_name in enumerate(columns):
-        # Create a new row frame when needed
-        if idx % max_columns_per_row == 0:
-            current_row_frame = ctk.CTkFrame(switches_frame)
-            current_row_frame.pack(fill="x", padx=5, pady=5)
-
-        # Create the switch inside the current row frame
+        target_frame = frameleft if idx < 8 else frameright
         switch = ctk.CTkSwitch(
-            current_row_frame,
+            target_frame,
             text=col_name,
             font=poppins12,
             command=lambda c=col_name: toggle_column(column_switches, c)
         )
-        switch.pack(side="left", padx=5, pady=5)  # Pack the switches side by side
+        switch.pack(padx=5, pady=5, anchor="w")
         column_switches[col_name] = switch
-        switch.select() # Enable all columns by default
+        switch.select()  # Enable all columns by default
 
-        switch_count += 1
-    
+    # Add the refresh button to framebot
     refresh_button = ctk.CTkButton(
-        current_row_frame,
+        framebot,
         text="Refresh Treeview",
         font=poppins12,
         command=lambda: refresh_treeview(treeview, column_switches)
     )
-    refresh_button.pack(side="right", padx=5, pady=5)  # Place the button on the right inside the `button_frame`
-     # Place the button below the switches
-
-    column_switches_created = True  # Mark column switches as created
-
-def toggle_column(column_switches, column):
-    # Toggle the visibility of the column
-    column_switches[column] = not column_switches[column]
-    print(f"Column {column} visibility is now {column_switches[column]}")
+    refresh_button.pack(pady=10, padx=10, side="right")
 
 def refresh_treeview(treeview, column_switches):
     # Clear the Treeview before updating with new data
@@ -114,7 +88,7 @@ def refresh_treeview(treeview, column_switches):
         treeview.delete(item)
 
     # Select columns that are marked as visible in the column_switches
-    selected_columns = [col for col, is_visible in column_switches.items() if is_visible]
+    selected_columns = [col for col, switch in column_switches.items() if switch.get() == 1]
     
     # If no columns are selected, show an error and stop the function
     if not selected_columns:
@@ -223,7 +197,7 @@ def consulta(window, last_window):
     volver_btn = ctk.CTkButton(top_frame, text="Volver", command=lambda: menu(window), font=poppins20bold)
     volver_btn.pack(padx=10, pady=10, side="left")
 
-    window_title = ctk.CTkLabel(top_frame, text="Sección de Gestión Liquidación", font=poppins30bold)
+    window_title = ctk.CTkLabel(top_frame, text="Sección de Consulta General", font=poppins30bold)
     window_title.pack(padx=10, pady=10, side="left")
 
     # Bottom Frame Content
@@ -236,11 +210,13 @@ def consulta(window, last_window):
     show_filter_btn = ctk.CTkButton(top_frame2, text="Show Filter", width=100, font=poppins14bold, command=lambda: toggle_top_frame_visibility(top_frame4, top_frame3))
     show_filter_btn.pack(padx=10, pady=5, side="left")
 
-    showtoplevel = ctk.CTkButton(top_frame2, text="TopLevel", width=100, font=poppins14bold, command=lambda: toplevelwindow(window))
+
+    treeview = my_tree
+    showtoplevel = ctk.CTkButton(top_frame2, text="TopLevel", width=100, font=poppins14bold, command=lambda: toplevelwindow(window, treeview, original_data))
     showtoplevel.pack(padx=10, pady=5, side="left")
 
     # Add column switch UI to top_frame4
-    display_column_switches(top_frame4, my_tree, original_data, window)
+    # display_column_switches(top_frame4, my_tree, original_data, window)
 
     searchbtn = display_search_filter(top_frame3, my_tree, original_data)
     print(type(searchbtn)) 
@@ -381,9 +357,9 @@ def bottom_treeview(frame):
             cursor.execute(sql)
             original_data = cursor.fetchall()
 
-            print(f"Fetched {len(original_data)} rows from the database.")
-            for row in original_data:
-                print(row) 
+            # print(f"Fetched {len(original_data)} rows from the database.")
+            # for row in original_data:
+            #     print(row) 
 
             # Insert all data into Treeview initially
             for row in original_data:
