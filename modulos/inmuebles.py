@@ -288,6 +288,16 @@ def ifasignar(bottom_frame, top_frame2, window, last_window):
     loaddata()
 
 def guardar_inmueble(inmueble, inmueblecod, uso, sector, id_contr):
+    # Verificar que todos los campos estén rellenados
+    if not inmueble.get() or not inmueblecod.get() or not uso.get() or not sector.get():
+        messagebox.showwarning("Advertencia", "Todos los campos deben estar rellenados")
+        return
+
+    # Verificar que se haya seleccionado un contribuyente
+    if not id_contr:
+        messagebox.showwarning("Advertencia", "Debe seleccionar un contribuyente")
+        return
+
     try:
         with connection() as conn:
             cursor = conn.cursor()
@@ -297,9 +307,14 @@ def guardar_inmueble(inmueble, inmueblecod, uso, sector, id_contr):
                 VALUES (?, ?, ?, ?, (SELECT id_sector FROM sectores WHERE nom_sector = ?))
             ''', (inmueble.get(), inmueblecod.get(), uso.get(), id_contribuyente, sector.get()))
             conn.commit()
+            messagebox.showinfo("Información", "Inmueble registrado correctamente")
             print("Inmueble guardado exitosamente.")
     except Exception as e:
         print(f"Error al guardar el inmueble: {e}")
+        messagebox.showerror("Error", f"Error al guardar el inmueble: {e}")
+        
+        
+        
 
 def ifgestionar(window, bottom_frame, top_frame2, last_window):
     global busquedainm, busquedabtn, refrescartabla

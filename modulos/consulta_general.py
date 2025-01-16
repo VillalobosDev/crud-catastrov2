@@ -192,68 +192,9 @@ def toggle_column(column_switches, column):
         switch.deselect()
     print(f"Column {column} visibility is now {column_switch_states[column]}")
 
-def refresh_treeview(treeview, column_switches):
-    # Clear the Treeview before updating with new data
-    for item in treeview.get_children():
-        treeview.delete(item)
 
-    # Select columns that are marked as visible in the column_switches
-    selected_columns = [col for col, switch in column_switches.items() if switch.get() == 1]
-    
-    # If no columns are selected, show an error and stop the function
-    if not selected_columns:
-        print("No columns selected. Please select at least one column.")
-        return
+# Llama a esta función después de configurar las columnas en el Treeview
 
-    # Map the user-friendly column names to actual database fields
-    db_columns = {
-        'Inmueble': 'inmuebles.nom_inmueble',
-        'Codigo Catastral': 'inmuebles.cod_catastral',
-        'Uso': 'inmuebles.uso',
-        'Contribuyente': "contribuyentes.nombres || ' ' || contribuyentes.apellidos",
-        'CI': 'contribuyentes.ci_contribuyente',
-        'RIF': 'contribuyentes.rif',
-        'Telefono': 'contribuyentes.telefono',
-        'Correo': 'contribuyentes.correo',
-        'Sector': 'sectores.nom_sector',
-        'Ubicacion Sector': 'sectores.ubic_sector',
-        'Liquidacion ID': 'liquidaciones.id_liquidacion',
-        'Monto 1': 'liquidaciones.monto_1',
-        'Monto 2': 'liquidaciones.monto_2',
-        'Fecha Liquidacion 1': 'liquidaciones.fecha_liquidacion_1',
-        'Fecha Liquidacion 2': 'liquidaciones.fecha_liquidacion_2'
-    }
-
-    # Map the selected columns to the actual database fields for the SQL query
-    selected_db_columns = [db_columns[col] for col in selected_columns]
-
-    # Construct the SQL query dynamically based on selected columns
-    query = f"SELECT {', '.join(selected_db_columns)} FROM inmuebles " \
-            f"JOIN contribuyentes ON inmuebles.id_contribuyente = contribuyentes.id_contribuyente " \
-            f"JOIN sectores ON inmuebles.id_sector = sectores.id_sector " \
-            f"JOIN liquidaciones ON inmuebles.id_inmueble = liquidaciones.id_inmueble"
-
-    print(f"Executing Query: {query}")  # Debugging: Show the query being executed
-
-    # Try to fetch the data from the database
-    try:
-        with connection() as conn:
-            cursor = conn.cursor()
-            cursor.execute(query)
-            filtered_data = cursor.fetchall()
-
-            # Update the Treeview columns and insert the new data into the Treeview
-            treeview["columns"] = selected_columns
-            for col in selected_columns:
-                treeview.heading(col, text=col)
-                treeview.column(col, anchor="center", width=200)  # Set the column width to 200
-
-            # Insert the rows fetched from the query into the Treeview
-            for row in filtered_data:
-                treeview.insert("", "end", values=row)
-
-    except Exception as e:
-        print(f"Error during query execution: {e}")
 
 def toggle_top_frame_visibility(frame_to_show, frame_to_hide):
     """Toggle visibility of the frames."""
@@ -262,6 +203,8 @@ def toggle_top_frame_visibility(frame_to_show, frame_to_hide):
     else:
         frame_to_show.pack(fill="x", padx=10, pady=5, after=top_frame2)  # Show it after top_frame2
         frame_to_hide.pack_forget()
+        
+        
 def consulta(window, last_window):
     for widget in window.winfo_children():
         widget.destroy()
@@ -389,6 +332,72 @@ def display_search_filter(frame, my_tree, original_data):
     search_filter_created = True
     return searchbtn
 
+def refresh_treeview(treeview, column_switches):
+    # Clear the Treeview before updating with new data
+    for item in treeview.get_children():
+        treeview.delete(item)
+
+    # Select columns that are marked as visible in the column_switches
+    selected_columns = [col for col, switch in column_switches.items() if switch.get() == 1]
+    
+    # If no columns are selected, show an error and stop the function
+    if not selected_columns:
+        print("No columns selected. Please select at least one column.")
+        return
+
+    # Map the user-friendly column names to actual database fields
+    db_columns = {
+        'Inmueble': 'inmuebles.nom_inmueble',
+        'Codigo Catastral': 'inmuebles.cod_catastral',
+        'Uso': 'inmuebles.uso',
+        'Contribuyente': "contribuyentes.nombres || ' ' || contribuyentes.apellidos",
+        'CI': 'contribuyentes.ci_contribuyente',
+        'RIF': 'contribuyentes.rif',
+        'Telefono': 'contribuyentes.telefono',
+        'Correo': 'contribuyentes.correo',
+        'Sector': 'sectores.nom_sector',
+        'Ubicacion Sector': 'sectores.ubic_sector',
+        'Liquidacion ID': 'liquidaciones.id_liquidacion',
+        'Monto 1': 'liquidaciones.monto_1',
+        'Monto 2': 'liquidaciones.monto_2',
+        'Fecha Liquidacion 1': 'liquidaciones.fecha_liquidacion_1',
+        'Fecha Liquidacion 2': 'liquidaciones.fecha_liquidacion_2'
+    }
+
+    # Map the selected columns to the actual database fields for the SQL query
+    selected_db_columns = [db_columns[col] for col in selected_columns]
+
+    # Construct the SQL query dynamically based on selected columns
+    query = f"SELECT {', '.join(selected_db_columns)} FROM inmuebles " \
+            f"JOIN contribuyentes ON inmuebles.id_contribuyente = contribuyentes.id_contribuyente " \
+            f"JOIN sectores ON inmuebles.id_sector = sectores.id_sector " \
+            f"JOIN liquidaciones ON inmuebles.id_inmueble = liquidaciones.id_inmueble"
+
+    print(f"Executing Query: {query}")  # Debugging: Show the query being executed
+
+    # Try to fetch the data from the database
+    try:
+        with connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(query)
+            filtered_data = cursor.fetchall()
+
+            # Update the Treeview columns and insert the new data into the Treeview
+            treeview["columns"] = selected_columns
+            
+            for col in selected_columns:
+                treeview.heading(col, text=col)
+                print(f"Setting width for column {col} to 200")
+                treeview.column(col, anchor="center", width=200)
+
+            # Insert the rows fetched from the query into the Treeview
+            for row in filtered_data:
+                treeview.insert("", "end", values=row)
+    
+    except Exception as e:
+        print(f"Error during query execution: {e}")
+
+# Asegúrate de llamar a esta función después de configurar las columnas en el Treeview
 def bottom_treeview(frame):
     # Treeview frame
     treeframe = ctk.CTkFrame(frame, corner_radius=15)
@@ -405,13 +414,11 @@ def bottom_treeview(frame):
     my_tree = ttk.Treeview(frame_tree, style="Custom.Treeview", show="headings")
     my_tree.pack(pady=10, padx=10, fill="both", expand=True)
 
-
     ################SCROLLBAR X
     horizontal_scrollbar = ttk.Scrollbar(frame_tree, orient="horizontal", command=my_tree.xview)
     my_tree.configure(xscrollcommand=horizontal_scrollbar.set)
     horizontal_scrollbar.pack(side="bottom", fill="x")
     
-
     # Define the columns
     columns = [
         'Inmueble', 'Codigo Catastral', 'Uso', 'Contribuyente', 'CI', 'RIF', 
@@ -420,7 +427,6 @@ def bottom_treeview(frame):
     ]
     my_tree["columns"] = columns
 
-    # Set column headers
     for col in columns:
         my_tree.heading(col, text=col)
         my_tree.column(col, anchor="center", width=200)
@@ -468,6 +474,7 @@ def bottom_treeview(frame):
         print(f"Error during database operation: {e}")
 
     return my_tree, original_data  # Return both my_tree and original_data
+
 
 def cedula_search(my_tree, original_data, cedula_entry):
     """Filter treeview data based on Cédula."""
@@ -553,3 +560,7 @@ def export_treeview_to_xlsx(treeview, filename):
     # Save the workbook to the specified filename
     workbook.save(filename)
     print(f"Data exported to {filename} successfully.")
+    
+    
+    
+    
