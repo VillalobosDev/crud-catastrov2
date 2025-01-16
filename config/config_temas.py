@@ -61,9 +61,6 @@ def open_config_window(parent):
     Tema_button = ctk.CTkButton(left_frame, text="Apariencia", font=poppins12bold)
     Tema_button.pack(padx=20, pady=10, side="top")
 
-    resolucion_button = ctk.CTkButton(left_frame, text="Pantalla", font=poppins12bold)
-    resolucion_button.pack(padx=20, pady=10, side="top")
-
     pass_button = ctk.CTkButton(left_frame, text="Contraseñas", font=poppins12bold)
     pass_button.pack(padx=20, pady=10, side="top")
 

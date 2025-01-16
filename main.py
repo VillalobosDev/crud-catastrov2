@@ -27,7 +27,7 @@ apply_theme(theme)
 apply_color(color)
 
 window = ctk.CTk()
-window.title("Menu")
+window.title("Axio")
 window.geometry("1080x720")
 
 
