@@ -198,12 +198,10 @@ def ifagregar(bottom_frame, top_frame2, window, last_window):
     my_tree.pack(pady=10, padx=10, fill="both", expand=True)
         
     horizontal_scrollbar = ttk.Scrollbar(frame_tree, orient="horizontal", command=my_tree.xview)
-    vertical_scrollbar = ttk.Scrollbar(frame_tree, orient="vertical", command=my_tree.yview)
 
-    my_tree.configure(xscrollcommand=horizontal_scrollbar.set, yscrollcommand=vertical_scrollbar.set)
+    my_tree.configure(xscrollcommand=horizontal_scrollbar.set)
 
     horizontal_scrollbar.pack(side="bottom", fill="x")
-    vertical_scrollbar.pack(side="right", fill="y")
 
     my_tree['columns'] = ('nombre', 'apellido', 'cedula', 'rif', 'telefono', 'correo')
 
@@ -429,12 +427,10 @@ def ifgestionar(bottom_frame, top_frame2, window, last_window):
     my_tree.pack(pady=10, padx=10, fill="both", expand=True)
 
     horizontal_scrollbar = ttk.Scrollbar(frame_tree, orient="horizontal", command=my_tree.xview)
-    vertical_scrollbar = ttk.Scrollbar(frame_tree, orient="vertical", command=my_tree.yview)
 
-    my_tree.configure(xscrollcommand=horizontal_scrollbar.set, yscrollcommand=vertical_scrollbar.set)
+    my_tree.configure(xscrollcommand=horizontal_scrollbar.set)
 
     horizontal_scrollbar.pack(side="bottom", fill="x")
-    vertical_scrollbar.pack(side="right", fill="y")
 
     my_tree["columns"] = ('id_contribuyente', 'nombre', 'apellido', 'cedula', 'rif', 'telefono', 'correo')
     for col in my_tree["columns"]:
@@ -442,14 +438,6 @@ def ifgestionar(bottom_frame, top_frame2, window, last_window):
         my_tree.column(col, anchor="center")
         
     my_tree.column('id_contribuyente', width=0, stretch=tk.NO)
-
-    horizontal_scrollbar = ttk.Scrollbar(frame_tree, orient="horizontal", command=my_tree.xview)
-    vertical_scrollbar = ttk.Scrollbar(frame_tree, orient="vertical", command=my_tree.yview)
-
-    my_tree.configure(xscrollcommand=horizontal_scrollbar.set, yscrollcommand=vertical_scrollbar.set)
-
-    horizontal_scrollbar.pack(side="bottom", fill="x")
-    vertical_scrollbar.pack(side="right", fill="y")
 
     def on_tree_select(event):
         selected_item = my_tree.selection()
