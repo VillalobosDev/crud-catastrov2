@@ -302,7 +302,7 @@ def guardar_inmueble(inmueble, inmueblecod, uso, sector, id_contr):
         print(f"Error al guardar el inmueble: {e}")
 
 def ifgestionar(window, bottom_frame, top_frame2, last_window):
-    global busquedainm, busquedabtn, refrescartabla
+    global busquedainm, busquedabtn, refrescartabla, id_contr
 
     if busquedabtn:
         busquedabtn.pack_forget()
@@ -339,6 +339,12 @@ def ifgestionar(window, bottom_frame, top_frame2, last_window):
 
     sector_frame = ctk.CTkFrame(frame_left)
     sector_frame.pack(padx=10, pady=5, fill="x")
+    
+    frameinformacion = ctk.CTkFrame(frame_left)
+    frameinformacion.pack(padx=10, pady=5, fill="x")
+
+    frameinformacion2 = ctk.CTkFrame(frameinformacion)
+    frameinformacion2.pack(padx=10, pady=5, fill="x", side="bottom")
 
     ################################
     refrescartabla = ctk.CTkButton(top_frame2, text="Refrescar Tabla", font=poppins14bold, width=80, command=lambda: reload_treeview(my_tree))
@@ -355,9 +361,15 @@ def ifgestionar(window, bottom_frame, top_frame2, last_window):
 
     contribuyenteci = ctk.CTkEntry(contribuyenteci_frame, placeholder_text="Cedula Contribuyente", font=poppins14bold, width=250)
     contribuyenteci.pack(pady=5, padx=5, side="left")
+    #hide the contribuyenteci
+    contribuyenteci.pack_forget()
+    contribuyenteci_frame.pack_forget()
 
     contribuyentenombre = ctk.CTkEntry(contribuyentenombre_frame, placeholder_text="Contribuyente", font=poppins14bold, width=250)
     contribuyentenombre.pack(pady=5, padx=5, side="left")
+    #hide the contribuyentenombre
+    contribuyentenombre.pack_forget()
+    contribuyentenombre_frame.pack_forget()
 
     inmueble = ctk.CTkEntry(inmueble_frame, placeholder_text="Inmueble", font=poppins14bold, width=250)
     inmueble.pack(padx=5, pady=5, side="left")
@@ -381,6 +393,16 @@ def ifgestionar(window, bottom_frame, top_frame2, last_window):
 
     sector = ctk.CTkOptionMenu(sector_frame, values=sector_names, font=poppins14bold, width=250)
     sector.pack(pady=5, padx=5, side="left")
+
+    # Informacion del contribuyente ##################################################
+
+    labelcontribuyente = ctk.CTkLabel(frameinformacion, text="Informacion del Contribuyente", font=poppins14bold)
+    labelcontribuyente.pack(pady=5)
+
+    labelcontri = ctk.CTkLabel(frameinformacion2, text="", font=poppins14bold)
+    labelcontri.pack(pady=5, side="bottom")
+
+    
 
     selected_item = None  # Initialize selected_item
 
@@ -413,7 +435,10 @@ def ifgestionar(window, bottom_frame, top_frame2, last_window):
         uso.set(values[4])
         sector.set(values[5])
 
+        labelcontri.configure(text=f"{values[1]}")
+
         my_tree.unbind("<ButtonRelease-1>")
+        my_tree.bind("<<TreeviewSelect>>", on_tree_select)
 
     def save_changes(selected_item):
         new_values = (
