@@ -489,7 +489,7 @@ def ifgestionar(window, bottom_frame, top_frame2, last_window):
     btndelete = ctk.CTkButton(frame_left, text="Eliminar", command=lambda: confirm_delete(selected_item), font=poppins14bold)
     btndelete.pack(padx=10, pady=10, anchor="e", side="bottom")
 
-    btnvolver = ctk.CTkButton(frame_left, text="Volver", command=lambda: inmuebles(window, last_window), font=poppins14bold)
+    btnvolver = ctk.CTkButton(frame_left, text="Atrás", command=lambda: inmuebles(window, last_window), font=poppins14bold)
     btnvolver.pack(padx=10, pady=10, anchor="e", side="bottom")
 
     frame_tree = ctk.CTkFrame(frame_right, fg_color="white")
