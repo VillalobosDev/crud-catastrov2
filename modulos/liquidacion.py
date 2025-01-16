@@ -395,6 +395,12 @@ def ifgestionar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold
     my_tree = setup_treeview(frame_tree)
     load_liquidaciones_data(my_tree)
 
+    horizontal_scrollbar = ttk.Scrollbar(frame_tree, orient="horizontal", command=my_tree.xview)
+
+    my_tree.configure(xscrollcommand=horizontal_scrollbar.set)
+
+    horizontal_scrollbar.pack(side="bottom", fill="x")
+
     my_tree.bind("<ButtonRelease-1>", lambda e: gestionar_liquidacion(my_tree, ci_entry, nombre_entry, inmueble_menu, monto1, monto2, fecha1, fecha2))        
 
     busquedabtn = ctk.CTkButton(top_frame2, text="Buscar", font=poppins14bold, width=80, command=lambda: reload_treeviewsearch(my_tree, busquedaliq))
@@ -485,6 +491,12 @@ def ifasignar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold, 
     ######################################
     my_tree = setup_treeview(frame_tree)
     ######################################
+
+    horizontal_scrollbar = ttk.Scrollbar(frame_tree, orient="horizontal", command=my_tree.xview)
+
+    my_tree.configure(xscrollcommand=horizontal_scrollbar.set)
+
+    horizontal_scrollbar.pack(side="bottom", fill="x")
       
     btnsave = ctk.CTkButton(frame_left, text="Guardar", command=lambda: save_liquidacion(my_tree, ci_entry, nombre_entry, inmueble_menu, monto1, monto2, fecha1, fecha2), font=poppins14bold)
     btnsave.pack(padx=10, pady=10, anchor="e", side="bottom")

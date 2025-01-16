@@ -4,6 +4,7 @@ from .menubar import menubar
 from functions.functions import * 
 from tkinter import ttk
 from functions.rectangle import rectangle
+from tkinter import messagebox
 
 def inmuebles(window, last_window):
     global busquedabtn, busquedainm, refrescartabla
