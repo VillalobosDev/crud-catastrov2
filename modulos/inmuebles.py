@@ -17,7 +17,7 @@ def inmuebles(window, last_window):
     poppins30bold = ("Poppins", 30, "bold")
     poppins20bold = ("Poppins", 20, "bold")
     poppins14bold = ("Poppins", 14, "bold")
-    poppins12 = ("Poppins", 12, "bold")
+    poppins12 = ("Poppins", 12)
     
     menubar(window)
     
@@ -286,6 +286,7 @@ def ifasignar(bottom_frame, top_frame2, window, last_window):
 
     loaddata()
 
+
 def guardar_inmueble(inmueble, inmueblecod, uso, sector, id_contr):
     try:
         with connection() as conn:
@@ -321,12 +322,6 @@ def ifgestionar(window, bottom_frame, top_frame2, last_window):
     frame_right = ctk.CTkFrame(bottom_frame, corner_radius=15)
     frame_right.pack(padx=5, pady=5, side="right", fill="both", expand=True)
 
-    contribuyenteci_frame = ctk.CTkFrame(frame_left)
-    contribuyenteci_frame.pack(padx=10, pady=5, fill="x")
-
-    contribuyentenombre_frame = ctk.CTkFrame(frame_left)
-    contribuyentenombre_frame.pack(padx=10, pady=5, fill="x")
-
     inmueble_frame = ctk.CTkFrame(frame_left)
     inmueble_frame.pack(padx=10, pady=5, anchor="w")
 
@@ -343,15 +338,9 @@ def ifgestionar(window, bottom_frame, top_frame2, last_window):
     infodelcontribuyente.pack(padx=10, pady=5, fill="x")
 
     ###############################
-    # Label para el contribuyente
-    frame2 = ctk.CTkFrame(infodelcontribuyente, corner_radius=10, width=240, height=40)
-    frame2.pack(pady=8, padx=10)
-    frame2.pack_propagate(False)
-    
-    text_label2=ctk.CTkLabel(frame2, text="", font=poppins14bold)
-    text_label2.pack(pady=5)
     
 
+    
     ################################
     refrescartabla = ctk.CTkButton(top_frame2, text="Refrescar Tabla", font=poppins14bold, width=80, command=lambda: reload_treeview(my_tree))
     refrescartabla.pack(padx=5, pady=5, side="right")
@@ -364,12 +353,6 @@ def ifgestionar(window, bottom_frame, top_frame2, last_window):
     ################################
 
     # Entrys del frame contribuyente
-
-    contribuyenteci = ctk.CTkEntry(contribuyenteci_frame, placeholder_text="Cedula Contribuyente", font=poppins14bold, width=250)
-    contribuyenteci.pack(pady=5, padx=5, side="left")
-
-    contribuyentenombre = ctk.CTkEntry(contribuyentenombre_frame, placeholder_text="Contribuyente", font=poppins14bold, width=250)
-    contribuyentenombre.pack(pady=5, padx=5, side="left")
 
     inmueble = ctk.CTkEntry(inmueble_frame, placeholder_text="Inmueble", font=poppins14bold, width=250)
     inmueble.pack(padx=5, pady=5, side="left")
@@ -396,25 +379,24 @@ def ifgestionar(window, bottom_frame, top_frame2, last_window):
 
     selected_item = None  # Initialize selected_item
 
-    def cancel_action():
-        contribuyenteci.delete(0, ctk.END)
-        contribuyentenombre.delete(0, ctk.END)
-        inmueble.delete(0, ctk.END)
-        inmueblecod.delete(0, ctk.END)
-        uso.set("")
-        sector.set("")
-        my_tree.bind("<ButtonRelease-1>", on_tree_select)
+    
+    # Label para el contribuyente seleccionado
+
+    frame2 = ctk.CTkFrame(infodelcontribuyente, corner_radius=10, width=240, height=40)
+    frame2.pack(pady=8, padx=10)
+    frame2.pack_propagate(False)
+    
+    text_label=ctk.CTkLabel(frame2, text="Contribuyente", font=poppins14bold)
+    text_label.pack(pady=5)
+    
+    text_label2=ctk.CTkLabel(infodelcontribuyente, text="", font=poppins14bold)
+    text_label2.pack(pady=5)
+    
 
     def on_tree_select(event):
         nonlocal selected_item  # Use nonlocal to modify the outer variable
         selected_item = my_tree.selection()[0]
         values = my_tree.item(selected_item, "values")
-
-        contribuyenteci.delete(0, ctk.END)
-        contribuyenteci.insert(0, values[0])
-
-        contribuyentenombre.delete(0, ctk.END)
-        contribuyentenombre.insert(0, values[1])
 
         inmueble.delete(0, ctk.END)
         inmueble.insert(0, values[2])
@@ -425,28 +407,30 @@ def ifgestionar(window, bottom_frame, top_frame2, last_window):
         uso.set(values[4])
         sector.set(values[5])
 
-        my_tree.unbind("<ButtonRelease-1>")
+        text_label2.configure(text="{} {}".format(values[0], values[1]))
 
-    def save_changes(selected_item):
-        new_values = (
-            contribuyenteci.get(),
-            contribuyentenombre.get(),
-            inmueble.get(),
-            inmueblecod.get(),
-            uso.get(),
-            sector.get()
-        )
+        my_tree.unbind("<ButtonRelease-1>")
+        my_tree.bind("<<TreeviewSelect>>", on_tree_select)
+        return values[0], values[1]
+
+    def save_changes(selected_item, inmueble, inmueblecod, uso, sector):    
+        cedula, nombre = on_tree_select(selected_item)
+        _inmueble = inmueble.get()
+        codcatastral = inmueblecod.get()
+        usovalue = uso.get()
+        sectorvalue = sector.get()
+        
 
         try:
             with connection() as conn:
                 cursor = conn.cursor()
 
                 # Get id_contribuyente from contribuyentes table
-                cursor.execute("SELECT id_contribuyente FROM contribuyentes WHERE ci_contribuyente = ?", (new_values[0],))
+                cursor.execute("SELECT id_contribuyente FROM contribuyentes WHERE ci_contribuyente = ?", (cedula,))
                 id_contribuyente = cursor.fetchone()[0]
 
                 # Get id_sector from sectores table
-                cursor.execute("SELECT id_sector FROM sectores WHERE nom_sector = ?", (new_values[5],))
+                cursor.execute("SELECT id_sector FROM sectores WHERE nom_sector = ?", (sectorvalue,))
                 id_sector = cursor.fetchone()[0]
 
                 sql = '''
@@ -454,7 +438,7 @@ def ifgestionar(window, bottom_frame, top_frame2, last_window):
                 SET nom_inmueble = ?, cod_catastral = ?, uso = ?, id_contribuyente = ?, id_sector = ?
                 WHERE id_inmueble = ?
                 '''
-                cursor.execute(sql, (new_values[2], new_values[3], new_values[4], id_contribuyente, id_sector, selected_item))
+                cursor.execute(sql, (_inmueble, codcatastral, usovalue, id_contribuyente, id_sector, selected_item))
                 conn.commit()
                 print("Changes saved successfully!")
                 reload_treeview(my_tree)
@@ -495,7 +479,7 @@ def ifgestionar(window, bottom_frame, top_frame2, last_window):
         selected_item = None
         my_tree.bind("<ButtonRelease-1>", on_tree_select)
 
-    btnsave = ctk.CTkButton(frame_left, text="Guardar", command=lambda: save_changes(selected_item), font=poppins14bold)
+    btnsave = ctk.CTkButton(frame_left, text="Guardar", command=lambda: save_changes(selected_item, inmueble, inmueblecod, uso, sector), font=poppins14bold)
     btnsave.pack(padx=10, pady=10, anchor="e", side="bottom")
 
     btndelete = ctk.CTkButton(frame_left, text="Eliminar", command=lambda: confirm_delete(selected_item), font=poppins14bold)
