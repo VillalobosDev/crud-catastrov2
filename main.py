@@ -38,7 +38,7 @@ def close_after_timeout(root, timeout):
     """Close the window after a specified timeout (in milliseconds)."""
     root.after(timeout, root.destroy)
 
-#Este es para administradoresssssss
+
 
 #inmuebles(window, menu)
 
@@ -50,8 +50,3 @@ menu(window)
 
 window.mainloop()
 
-
-#ñlñlñlñl
-#02
-
-#!11e2

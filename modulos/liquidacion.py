@@ -301,6 +301,7 @@ def ifgestionar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold
 
     poppins14bold = ("Poppins", 14, "bold")
     poppins18 = ("Poppins", 18, "bold")
+    poppins18 = ("Poppins", 18, "bold")
 
     for widget in bottom_frame.winfo_children():
         widget.destroy()
@@ -400,6 +401,7 @@ def ifasignar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold, 
         busquedaliqold.pack_forget()
 
     poppins14bold = ("Poppins", 14, "bold")
+    poppins18 = ("Poppins", 18, "bold")
     poppins18 = ("Poppins", 18, "bold")
 
     for widget in bottom_frame.winfo_children():
