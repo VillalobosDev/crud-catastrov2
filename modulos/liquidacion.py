@@ -300,13 +300,12 @@ def ifgestionar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold
         busquedaliqold.pack_forget()
 
     poppins14bold = ("Poppins", 14, "bold")
+    poppins18 = ("Poppins", 18, "bold")
 
     for widget in bottom_frame.winfo_children():
         widget.destroy()
 
     
-
-
 
     frame_left = ctk.CTkFrame(bottom_frame, corner_radius=15, width=400)
     frame_left.pack(padx=5, pady=5, side="left", fill="both")
@@ -314,6 +313,10 @@ def ifgestionar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold
     frame_right = ctk.CTkFrame(bottom_frame, corner_radius=15)
     frame_right.pack(padx=5, pady=5, side="right", fill="both", expand=True)
 
+    text_top = ctk.CTkLabel(frame_left, text="Gestionar Liquidación", font=poppins18, width=250)
+    text_top.pack(padx=10, pady=10)
+    
+    
     # Add UI elements for the left frame
     ci_frame = ctk.CTkFrame(frame_left)
     ci_frame.pack(padx=10, pady=5, fill="x")
@@ -365,15 +368,14 @@ def ifgestionar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold
 
     ci_entry.bind("<FocusOut>", lambda e: update_contribuyente_info(ci_entry, nombre_entry, inmueble_menu))
 
-
-    btnvolver = ctk.CTkButton(frame_left, text="CancelPcopcar", command=lambda: liquidacion(window, last_window), font=poppins14bold)
-    btnvolver.pack(padx=10, pady=10, anchor="e", side="bottom")
-
-    btndelete = ctk.CTkButton(frame_left, text="Eliminar", command=lambda: delete_liquidacion(ci_entry, inmueble_menu, my_tree), font=poppins14bold)
-    btndelete.pack(padx=10, pady=10, anchor="e", side="bottom")
-
     btnsave = ctk.CTkButton(frame_left, text="Guardar", command=lambda: update_liquidacion(my_tree, ci_entry, nombre_entry, inmueble_menu, monto1, monto2, fecha1, fecha2), font=poppins14bold)
     btnsave.pack(padx=10, pady=10, anchor="e", side="bottom")
+    
+    btndelete = ctk.CTkButton(frame_left, text="Eliminar", command=lambda: delete_liquidacion(ci_entry, inmueble_menu, my_tree), font=poppins14bold)
+    btndelete.pack(padx=10, pady=10, anchor="e", side="bottom")
+        
+    btnvolver = ctk.CTkButton(frame_left, text="Atrás", command=lambda: liquidacion(window, last_window), font=poppins14bold)
+    btnvolver.pack(padx=10, pady=10, anchor="e", side="bottom")
 
     # Add Treeview for the right frame.
     frame_tree = ctk.CTkFrame(frame_right, fg_color="white")
@@ -398,6 +400,7 @@ def ifasignar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold, 
         busquedaliqold.pack_forget()
 
     poppins14bold = ("Poppins", 14, "bold")
+    poppins18 = ("Poppins", 18, "bold")
 
     for widget in bottom_frame.winfo_children():
         widget.destroy()
@@ -407,6 +410,9 @@ def ifasignar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold, 
     
     frame_right = ctk.CTkFrame(bottom_frame, corner_radius=15)
     frame_right.pack(padx=5, pady=5, side="right", fill="both", expand=True)
+    
+    text_top = ctk.CTkLabel(frame_left, text="Asignar Liquidación", font=poppins18, width=250)
+    text_top.pack(padx=10, pady=10)
 
 
 
@@ -470,14 +476,13 @@ def ifasignar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold, 
     ######################################
     my_tree = setup_treeview(frame_tree)
     ######################################
-    
-    btnvolver = ctk.CTkButton(frame_left, text="Volver", command=lambda: liquidacion(window, last_window), font=poppins14bold)
-    btnvolver.pack(padx=10, pady=10, anchor="e", side="bottom")
-
-    
+      
     btnsave = ctk.CTkButton(frame_left, text="Guardar", command=lambda: save_liquidacion(my_tree, ci_entry, nombre_entry, inmueble_menu, monto1, monto2, fecha1, fecha2), font=poppins14bold)
     btnsave.pack(padx=10, pady=10, anchor="e", side="bottom")
-
+    
+    btnvolver = ctk.CTkButton(frame_left, text="Atrás", command=lambda: liquidacion(window, last_window), font=poppins14bold)
+    btnvolver.pack(padx=10, pady=10, anchor="e", side="bottom")
+     
     load_liquidaciones_data(my_tree)
 
     busquedabtn = ctk.CTkButton(top_frame2, text="Buscar", font=poppins14bold, width=80, command=lambda: reload_treeviewsearch(my_tree, busquedaliq))
