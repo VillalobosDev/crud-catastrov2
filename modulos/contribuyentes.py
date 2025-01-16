@@ -584,15 +584,12 @@ def contribuyentes(window, last_window):
 
     # Crear el Treeview
     my_tree = ttk.Treeview(frame_tree, style="Custom.Treeview", show="headings")
-    my_tree.pack(pady=10, padx=10, fill="both", expand=True, side="left")
+    my_tree.pack(pady=10, padx=10, fill="both", expand=True)
 
     # Crear el scrollbar vertical con CustomTkinter
-    vertical_scrollbar = ttk.Scrollbar(frame_tree, orient="vertical", command=my_tree.yview)
+
     horizontal_scrollbar = ttk.Scrollbar(frame_tree, orient="horizontal", command=my_tree.xview)
-
-    my_tree.configure(yscrollcommand=vertical_scrollbar.set,xscrollcommand=horizontal_scrollbar.set)
-
-    vertical_scrollbar.pack(side="right", fill="y")
+    my_tree.configure(xscrollcommand=horizontal_scrollbar.set)
     horizontal_scrollbar.pack(side="bottom", fill="x")
 
 

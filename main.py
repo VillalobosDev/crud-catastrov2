@@ -41,9 +41,9 @@ def close_after_timeout(root, timeout):
 
 
 #inmuebles(window, menu)
-inmuebles(window, menu)
+#inmuebles(window, menu)
 #Este es para usuarios
-# menu(window)
+menu(window)
 #inmuebles(window, menu)
 #Para iniciar desde el login, la contraseña es 1234
 #login(window)
