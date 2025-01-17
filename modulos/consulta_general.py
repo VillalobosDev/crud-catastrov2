@@ -377,6 +377,14 @@ def refresh_treeview(treeview, column_switches):
             f"JOIN liquidaciones ON inmuebles.id_inmueble = liquidaciones.id_inmueble"
 
     print(f"Executing Query: {query}")  # Debugging: Show the query being executed
+    
+    treeview["columns"] = selected_columns
+            
+    for col in selected_columns:
+        treeview.heading(col, text=col)
+        print(f"Setting width for column {col} to 200")
+        treeview.column(col, anchor="center")
+
 
     # Try to fetch the data from the database
     try:
