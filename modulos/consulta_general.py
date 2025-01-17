@@ -27,7 +27,7 @@ column_switch_states = {
     'Telefono': True,
     'Correo': True,
     'Sector': True,
-    'Ubicacion Sector': True,
+    'Codigo del Sector': True,
     'Liquidacion ID': True,
     'Monto 1': True,
     'Monto 2': True,
@@ -66,7 +66,7 @@ def display_column_switches(top_frame4, treeview, original_data, window):
     # Treeview columns
     columns = [
         'Inmueble', 'Codigo Catastral', 'Uso', 'Contribuyente', 'CI', 'RIF', 
-        'Telefono', 'Correo', 'Sector', 'Ubicacion Sector', 
+        'Telefono', 'Correo', 'Sector', 'Codigo del Sector', 
         'Liquidacion ID', 'Monto 1', 'Monto 2', 'Fecha Liquidacion 1', 'Fecha Liquidacion 2'
     ]
 
@@ -129,7 +129,7 @@ def display_column_switches(top_frame4, treeview, original_data, window):
     text_3.pack(pady=10, side="top")
 
 
-    for col_name in ['Sector', 'Ubicacion Sector']:
+    for col_name in ['Sector', 'Codigo del Sector']:
         switch = ctk.CTkSwitch(
             group3_frame,
             text=col_name,
@@ -354,12 +354,12 @@ def refresh_treeview(treeview, column_switches):
         'Codigo Catastral': 'inmuebles.cod_catastral',
         'Uso': 'inmuebles.uso',
         'Contribuyente': "contribuyentes.nombres || ' ' || contribuyentes.apellidos",
-        'CI': 'contribuyentes.ci_contribuyente',
-        'RIF': 'contribuyentes.rif',
+        'CI': 'contribuyentes.v_e || "-" || contribuyentes.ci_contribuyente',
+        'RIF': 'contribuyentes.j_c_g || "-" || contribuyentes.rif',
         'Telefono': 'contribuyentes.telefono',
         'Correo': 'contribuyentes.correo',
         'Sector': 'sectores.nom_sector',
-        'Ubicacion Sector': 'sectores.ubic_sector',
+        'Codigo del Sector': 'sectores.cod_sector',
         'Liquidacion ID': 'liquidaciones.id_liquidacion',
         'Monto 1': 'liquidaciones.monto_1',
         'Monto 2': 'liquidaciones.monto_2',
@@ -427,7 +427,7 @@ def bottom_treeview(frame):
     # Define the columns
     columns = [
         'Inmueble', 'Codigo Catastral', 'Uso', 'Contribuyente', 'CI', 'RIF', 
-        'Telefono', 'Correo', 'Sector', 'Ubicacion Sector', 
+        'Telefono', 'Correo', 'Sector', 'Codigo del Sector', 
         'Liquidacion ID', 'Monto 1', 'Monto 2', 'Fecha Liquidacion 1', 'Fecha Liquidacion 2'
     ]
     my_tree["columns"] = columns
@@ -446,12 +446,12 @@ def bottom_treeview(frame):
             inmuebles.cod_catastral,
             inmuebles.uso,
             contribuyentes.nombres || ' ' || contribuyentes.apellidos AS contribuyente,
-            contribuyentes.ci_contribuyente,
-            contribuyentes.rif,
+            contribuyentes.v_e || "-" || contribuyentes.ci_contribuyente AS cedula_completa,
+            contribuyentes.j_c_g || "-" || contribuyentes.rif,
             contribuyentes.telefono,
             contribuyentes.correo,
             sectores.nom_sector,
-            sectores.ubic_sector,
+            sectores.cod_sector,
             liquidaciones.id_liquidacion,
             liquidaciones.monto_1,
             liquidaciones.monto_2,
