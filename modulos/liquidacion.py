@@ -5,6 +5,9 @@ import customtkinter as ctk
 from functions.functions import *
 from modulos.menubar import menubar
 from functions.calendario import open_calendar_popup  # Import the calendar popup function
+import customtkinter as ctk
+from tkinter import ttk
+from config.config import centrar_ventana
 
 def setup_treeview(frame):
     style = ttk.Style()
@@ -14,19 +17,111 @@ def setup_treeview(frame):
     treeview = ttk.Treeview(frame, style="Custom.Treeview", show="headings")
     treeview.pack(pady=10, padx=10, fill="both", expand=True)
 
-    treeview["columns"] = ("CI","Contribuyente Nombre", "Inmueble", "Monto 1", "Monto 2", "Fecha Liq 1", "Fecha Liq 2")
+    treeview["columns"] = ("CI", "Contribuyente", "Inmueble", "Monto 1", "Monto 2", "Fecha Liq 1", "Fecha Liq 2")
     for col in treeview["columns"]:
         treeview.heading(col, text=col.capitalize(), anchor="center")
         treeview.column(col, anchor="center")
 
     return treeview
 
+
+def liqui_info(data):
+    
+    poppins30bold = ("Poppins", 25, "bold")
+    poppins20bold = ("Poppins", 20, "bold")
+    poppins14bold = ("Poppins", 14, "bold")
+    poppins16bold = ("Poppins", 16, "bold")
+
+    popup = ctk.CTkToplevel()
+    popup.title("Liquidación")
+    popup.geometry("600x500")
+    popup.grab_set()
+    popup.resizable(False, False)
+    
+    centrar_ventana(popup, 600, 500)
+
+    bton_atras= ctk.CTkButton(popup, text="Atrás", command=popup.destroy, font=poppins14bold)
+    bton_atras.pack(padx=10, pady=10, anchor="e", side="bottom")
+
+    frame = ctk.CTkFrame(popup, corner_radius=15)
+    frame.pack(fill="both", expand=True, padx=5, pady=5)
+    
+    # Crear un contenedor para frame2 y frame3
+    
+    top_container = ctk.CTkFrame(frame, corner_radius=15)
+    top_container.pack(fill="x", padx=5, pady=5, side="top")
+    
+
+    frame2 = ctk.CTkFrame(top_container, corner_radius=15)
+    frame2.pack(side="left", fill="both", expand=True, padx=5, pady=5)
+
+    frame3 = ctk.CTkFrame(top_container, corner_radius=15)
+    frame3.pack(side="left", fill="both", expand=True, padx=5, pady=5)
+
+    frame4 = ctk.CTkFrame(frame, corner_radius=15)
+    frame4.pack(fill="both", expand=True, padx=5, pady=5)
+    
+    
+    
+    text_top = ctk.CTkLabel(frame2, text="Contribuyente", font=poppins20bold)
+    text_top.pack(padx=10, pady=5, side="top")
+    
+    contribuyente_value = ctk.CTkLabel(frame2, text=f"• {data[1]}", font=poppins16bold)
+    contribuyente_value.pack(padx=20, pady=10, anchor="w")
+
+    ci_value = ctk.CTkLabel(frame2, text=f"• {data[0]}", font=poppins16bold)
+    ci_value.pack(padx=20, pady=10, anchor="w")
+    
+    
+    text_top2 = ctk.CTkLabel(frame3, text="Inmueble", font=poppins20bold)
+    text_top2.pack(padx=10, pady=10, side="top")
+    
+    inmueble_value = ctk.CTkLabel(frame3, text=f"• {data[2]}", font=poppins16bold)
+    inmueble_value.pack(padx=20, pady=10, anchor="w")
+    
+    
+    text_top3= ctk.CTkLabel(frame4, text="Pagos del inmueble", font=poppins20bold)
+    text_top3.pack(pady=10, side="top")
+    
+    #frames de los pagos
+
+    left_frame = ctk.CTkFrame(frame4)
+    left_frame.pack(side="left", fill="both", expand=True, padx=5, pady=5)
+
+    right_frame = ctk.CTkFrame(frame4)
+    right_frame.pack(side="right", fill="both", expand=True, padx=5, pady=5)
+
+    frame4.columnconfigure(0, weight=1)
+    frame4.columnconfigure(1, weight=1)
+    
+    # Agrupar elementos en left_frame
+    text_monto1 = ctk.CTkLabel(left_frame, text="Pago Inicial:", font=poppins16bold)
+    text_monto1.pack(padx=10, pady=10, anchor="w")
+
+    monto1_value = ctk.CTkLabel(left_frame, text=f"• Monto: {data[3]}", font=poppins14bold)
+    monto1_value.pack(padx=10, pady=5, anchor="w")
+
+    fecha_liq1_value = ctk.CTkLabel(left_frame, text=f"• Fecha: {data[5]}", font=poppins14bold)
+    fecha_liq1_value.pack(padx=10, pady=5, anchor="w")
+
+    # Agrupar elementos en right_frame
+    text_monto2 = ctk.CTkLabel(right_frame, text="Pago Final:", font=poppins16bold)
+    text_monto2.pack(padx=10, pady=10, anchor="w")
+
+    monto2_value = ctk.CTkLabel(right_frame, text=f"• Monto: {data[4]}", font=poppins14bold)
+    monto2_value.pack(padx=10, pady=5, anchor="w")
+
+    fecha_liq2_value = ctk.CTkLabel(right_frame, text=f"• Fecha: {data[6]}", font=poppins14bold)
+    fecha_liq2_value.pack(padx=10, pady=5, anchor="w")
+    
+
+
 def load_liquidaciones_data(treeview):
     try:
         with connection() as conn:
             cursor = conn.cursor()
             sql = """
-            SELECT l.id_liquidacion, c.ci_contribuyente, c.nombres || ' ' || c.apellidos AS contribuyente_nombre, i.nom_inmueble, l.monto_1, l.monto_2, l.fecha_Liquidacion_1, l.fecha_Liquidacion_2
+            SELECT l.id_liquidacion,  c.v_e || "-" || c.ci_contribuyente AS cedula_completa, c.nombres || ' ' || c.apellidos AS contribuyente_nombre, i.nom_inmueble, l.monto_1, l.monto_2, l.fecha_Liquidacion_1, l.fecha_Liquidacion_2
             FROM liquidaciones l
             JOIN inmuebles i ON l.id_inmueble = i.id_inmueble
             JOIN contribuyentes c ON l.id_contribuyente = c.id_contribuyente
@@ -280,6 +375,15 @@ def liquidacion(window, last_window):
     gestionarinm = ctk.CTkButton(top_frame2, text="Gestionar", command=lambda: ifgestionar(window, bottom_frame, top_frame2, busquedabtn, busquedaliq, last_window), font=poppins14bold)
     gestionarinm.pack(padx=5, pady=5, side="left")
 
+
+
+    def on_double_click(event):
+        item = my_tree.selection()[0]
+        data = my_tree.item(item, "values")
+        liqui_info(data)
+        
+
+            
     # Contenido del bottom frame
     treeframe = ctk.CTkFrame(bottom_frame, corner_radius=15)
     treeframe.pack(padx=5, pady=5, fill="both", expand=True)
@@ -288,19 +392,21 @@ def liquidacion(window, last_window):
     frame_tree = ctk.CTkFrame(treeframe, fg_color='white', width=580, height=360)
     frame_tree.pack(pady=10, padx=10, expand=True, fill="both")
 
-
     my_tree = setup_treeview(frame_tree)
     load_liquidaciones_data(my_tree)
-        # Configuración del estilo del Treeview (usando ttk dentro de CustomTkinter)
+
+    # Configuración del estilo del Treeview (usando ttk dentro de CustomTkinter)
     style = ttk.Style()
     style.configure("Custom.Treeview", font=("Poppins", 12), rowheight=25)
     style.configure("Custom.Treeview.Heading", font=("Poppins", 14, "bold"))
 
     # Crear el scrollbar vertical con CustomTkinter
-
     horizontal_scrollbar = ttk.Scrollbar(frame_tree, orient="horizontal", command=my_tree.xview)
     my_tree.configure(xscrollcommand=horizontal_scrollbar.set)
     horizontal_scrollbar.pack(side="bottom", fill="x")
+
+    # Añadir evento de doble clic
+    my_tree.bind("<Double-1>", on_double_click)
 
 def ifgestionar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold, last_window):
     global busquedabtn, busquedaliq

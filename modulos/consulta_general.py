@@ -267,6 +267,9 @@ def consulta(window, last_window):
 
 def display_search_filter(frame, my_tree, original_data):
     global search_filter_created
+    global selected_columns
+    
+    
     if search_filter_created:
         return  # Avoid creating widgets multiple times
 
@@ -383,12 +386,6 @@ def refresh_treeview(treeview, column_switches):
             filtered_data = cursor.fetchall()
 
             # Update the Treeview columns and insert the new data into the Treeview
-            treeview["columns"] = selected_columns
-            
-            for col in selected_columns:
-                treeview.heading(col, text=col)
-                print(f"Setting width for column {col} to 200")
-                treeview.column(col, anchor="center", width=200)
 
             # Insert the rows fetched from the query into the Treeview
             for row in filtered_data:
