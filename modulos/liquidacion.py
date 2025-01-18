@@ -1,13 +1,16 @@
 import tkinter as tk
-from tkinter import messagebox
+from tkinter import messagebox, filedialog
 from tkinter import ttk
 import customtkinter as ctk
 from functions.functions import *
 from modulos.menubar import menubar
-from functions.calendario import open_calendar_popup  # Import the calendar popup function
+from functions.calendario import open_calendar_popup
 import customtkinter as ctk
 from tkinter import ttk
 from config.config import centrar_ventana
+import openpyxl
+import sqlite3
+from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 
 def setup_treeview(frame):
     style = ttk.Style()
@@ -95,23 +98,23 @@ def liqui_info(data):
     frame4.columnconfigure(1, weight=1)
     
     # Agrupar elementos en left_frame
-    text_monto1 = ctk.CTkLabel(left_frame, text="Pago Inicial:", font=poppins16bold)
+    text_monto1 = ctk.CTkLabel(left_frame, text="Monto Liquidado:", font=poppins16bold)
     text_monto1.pack(padx=10, pady=10, anchor="w")
 
-    monto1_value = ctk.CTkLabel(left_frame, text=f"• Monto: {data[3]}", font=poppins14bold)
+    monto1_value = ctk.CTkLabel(left_frame, text=f"• Monto a pagar: {data[3]}", font=poppins14bold)
     monto1_value.pack(padx=10, pady=5, anchor="w")
 
-    fecha_liq1_value = ctk.CTkLabel(left_frame, text=f"• Fecha: {data[5]}", font=poppins14bold)
+    fecha_liq1_value = ctk.CTkLabel(left_frame, text=f"• Fecha de pago: {data[5]}", font=poppins14bold)
     fecha_liq1_value.pack(padx=10, pady=5, anchor="w")
 
     # Agrupar elementos en right_frame
-    text_monto2 = ctk.CTkLabel(right_frame, text="Pago Final:", font=poppins16bold)
+    text_monto2 = ctk.CTkLabel(right_frame, text="Imp derecho ocupación:", font=poppins16bold)
     text_monto2.pack(padx=10, pady=10, anchor="w")
 
-    monto2_value = ctk.CTkLabel(right_frame, text=f"• Monto: {data[4]}", font=poppins14bold)
+    monto2_value = ctk.CTkLabel(right_frame, text=f"• Monto a pagar: {data[4]}", font=poppins14bold)
     monto2_value.pack(padx=10, pady=5, anchor="w")
 
-    fecha_liq2_value = ctk.CTkLabel(right_frame, text=f"• Fecha: {data[6]}", font=poppins14bold)
+    fecha_liq2_value = ctk.CTkLabel(right_frame, text=f"• Fecha de pago: {data[6]}", font=poppins14bold)
     fecha_liq2_value.pack(padx=10, pady=5, anchor="w")
     
 
@@ -368,12 +371,16 @@ def liquidacion(window, last_window):
 
     busquedaliq = ctk.CTkEntry(top_frame2, placeholder_text="Buscar por cedula", font=poppins14bold, width=200)
     busquedaliq.pack(padx=5, pady=5, side="right")
+    
+    btn_exportar = ctk.CTkButton(top_frame2, text="Exportar a Excel", command=exportar_a_excel, font=poppins14bold)
+    btn_exportar.pack(padx=5, pady=5, side="right")
 
     crearinm = ctk.CTkButton(top_frame2, text="Asignar", command=lambda: ifasignar(window, bottom_frame, top_frame2, busquedabtn, busquedaliq, last_window), font=poppins14bold)
     crearinm.pack(padx=5, pady=5, side="left")
 
     gestionarinm = ctk.CTkButton(top_frame2, text="Gestionar", command=lambda: ifgestionar(window, bottom_frame, top_frame2, busquedabtn, busquedaliq, last_window), font=poppins14bold)
     gestionarinm.pack(padx=5, pady=5, side="left")
+    
 
 
 
@@ -617,3 +624,130 @@ def ifasignar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold, 
 
     busquedaliq = ctk.CTkEntry(top_frame2, placeholder_text="Buscar por cedula", font=poppins14bold, width=200)
     busquedaliq.pack(padx=5, pady=5, side="right")
+
+
+
+
+
+def exportar_a_excel():
+    try:
+        # Conectar a la base de datos
+        conn = sqlite3.connect('db.db')
+        cursor = conn.cursor()
+
+        # Consulta para obtener los datos
+        cursor.execute('''
+            SELECT l.fecha_Liquidacion_1, l.id_liquidacion, i.nom_inmueble, c.nombres || ' ' || c.apellidos, 
+                   c.ci_contribuyente, s.nom_sector, i.cod_catastral, i.uso, l.monto_1, l.monto_2, l.fecha_Liquidacion_2
+            FROM liquidaciones l
+            JOIN inmuebles i ON l.id_inmueble = i.id_inmueble
+            JOIN contribuyentes c ON l.id_contribuyente = c.id_contribuyente
+            JOIN sectores s ON i.id_sector = s.id_sector
+        ''')
+        rows = cursor.fetchall()
+
+        # Pedir al usuario que elija la ubicación y el nombre del archivo
+        file_path = filedialog.asksaveasfilename(defaultextension=".xlsx", filetypes=[("Excel files", "*.xlsx"), ("All files", "*.*")])
+        if not file_path:
+            return  # El usuario canceló la operación
+
+        # Crear un nuevo archivo Excel
+        workbook = openpyxl.Workbook()
+        sheet = workbook.active
+        sheet.title = 'Liquidaciones totales'
+
+        # Agregar encabezados de columna
+        headers = [
+            "Fecha Liquidación", "N° Liquidación", "Inmueble", "Nombres y Apellidos",
+            "Cédula", "Sector", "Código Catastral", "Uso", "Monto Liquidado",
+            "Recargo del 10%", "Recargo del 15%", "Imp derecho de ocupación", "Total a Pagar", "Observación", "Fecha Liquidación"
+        ]
+        sheet.append(headers)
+
+        # Cambiar la fuente y el tamaño de los encabezados
+        header_font = Font(name='Arial', size=12, bold=True)
+        thin_border = Border(left=Side(style='thin'), right=Side(style='thin'), top=Side(style='thin'), bottom=Side(style='thin'))
+        yellow_fill = PatternFill(start_color="FFFF00", end_color="FFFF00", fill_type="solid")
+        
+        
+        for cell in sheet[1]:
+            cell.font = header_font
+            cell.alignment = Alignment(horizontal='center', vertical='center')
+            cell.border = thin_border
+            
+        # Resaltar las celdas de monto_2 y fecha_Liquidacion_2 en amarillo en los encabezados
+        sheet["L1"].fill = yellow_fill  # monto_2
+        sheet["O1"].fill = yellow_fill  # fecha_Liquidacion_2
+            
+            
+        # Ajustar el ancho de las columnas
+        column_widths = [30, 20, 25, 30, 20, 20, 30, 20, 30, 30, 30, 30, 30, 20, 30]
+        for i, column_width in enumerate(column_widths, start=1):
+            sheet.column_dimensions[openpyxl.utils.get_column_letter(i)].width = column_width
+
+        # Agregar los datos al archivo Excel
+        for row_data in rows:
+            sheet.append([
+                row_data[0],  # fecha_Liquidacion_1
+                row_data[1],  # id_liquidacion
+                row_data[2],  # nom_inmueble
+                row_data[3],  # nombres y apellidos
+                row_data[4],  # ci_contribuyente
+                row_data[5],  # nom_sector
+                row_data[6],  # cod_catastral
+                row_data[7],  # uso
+                row_data[8],  # monto_1
+                "",           # Recargo del 10%
+                "",           # Recargo del 15%
+                row_data[9],  # monto_2
+                row_data[8] + row_data[9],  # total_a_pagar
+                "",           # Observación
+                row_data[10]  # fecha_Liquidacion_2
+            ])
+
+        # Cambiar la fuente y el tamaño de los datos
+        data_font = Font(name='Arial', size=10)
+        for row in sheet.iter_rows(min_row=2, max_row=sheet.max_row, min_col=1, max_col=sheet.max_column):
+            for cell in row:
+                cell.font = data_font
+                cell.alignment = Alignment(horizontal='center', vertical='center')
+                
+        # Resaltar las celdas de monto_2 y fecha_Liquidacion_2 en amarillo
+        yellow_fill = PatternFill(start_color="FFFF00", end_color="FFFF00", fill_type="solid")
+        for row in sheet.iter_rows(min_row=2, max_row=sheet.max_row, min_col=1, max_col=sheet.max_column):
+            row[11].fill = yellow_fill  # monto_2
+            row[14].fill = yellow_fill  # fecha_Liquidacion_2
+                
+                
+        # Resaltar las filas en rojo si las fechas están vacías
+        red_fill = PatternFill(start_color="FF0000", end_color="FF0000", fill_type="solid")
+        for row in sheet.iter_rows(min_row=2, max_row=sheet.max_row, min_col=1, max_col=sheet.max_column):
+            fecha_liquidacion_1 = row[0].value
+            fecha_liquidacion_2 = row[14].value
+            if not fecha_liquidacion_1 or not fecha_liquidacion_2:
+                for cell in row:
+                    cell.fill = red_fill
+                    
+                            
+        # Agregar bordes a todas las celdas
+        thin_border = Border(left=Side(style='thin'), right=Side(style='thin'), top=Side(style='thin'), bottom=Side(style='thin'))
+        for row in sheet.iter_rows(min_row=1, max_row=sheet.max_row, min_col=1, max_col=sheet.max_column):
+            for cell in row:
+                cell.border = thin_border
+
+        # Guardar el nuevo archivo Excel en la ubicación seleccionada por el usuario
+        workbook.save(file_path)
+        messagebox.showinfo("Información", "Datos exportados exitosamente a Excel.")
+
+    except PermissionError:
+        messagebox.showerror("Error", "Permiso denegado: asegúrese de que el archivo no esté abierto en otra aplicación.")
+    except Exception as e:
+        messagebox.showerror("Error", f"Error al exportar los datos: {e}")
+
+    finally:
+        conn.close()
+
+
+
+
+

@@ -98,8 +98,7 @@ def ifasignar(bottom_frame, window, last_window):
         codigo = cod_sectores.get()
         
         if not nombre or not codigo:
-            text = ctk.CTkLabel(left_frame, text="Todos los campos son obligatorios", text_color="red", font=poppins14bold)
-            text.place(x=15, y=350)
+            messagebox.showwarning("Advertencia", "Por favor complete todos los campos.")
             return
         
         try:
@@ -108,26 +107,19 @@ def ifasignar(bottom_frame, window, last_window):
                 # Verificar si el código ya existe
                 cursor.execute('SELECT COUNT(*) FROM sectores WHERE cod_sector = ?', (codigo,))
                 if cursor.fetchone()[0] > 0:
-                    text = ctk.CTkLabel(left_frame, text="       El código del sector ya existe     ", text_color="red", font=poppins14bold, width=260)
-                    text.place(x=10, y=370)
+                    messagebox.showwarning("Advertencia", "El código del sector ya existe.")
                 else:
                     # Asignar ruta predeterminada si no se selecciona ninguna imagen
                     if not image_path:
-                        image_path = "assets/default.jpg"
-                    else:
-                        # Copiar la imagen a la carpeta de imágenes
-                        image_folder = create_image_folder()
-                        image_name = os.path.basename(image_path)
-                        image_save_path = os.path.join(image_folder, image_name)
-                        shutil.copy(image_path, image_save_path)
+                        image_path = "assets/default.png"
                     
+                    # Guardar la ruta de la imagen directamente en la base de datos
                     sql = 'INSERT INTO sectores (nom_sector, cod_sector, image_path) VALUES (?, ?, ?)'
-                    cursor.execute(sql, (nombre, codigo, image_save_path))
+                    cursor.execute(sql, (nombre, codigo, image_path))
                     conn.commit()
 
                     print("Datos guardados exitosamente.")
-                    text = ctk.CTkLabel(left_frame, text="Datos guardados correctamente", text_color="green", font=poppins14bold, width=250)
-                    text.place(x=10, y=370)
+                    messagebox.showinfo("Información", "Datos guardados exitosamente.")
                     
                     nom_sectores.delete(0, tk.END)
                     cod_sectores.delete(0, tk.END)
@@ -439,14 +431,13 @@ def ifgestionar(bottom_frame, window, last_window):
 
     btncargar = ctk.CTkButton(center_frame, text="Buscar", command=cambiar_imagen, font=poppins14bold)
     btncargar.pack(padx=30, pady=10)
-    
+
     def guardar_datos():
         global image_save_path, id_sector  # Usar las variables globales image_save_path y id_sector
         nombre = nom_sectores.get()
         codigo = cod_sectores.get()
         
         if not nombre or not codigo:
-
             return
         
         try:
@@ -475,13 +466,14 @@ def ifgestionar(bottom_frame, window, last_window):
                 cursor.execute(sql, (nombre, codigo, image_save_path, id_sector))
                 conn.commit()
                 print("Datos actualizados exitosamente.")
+                messagebox.showinfo("Información", "Datos actualizados exitosamente.")
                 
                 # Actualizar el Treeview
                 selected_item = my_tree.selection()[0]
                 my_tree.item(selected_item, values=(id_sector, nombre, codigo))
                 
-                # Eliminar la imagen anterior si es diferente de la nueva
-                if old_image_path and old_image_path != image_save_path and os.path.exists(old_image_path):
+                # Eliminar la imagen anterior si es diferente de la nueva y no es default.png
+                if old_image_path and old_image_path != image_save_path and os.path.exists(old_image_path) and "assets/default.png" not in old_image_path:
                     os.remove(old_image_path)
                     print("Imagen anterior eliminada exitosamente.")
         except Exception as e:
@@ -510,7 +502,7 @@ def ifgestionar(bottom_frame, window, last_window):
                         my_tree.delete(selected_item)
                         
                         # Eliminar la imagen del sistema de archivos
-                        if image_path and os.path.exists(image_path):
+                        if image_path and os.path.exists(image_path) and "assets/default.png" not in image_path:
                             os.remove(image_path)
                             print("Imagen eliminada exitosamente.")
                         
@@ -518,22 +510,12 @@ def ifgestionar(bottom_frame, window, last_window):
                         nom_sectores.delete(0, tk.END)
                         cod_sectores.delete(0, tk.END)
                         
-                        # Recargar el frame de center_frame
-                        center_frame.destroy()
-                        center_frame = ctk.CTkFrame(bottom_frame, corner_radius=15, width=300)
-                        center_frame.pack(padx=10, pady=10, side="left", fill="both", expand=True)
                         
-                        img_sectores_frame = ctk.CTkFrame(center_frame, width=260, height=260, corner_radius=15)
-                        img_sectores_frame.pack(pady=50)
-                        img_sectores_frame.pack_propagate(False)
-                        image_label = ctk.CTkLabel(img_sectores_frame, text="", font=poppins14bold)
-                        image_label.pack(expand=True, padx=10, pady=10)
-                        
-                        btncargar = ctk.CTkButton(center_frame, text="Buscar", command=cambiar_imagen, font=poppins14bold)
-                        btncargar.pack(padx=30, pady=10)
                 except Exception as e:
                     print(f"Error al eliminar los datos: {e}")
-
+                    
+                    
+                    
     btnsave = ctk.CTkButton(left_frame, text="Guardar", command=guardar_datos, font=poppins14bold)
     btnsave.pack(padx=10, pady=10, anchor="e", side="bottom")
     
