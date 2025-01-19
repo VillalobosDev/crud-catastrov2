@@ -9,15 +9,14 @@ import tkinter
 
 
 def ifagregar(bottom_frame, top_frame2, window, last_window):
-    global busquedainm, busquedabtn, refrescarbtn
+    global busquedainm, busquedabtn
     
 
     if busquedabtn:
         busquedabtn.pack_forget()
     if busquedainm:
         busquedainm.pack_forget()
-    if refrescarbtn:
-        refrescarbtn.pack_forget()
+
 
     poppins14bold = ("Poppins", 14, "bold")
     poppins10 = ("Poppins", 10)
@@ -56,9 +55,6 @@ def ifagregar(bottom_frame, top_frame2, window, last_window):
     correo_frame.pack(padx=10, pady=5, fill="x")
 
     #############################################
-
-    refrescarbtn = ctk.CTkButton(top_frame2, text="Refrescar Tabla", font=poppins14bold, width=80, command=lambda: cargar_datos())
-    refrescarbtn.pack(padx=5, pady=5, side="right")
 
     busquedabtn = ctk.CTkButton(top_frame2, text="Buscar", font=poppins14bold, width=80, command=lambda: reload_treeviewsearch(my_tree, busquedainm))
     busquedabtn.pack(padx=5, pady=5, side="right")
@@ -113,9 +109,6 @@ def ifagregar(bottom_frame, top_frame2, window, last_window):
         correo.delete(0, tk.END)
         correo.configure(placeholder_text="ejemplo@gmail.com")
 
-    def volver():
-        contribuyentes
-        print("back")
 
     def cargar_datos():
         for item in my_tree.get_children():
@@ -218,8 +211,7 @@ def ifgestionar(bottom_frame, top_frame2, window, last_window):
         busquedabtn.pack_forget()
     if busquedainm:
         busquedainm.pack_forget()
-    if refrescarbtn:
-        refrescarbtn.pack_forget()
+
 
     poppins14bold = ("Poppins", 14, "bold")
     poppins18 = ("Poppins", 18, "bold")
@@ -258,8 +250,7 @@ def ifgestionar(bottom_frame, top_frame2, window, last_window):
 
     ##############################################
     
-    refrescarbtn = ctk.CTkButton(top_frame2, text="Refrescar Tabla", font=poppins14bold, width=80, command=lambda: cargar_datos())
-    refrescarbtn.pack(padx=5, pady=5, side="right")
+
 
     busquedabtn = ctk.CTkButton(top_frame2, text="Buscar", font=poppins14bold, width=80, command=lambda: reload_treeviewsearch(my_tree, busquedainm))
     busquedabtn.pack(padx=5, pady=5, side="right")
@@ -467,40 +458,9 @@ def ifgestionar(bottom_frame, top_frame2, window, last_window):
 
     my_tree.bind("<<TreeviewSelect>>", on_tree_select)
     cargar_datos()
-    # def cargartreeview():
-    #     try:
-    #         # Establish a database connection
-    #         with connection() as conn:
-    #             cursor = conn.cursor()
-    #             # SQL query to fetch data
-    #             sql = '''
-    #                 SELECT 
-    #                     id_contribuyente, 
-    #                     nombres, 
-    #                     apellidos, 
-    #                     v_e || "-" || ci_contribuyente AS cedula_completa, 
-    #                     j_c_g || "-" || rif AS rif_completo, 
-    #                     telefono, 
-    #                     correo 
-    #                 FROM contribuyentes
-    #             '''
-    #             cursor.execute(sql)
-    #             results = cursor.fetchall()
-
-    #             # Clear the Treeview before populating
-    #             for item in my_tree.get_children():
-    #                 my_tree.delete(item)
-
-    #             # Populate the Treeview with fetched data
-    #             for row in results:
-    #                 my_tree.insert("", "end", iid=row[0], values=row)
-
-    #     except Exception as e:
-    #         print(f"Error fetching data: {e}")
-    # cargartreeview()
 
 def contribuyentes(window, last_window):
-    global busquedainm, busquedabtn, refrescarbtn
+    global busquedainm, busquedabtn
     
     for widget in window.winfo_children():
         widget.destroy()
@@ -539,8 +499,6 @@ def contribuyentes(window, last_window):
     gestionarliq = ctk.CTkButton(top_frame2, text="Modificar", command=lambda:ifgestionar(bottom_frame, top_frame2, window, last_window), font=poppins14bold)
     gestionarliq.pack(padx=5, pady=5, side="left")
 
-    refrescarbtn = ctk.CTkButton(top_frame2, text="Refrescar Tabla", font=poppins14bold, width=80, command=lambda: loaddata(my_tree))
-    refrescarbtn.pack(padx=5, pady=5, side="right")
 
     busquedabtn = ctk.CTkButton(top_frame2, text="Buscar", font=poppins14bold, width=80, command=lambda: reload_treeviewsearch(my_tree, busquedainm))
     busquedabtn.pack(padx=5, pady=5, side="right")
@@ -600,6 +558,10 @@ def contribuyentes(window, last_window):
 
 def reload_treeviewsearch(treeview, ci):
     ci = ci.get()
+    if not ci:
+        messagebox.showwarning("Advertencia", "Por favor ingrese una cedula para buscar.")
+        loaddata(treeview)
+        return
     try:
         with connection() as conn:
             cursor = conn.cursor()
@@ -613,6 +575,12 @@ def reload_treeviewsearch(treeview, ci):
             # Clear existing rows
             for row in treeview.get_children():
                 treeview.delete(row)
+                
+
+            if not results:
+                messagebox.showerror("Error", "No se ha encontrado la cédula del contribuyente.")
+                loaddata(treeview)
+                return
 
             # Insert updated rows
             for row in results:
@@ -758,4 +726,3 @@ def cargar_datoss(ID):
         print(f"Error during database operation: {e}")
 
     return original_data
-1

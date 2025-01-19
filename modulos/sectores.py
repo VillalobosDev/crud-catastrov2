@@ -33,7 +33,9 @@ def cargar_imagen(frameimg, img_label1):
         img_label.pack(expand=True, padx=10, pady=10)
         img_label.image = image_tk  # Guardar referencia para evitar que la imagen sea recolectada por el garbage collector
         
-def ifasignar(bottom_frame, window, last_window):
+def ifasignar(bottom_frame, window, last_window, busqueda, busquedabtn):
+    busqueda.destroy()
+    busquedabtn.destroy()
     global center_frame, image_path  # Definir image_path como variable global
     image_path = ""  # Inicializar image_path
 
@@ -175,21 +177,7 @@ def ifasignar(bottom_frame, window, last_window):
     canvas.pack()  # Posicionamos el canvas
     rectangle(canvas, 10, 10, 0, 0, r=5, fill='lightgray', outline='black')
     
-    try:
-        with connection() as conn:
-            print("Database connection established.")
-            cursor = conn.cursor()
-            sql = 'SELECT nom_sector, cod_sector FROM sectores'
-            cursor.execute(sql)
-            results = cursor.fetchall()
-            print(f"Query executed successfully, fetched results: {results}")
-
-            # Ensure data fits Treeview structure
-            for row in results:
-                my_tree.insert("", "end", values=row)
-
-    except Exception as e:
-        print(f"Error during database operation: {e}")
+    loaddata(my_tree)
 
 def sectores(window, last_window):
     for widget in window.winfo_children():
@@ -220,11 +208,14 @@ def sectores(window, last_window):
     window_title.pack(padx=10, pady=10, side="left")
 
     # Contenido del top frame 2
-    crear = ctk.CTkButton(top_frame2, text="Agregar", command=lambda: ifasignar(bottom_frame, window, last_window), font=poppins14bold)
+    crear = ctk.CTkButton(top_frame2, text="Agregar", command=lambda: ifasignar(bottom_frame, window, last_window, busqueda, busquedabtn), font=poppins14bold)
     crear.pack(padx=5, pady=5, side="left")
 
-    gestionar = ctk.CTkButton(top_frame2, text="Modificar", command=lambda: ifgestionar(bottom_frame, window, last_window), font=poppins14bold)
+    gestionar = ctk.CTkButton(top_frame2, text="Modificar", command=lambda: ifgestionar(bottom_frame, window, last_window, busqueda, busquedabtn), font=poppins14bold)
     gestionar.pack(padx=5, pady=5, side="left")
+    
+    busquedabtn = ctk.CTkButton(top_frame2, text="Buscar", font=poppins14bold, width=80, command=lambda: reload_treeviewsearch(my_tree, busqueda))
+    busquedabtn.pack(padx=5, pady=5, side="right")
     
     busqueda = ctk.CTkEntry(top_frame2, placeholder_text="Buscar por codigo", font=poppins14bold, width=200)
     busqueda.pack(padx=5, pady=5, side="right")
@@ -292,21 +283,9 @@ def sectores(window, last_window):
 
     my_tree.bind("<<TreeviewSelect>>", on_tree_select)
 
-    try:
-        with connection() as conn:
-            print("Database connection established.")
-            cursor = conn.cursor()
-            sql = 'SELECT id_sector, nom_sector, cod_sector FROM sectores'
-            cursor.execute(sql)
-            results = cursor.fetchall()
-            print(f"Query executed successfully, fetched results: {results}")
+    loaddata(my_tree)
 
-            # Ensure data fits Treeview structure
-            for row in results:
-                my_tree.insert("", "end", values=row)
 
-    except Exception as e:
-        print(f"Error during database operation: {e}")
 
     def confirmar():
         selected_item = my_tree.selection()
@@ -358,14 +337,14 @@ def crear_arbol_inmuebles(parent_frame, sector_id):
     except Exception as e:
         print(f"Error loading inmuebles: {e}")
 
-
-
-
-
-def ifgestionar(bottom_frame, window, last_window):
-    global image_save_path, id_sector, center_frame  # Definir image_save_path, id_sector y center_frame como variables globales
+def ifgestionar(bottom_frame, window, last_window, busqueda, busquedabtn):
+    global image_save_path, id_sector, center_frame
     image_save_path = ""  # Inicializar image_save_path
     id_sector = None  # Inicializar id_sector
+    busqueda.destroy()
+    busquedabtn.destroy()
+    
+    
 
     poppins14bold = ("Poppins", 14, "bold")
     poppins18bold = ("Poppins", 18, "bold")
@@ -591,6 +570,39 @@ def ifgestionar(bottom_frame, window, last_window):
 
     my_tree.bind("<<TreeviewSelect>>", on_tree_select)
 
+    loaddata(my_tree)
+
+        
+        
+def reload_treeviewsearch(my_tree, busqueda):
+    busqueda = busqueda.get()
+    if not busqueda:
+        messagebox.showwarning("Advertencia", "Por favor ingrese un codigo de sector para buscar.")
+        loaddata(my_tree)
+        return
+    try:
+        with connection() as conn:
+            cursor = conn.cursor()
+            sql = 'SELECT id_sector, nom_sector, cod_sector FROM sectores WHERE cod_sector = ?'
+            cursor.execute(sql, (busqueda,))
+            results = cursor.fetchall()
+
+            # Clear existing rows
+            for row in my_tree.get_children():
+                my_tree.delete(row)
+
+            if not results:
+                messagebox.showerror("Error", "No se ha encontrado el código del sector.")
+                loaddata(my_tree)
+                return
+
+            # Insert updated rows
+            for row in results:
+                my_tree.insert("", "end", iid=row[0], values=row)
+    except Exception as e:
+        print(f"Error refreshing Treeview: {e}")
+
+def loaddata(my_tree):
     try:
         with connection() as conn:
             print("Database connection established.")
@@ -600,9 +612,12 @@ def ifgestionar(bottom_frame, window, last_window):
             results = cursor.fetchall()
             print(f"Query executed successfully, fetched results: {results}")
 
+            # Clear existing rows
+            for row in my_tree.get_children():
+                my_tree.delete(row)
+
             # Ensure data fits Treeview structure
             for row in results:
                 my_tree.insert("", "end", values=row)
-
     except Exception as e:
-        print(f"Error during database operation: {e}")
+        print(f"Error refreshing Treeview: {e}")
