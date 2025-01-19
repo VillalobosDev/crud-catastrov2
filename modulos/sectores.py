@@ -33,9 +33,10 @@ def cargar_imagen(frameimg, img_label1):
         img_label.pack(expand=True, padx=10, pady=10)
         img_label.image = image_tk  # Guardar referencia para evitar que la imagen sea recolectada por el garbage collector
         
-def ifasignar(bottom_frame, window, last_window, busqueda, busquedabtn):
+def ifasignar(bottom_frame, window, last_window, busqueda, busquedabtn, recargarbusqueda):
     busqueda.destroy()
     busquedabtn.destroy()
+    recargarbusqueda.destroy()
     global center_frame, image_path  # Definir image_path como variable global
     image_path = ""  # Inicializar image_path
 
@@ -208,11 +209,15 @@ def sectores(window, last_window):
     window_title.pack(padx=10, pady=10, side="left")
 
     # Contenido del top frame 2
-    crear = ctk.CTkButton(top_frame2, text="Agregar", command=lambda: ifasignar(bottom_frame, window, last_window, busqueda, busquedabtn), font=poppins14bold)
+    crear = ctk.CTkButton(top_frame2, text="Agregar", command=lambda: ifasignar(bottom_frame, window, last_window, busqueda, busquedabtn, recargarbusqueda), font=poppins14bold)
     crear.pack(padx=5, pady=5, side="left")
 
-    gestionar = ctk.CTkButton(top_frame2, text="Modificar", command=lambda: ifgestionar(bottom_frame, window, last_window, busqueda, busquedabtn), font=poppins14bold)
+    gestionar = ctk.CTkButton(top_frame2, text="Modificar", command=lambda: ifgestionar(bottom_frame, window, last_window, busqueda, busquedabtn, recargarbusqueda), font=poppins14bold)
     gestionar.pack(padx=5, pady=5, side="left")
+    
+    
+    recargarbusqueda = ctk.CTkButton(top_frame2, text="🔁", font=poppins14bold, width=30, command=lambda: loaddata(my_tree))
+    recargarbusqueda.pack(padx=5, pady=5, side="right")
     
     busquedabtn = ctk.CTkButton(top_frame2, text="Buscar", font=poppins14bold, width=80, command=lambda: reload_treeviewsearch(my_tree, busqueda))
     busquedabtn.pack(padx=5, pady=5, side="right")
@@ -337,15 +342,14 @@ def crear_arbol_inmuebles(parent_frame, sector_id):
     except Exception as e:
         print(f"Error loading inmuebles: {e}")
 
-def ifgestionar(bottom_frame, window, last_window, busqueda, busquedabtn):
+def ifgestionar(bottom_frame, window, last_window, busqueda, busquedabtn, recargarbusqueda):
     global image_save_path, id_sector, center_frame
     image_save_path = ""  # Inicializar image_save_path
     id_sector = None  # Inicializar id_sector
     busqueda.destroy()
     busquedabtn.destroy()
+    recargarbusqueda.destroy()
     
-    
-
     poppins14bold = ("Poppins", 14, "bold")
     poppins18bold = ("Poppins", 18, "bold")
     poppins30bold = ("Poppins", 30, "bold")
@@ -487,16 +491,12 @@ def ifgestionar(bottom_frame, window, last_window, busqueda, busquedabtn):
                             os.remove(image_path)
                             print("Imagen eliminada exitosamente.")
                         
-                        # Limpiar los campos de entrada y la imagen
-                        nom_sectores.delete(0, tk.END)
-                        cod_sectores.delete(0, tk.END)
-                        
+                        # Recargar la ventana de ifgestionar
+                        ifgestionar(bottom_frame, window, last_window, busqueda, busquedabtn, recargarbusqueda)
                         
                 except Exception as e:
                     print(f"Error al eliminar los datos: {e}")
-                    
-                    
-                    
+
     btnsave = ctk.CTkButton(left_frame, text="Guardar", command=guardar_datos, font=poppins14bold)
     btnsave.pack(padx=10, pady=10, anchor="e", side="bottom")
     
@@ -574,7 +574,6 @@ def ifgestionar(bottom_frame, window, last_window, busqueda, busquedabtn):
     my_tree.bind("<<TreeviewSelect>>", on_tree_select)
 
     loaddata(my_tree)
-
         
         
 def reload_treeviewsearch(my_tree, busqueda):
