@@ -4,12 +4,7 @@ from .menubar import menubar
 from functions.functions import * 
 from tkinter import ttk
 from functions.rectangle import rectangle
-<<<<<<< Updated upstream
-import tkinter.messagebox as messagebox
-
-
-=======
->>>>>>> Stashed changes
+from tkinter import messagebox
 
 def inmuebles(window, last_window):
     global busquedabtn, busquedainm, refrescartabla
@@ -113,13 +108,8 @@ def inmuebles(window, last_window):
     loaddata()
     return window
 
-<<<<<<< Updated upstream
-def ifasignar(bottom_frame, top_frame2):
-    global busquedainm, busquedabtn, refrescartabla
-=======
 def ifasignar(bottom_frame, top_frame2, window, last_window):
     global busquedainm, busquedabtn, refrescartabla, id_contr
->>>>>>> Stashed changes
 
     if busquedabtn:
         busquedabtn.pack_forget()
@@ -157,9 +147,6 @@ def ifasignar(bottom_frame, top_frame2, window, last_window):
 
     sector_frame = ctk.CTkFrame(frame_left)
     sector_frame.pack(padx=10, pady=5, fill="x")
-<<<<<<< Updated upstream
-
-=======
     
     cont_frame = ctk.CTkFrame(frame_left)
     cont_frame.pack(padx=10, pady=5, fill="x")
@@ -176,7 +163,6 @@ def ifasignar(bottom_frame, top_frame2, window, last_window):
     text_label2=ctk.CTkLabel(frame2, text="", font=poppins14bold)
     text_label2.pack(pady=5)
     
->>>>>>> Stashed changes
     #############################################
 
     refrescartabla = ctk.CTkButton(top_frame2, text="Refrescar tabla", font=poppins14bold, width=80, command=lambda: loaddata())
@@ -223,12 +209,9 @@ def ifasignar(bottom_frame, top_frame2, window, last_window):
     btnsave = ctk.CTkButton(frame_left, text="Guardar", font=poppins14bold, command=lambda: guardar_inmueble(inmueble, inmueblecod, uso, sector, id_contr))
     btnsave.pack(padx=10, pady=10, anchor="e", side="bottom")
 
-<<<<<<< Updated upstream
-=======
     btnvolver = ctk.CTkButton(frame_left, text="Atrás", command=lambda: inmuebles(window, last_window), font=poppins14bold)
     btnvolver.pack(padx=10, pady=10, anchor="e", side="bottom")
 
->>>>>>> Stashed changes
     # Fin del contenido del left frame #########################################################################
 
     # Contenido del RIGHT FRAME
@@ -302,75 +285,6 @@ def ifasignar(bottom_frame, top_frame2, window, last_window):
 
     loaddata()
 
-<<<<<<< Updated upstream
-    def asignar_inmueble(contribuyenteci, contribuyentenombre, inmueble, inmueblecod, uso, sector):
-        # Get values from entry fields
-        contribuyenteci = contribuyenteci.get()
-        contribuyentenombre = contribuyentenombre.get().split()[0]
-        inmueble = inmueble.get()
-        inmueblecod = inmueblecod.get()
-        uso = uso.get()
-        sector = sector.get()
-
-        if not (contribuyenteci and contribuyentenombre and inmueble and inmueblecod and uso and sector):
-            print("Please fill in all fields.")
-            return
-
-        try:
-            with connection() as conn:
-                cursor = conn.cursor()
-
-                # Step 1: Get `id_contribuyente` from `contribuyentes` table
-                cursor.execute(
-                    "SELECT id_contribuyente FROM contribuyentes WHERE ci_contribuyente = ? AND nombres = ?",
-                    (contribuyenteci, contribuyentenombre)
-                )
-                contribuyente_result = cursor.fetchone()
-                if contribuyente_result:
-                    id_contribuyente = contribuyente_result[0]
-                else:
-                    print("Contribuyente not found.")
-                    return
-
-                # Step 2: Get `id_sector` from `sectores` table
-                cursor.execute(
-                    "SELECT id_sector FROM sectores WHERE nom_sector = ?",
-                    (sector,)
-                )
-                sector_result = cursor.fetchone()
-                if sector_result:
-                    id_sector = sector_result[0]
-                else:
-                    print("Sector not found.")
-                    return
-                ################################################
-
-                # Chek if there is any inmueble exactly the same
-                cursor.execute(
-                    "SELECT COUNT(*) from inmuebles WHERE cod_catastral = ?", (inmueblecod,)
-                )
-                if cursor.fetchone()[0] > 0:
-                    print("Inmueble existente")
-                    return
-
-
-                # Step 3: Insert into `inmuebles` table
-                sql = '''
-                INSERT INTO inmuebles (nom_inmueble, cod_catastral, uso, id_contribuyente, id_sector)
-                VALUES (?, ?, ?, ?, ?)
-                '''
-                cursor.execute(sql, (inmueble, inmueblecod, uso, id_contribuyente, id_sector))
-                conn.commit()
-                print("Inmueble successfully assigned!")
-                # Inside asignar_inmueble
-                reload_treeview(my_tree)
-
-        except Exception as e:
-            print(f"Error: {e}")
-
-def ifgestionar(window, bottom_frame, top_frame2):
-    global busquedainm, busquedabtn, refrescartabla
-=======
 def guardar_inmueble(inmueble, inmueblecod, uso, sector, id_contr):
     try:
         with connection() as conn:
@@ -387,7 +301,6 @@ def guardar_inmueble(inmueble, inmueblecod, uso, sector, id_contr):
 
 def ifgestionar(window, bottom_frame, top_frame2, last_window):
     global busquedainm, busquedabtn, refrescartabla, id_contr
->>>>>>> Stashed changes
 
     if busquedabtn:
         busquedabtn.pack_forget()
@@ -424,15 +337,12 @@ def ifgestionar(window, bottom_frame, top_frame2, last_window):
 
     sector_frame = ctk.CTkFrame(frame_left)
     sector_frame.pack(padx=10, pady=5, fill="x")
-<<<<<<< Updated upstream
-=======
     
     frameinformacion = ctk.CTkFrame(frame_left)
     frameinformacion.pack(padx=10, pady=5, fill="x")
 
     frameinformacion2 = ctk.CTkFrame(frameinformacion)
     frameinformacion2.pack(padx=10, pady=5, fill="x", side="bottom")
->>>>>>> Stashed changes
 
     ################################
     refrescartabla = ctk.CTkButton(top_frame2, text="Refrescar Tabla", font=poppins14bold, width=80, command=lambda: reload_treeview(my_tree))
@@ -449,11 +359,6 @@ def ifgestionar(window, bottom_frame, top_frame2, last_window):
 
     contribuyenteci = ctk.CTkEntry(contribuyenteci_frame, placeholder_text="Cedula Contribuyente", font=poppins14bold, width=250)
     contribuyenteci.pack(pady=5, padx=5, side="left")
-<<<<<<< Updated upstream
-
-    contribuyentenombre = ctk.CTkEntry(contribuyentenombre_frame, placeholder_text="Contribuyente", font=poppins14bold, width=250)
-    contribuyentenombre.pack(pady=5, padx=5, side="left")
-=======
     #hide the contribuyenteci
     contribuyenteci.pack_forget()
     contribuyenteci_frame.pack_forget()
@@ -463,7 +368,6 @@ def ifgestionar(window, bottom_frame, top_frame2, last_window):
     #hide the contribuyentenombre
     contribuyentenombre.pack_forget()
     contribuyentenombre_frame.pack_forget()
->>>>>>> Stashed changes
 
     inmueble = ctk.CTkEntry(inmueble_frame, placeholder_text="Inmueble", font=poppins14bold, width=250)
     inmueble.pack(padx=5, pady=5, side="left")
@@ -499,13 +403,10 @@ def ifgestionar(window, bottom_frame, top_frame2, last_window):
         uso.set("")
         sector.set("")
         my_tree.bind("<ButtonRelease-1>", on_tree_select)
-<<<<<<< Updated upstream
-=======
 
     def clear():
         contribuyenteci.delete(0, ctk.END)
         contribuyenteci.configure(placeholder_text="")
->>>>>>> Stashed changes
 
         contribuyentenombre.delete(0, ctk.END)
         contribuyentenombre.configure(placeholder_text="")
@@ -540,14 +441,10 @@ def ifgestionar(window, bottom_frame, top_frame2, last_window):
         uso.set(values[4])
         sector.set(values[5])
 
-<<<<<<< Updated upstream
-        my_tree.unbind("<ButtonRelease-1>")
-=======
         labelcontri.configure(text=f"{values[1]}")
 
         my_tree.unbind("<ButtonRelease-1>")
         my_tree.bind("<<TreeviewSelect>>", on_tree_select)
->>>>>>> Stashed changes
 
     def save_changes(selected_item):
         new_values = (
@@ -617,13 +514,8 @@ def ifgestionar(window, bottom_frame, top_frame2, last_window):
     btncancel = ctk.CTkButton(frame_left, text="Cancelar", command=cancel_action, font=poppins14bold)
     btncancel.pack(padx=10, pady=10, anchor="e", side="bottom")
 
-<<<<<<< Updated upstream
-    btndelete = ctk.CTkButton(frame_left, text="Eliminar", command=confirm_delete, font=poppins14bold)
-    btndelete.pack(padx=10, pady=10, anchor="e", side="bottom")
-=======
     btnvolver = ctk.CTkButton(frame_left, text="Volver", command=lambda: inmuebles(window, last_window), font=poppins14bold)
     btnvolver.pack(padx=10, pady=10, anchor="e", side="bottom")
->>>>>>> Stashed changes
 
     frame_tree = ctk.CTkFrame(frame_right, fg_color="white")
     frame_tree.pack(pady=10, padx=10, expand=True, fill="both")
