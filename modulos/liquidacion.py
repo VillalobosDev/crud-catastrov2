@@ -339,7 +339,7 @@ def delete_liquidacion(ci_entry, inmueble_menu, my_tree):
         print(f"Error eliminando la liquidación: {e}")
 
 def liquidacion(window, last_window):
-    global busquedabtn, busquedaliq
+    global busquedabtn, busquedaliq, recargarbusqueda
 
 
     for widget in window.winfo_children():
@@ -370,6 +370,9 @@ def liquidacion(window, last_window):
     window_title.pack(padx=10, pady=10, side="left")
 
     # Contenido del top frame 2
+    
+    recargarbusqueda = ctk.CTkButton(top_frame2, text="🔁", font=poppins14bold, width=30, command=lambda: load_liquidaciones_data(my_tree))
+    recargarbusqueda.pack(padx=5, pady=5, side="right")
 
 
     busquedabtn = ctk.CTkButton(top_frame2, text="Buscar", font=poppins14bold, width=80, command=lambda: reload_treeviewsearch(my_tree, busquedaliq))
@@ -377,6 +380,7 @@ def liquidacion(window, last_window):
 
     busquedaliq = ctk.CTkEntry(top_frame2, placeholder_text="Buscar por cedula", font=poppins14bold, width=200)
     busquedaliq.pack(padx=5, pady=5, side="right")
+
     
 
     crearinm = ctk.CTkButton(top_frame2, text="Asignar", command=lambda: ifasignar(window, bottom_frame, top_frame2, busquedabtn, busquedaliq, last_window), font=poppins14bold)
@@ -422,12 +426,14 @@ def liquidacion(window, last_window):
     my_tree.bind("<Double-1>", on_double_click)
 
 def ifgestionar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold, last_window):
-    global busquedabtn, busquedaliq
+    global busquedabtn, busquedaliq, recargarbusqueda
 
     if busquedabtnold:
         busquedabtnold.pack_forget()
     if busquedaliqold:
         busquedaliqold.pack_forget()
+    if recargarbusqueda:
+        recargarbusqueda.pack_forget()
 
     poppins14bold = ("Poppins", 14, "bold")
     poppins18 = ("Poppins", 18, "bold")
@@ -520,7 +526,10 @@ def ifgestionar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold
 
     horizontal_scrollbar.pack(side="bottom", fill="x")
 
-    my_tree.bind("<ButtonRelease-1>", lambda e: gestionar_liquidacion(my_tree, ci_entry, nombre_entry, inmueble_menu, monto1, monto2, fecha1, fecha2))        
+    my_tree.bind("<ButtonRelease-1>", lambda e: gestionar_liquidacion(my_tree, ci_entry, nombre_entry, inmueble_menu, monto1, monto2, fecha1, fecha2))  
+    
+    recargarbusqueda = ctk.CTkButton(top_frame2, text="🔁", font=poppins14bold, width=30, command=lambda: load_liquidaciones_data(my_tree))
+    recargarbusqueda.pack(padx=5, pady=5, side="right")      
 
     busquedabtn = ctk.CTkButton(top_frame2, text="Buscar", font=poppins14bold, width=80, command=lambda: reload_treeviewsearch(my_tree, busquedaliq))
     busquedabtn.pack(padx=5, pady=5, side="right")
@@ -529,11 +538,13 @@ def ifgestionar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold
     busquedaliq.pack(padx=5, pady=5, side="right")
 
 def ifasignar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold, last_window):
-    global busquedabtn, busquedaliq
+    global busquedabtn, busquedaliq, recargarbusqueda
     if busquedabtnold:
         busquedabtnold.pack_forget()
     if busquedaliqold:
         busquedaliqold.pack_forget()
+    if recargarbusqueda:
+        recargarbusqueda.pack_forget()
 
     poppins14bold = ("Poppins", 14, "bold")
     poppins18 = ("Poppins", 18, "bold")
@@ -624,6 +635,10 @@ def ifasignar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold, 
     btnvolver.pack(padx=10, pady=10, anchor="e", side="bottom")
      
     load_liquidaciones_data(my_tree)
+    
+    recargarbusqueda = ctk.CTkButton(top_frame2, text="🔁", font=poppins14bold, width=30, command=lambda: load_liquidaciones_data(my_tree))
+    recargarbusqueda.pack(padx=5, pady=5, side="right")
+
 
     busquedabtn = ctk.CTkButton(top_frame2, text="Buscar", font=poppins14bold, width=80, command=lambda: reload_treeviewsearch(my_tree, busquedaliq))
     busquedabtn.pack(padx=5, pady=5, side="right")

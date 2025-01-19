@@ -214,6 +214,10 @@ def sectores(window, last_window):
     gestionar = ctk.CTkButton(top_frame2, text="Modificar", command=lambda: ifgestionar(bottom_frame, window, last_window, busqueda, busquedabtn), font=poppins14bold)
     gestionar.pack(padx=5, pady=5, side="left")
     
+    
+    recargarbusqueda = ctk.CTkButton(top_frame2, text="🔁", font=poppins14bold, width=30, command=lambda: loaddata(my_tree))
+    recargarbusqueda.pack(padx=5, pady=5, side="right")
+    
     busquedabtn = ctk.CTkButton(top_frame2, text="Buscar", font=poppins14bold, width=80, command=lambda: reload_treeviewsearch(my_tree, busqueda))
     busquedabtn.pack(padx=5, pady=5, side="right")
     

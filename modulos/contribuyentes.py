@@ -9,13 +9,16 @@ import tkinter
 
 
 def ifagregar(bottom_frame, top_frame2, window, last_window):
-    global busquedainm, busquedabtn
+    global busquedainm, busquedabtn, recargarbusqueda
     
 
     if busquedabtn:
         busquedabtn.pack_forget()
     if busquedainm:
         busquedainm.pack_forget()
+
+    if recargarbusqueda:
+        recargarbusqueda.pack_forget()
 
 
     poppins14bold = ("Poppins", 14, "bold")
@@ -55,6 +58,9 @@ def ifagregar(bottom_frame, top_frame2, window, last_window):
     correo_frame.pack(padx=10, pady=5, fill="x")
 
     #############################################
+    
+    recargarbusqueda = ctk.CTkButton(top_frame2, text="🔁", font=poppins14bold, width=30, command=lambda: cargar_datos())
+    recargarbusqueda.pack(padx=5, pady=5, side="right")
 
     busquedabtn = ctk.CTkButton(top_frame2, text="Buscar", font=poppins14bold, width=80, command=lambda: reload_treeviewsearch(my_tree, busquedainm))
     busquedabtn.pack(padx=5, pady=5, side="right")
@@ -205,12 +211,14 @@ def ifagregar(bottom_frame, top_frame2, window, last_window):
     cargar_datos()  # Llamar a la función para cargar los datos inicialmente
 
 def ifgestionar(bottom_frame, top_frame2, window, last_window):
-    global busquedainm, busquedabtn, refrescarbtn
+    global busquedainm, busquedabtn, recargarbusqueda
 
     if busquedabtn:
         busquedabtn.pack_forget()
     if busquedainm:
         busquedainm.pack_forget()
+    if recargarbusqueda:
+        recargarbusqueda.pack_forget()
 
 
     poppins14bold = ("Poppins", 14, "bold")
@@ -250,6 +258,9 @@ def ifgestionar(bottom_frame, top_frame2, window, last_window):
 
     ##############################################
     
+    
+    recargarbusqueda = ctk.CTkButton(top_frame2, text="🔁", font=poppins14bold, width=30, command=lambda: loaddata(my_tree))
+    recargarbusqueda.pack(padx=5, pady=5, side="right")
 
 
     busquedabtn = ctk.CTkButton(top_frame2, text="Buscar", font=poppins14bold, width=80, command=lambda: reload_treeviewsearch(my_tree, busquedainm))
@@ -460,7 +471,7 @@ def ifgestionar(bottom_frame, top_frame2, window, last_window):
     cargar_datos()
 
 def contribuyentes(window, last_window):
-    global busquedainm, busquedabtn
+    global busquedainm, busquedabtn, recargarbusqueda
     
     for widget in window.winfo_children():
         widget.destroy()
@@ -498,7 +509,10 @@ def contribuyentes(window, last_window):
 
     gestionarliq = ctk.CTkButton(top_frame2, text="Modificar", command=lambda:ifgestionar(bottom_frame, top_frame2, window, last_window), font=poppins14bold)
     gestionarliq.pack(padx=5, pady=5, side="left")
-
+    
+    
+    recargarbusqueda = ctk.CTkButton(top_frame2, text="🔁", font=poppins14bold, width=30, command=lambda: loaddata(my_tree))
+    recargarbusqueda.pack(padx=5, pady=5, side="right")
 
     busquedabtn = ctk.CTkButton(top_frame2, text="Buscar", font=poppins14bold, width=80, command=lambda: reload_treeviewsearch(my_tree, busquedainm))
     busquedabtn.pack(padx=5, pady=5, side="right")
