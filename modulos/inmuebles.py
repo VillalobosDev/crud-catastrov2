@@ -1,11 +1,15 @@
 import customtkinter as ctk
+import tkinter as tk
 from .menubar import menubar
 from functions.functions import * 
 from tkinter import ttk
 from functions.rectangle import rectangle
+<<<<<<< Updated upstream
 import tkinter.messagebox as messagebox
 
 
+=======
+>>>>>>> Stashed changes
 
 def inmuebles(window, last_window):
     global busquedabtn, busquedainm, refrescartabla
@@ -109,8 +113,13 @@ def inmuebles(window, last_window):
     loaddata()
     return window
 
+<<<<<<< Updated upstream
 def ifasignar(bottom_frame, top_frame2):
     global busquedainm, busquedabtn, refrescartabla
+=======
+def ifasignar(bottom_frame, top_frame2, window, last_window):
+    global busquedainm, busquedabtn, refrescartabla, id_contr
+>>>>>>> Stashed changes
 
     if busquedabtn:
         busquedabtn.pack_forget()
@@ -125,17 +134,17 @@ def ifasignar(bottom_frame, top_frame2):
 
     frame_right = ctk.CTkFrame(bottom_frame, corner_radius=15)
     frame_right.pack(padx=5, pady=5, side="right", fill="both", expand=True)
+    
+    poppins18 = ("Poppins", 18, "bold")
+    
+    text_top = ctk.CTkLabel(frame_left, text="Asignar Inmueble", font=poppins18, width=250)
+    text_top.pack(padx=10, pady=10)
+    
 
     frame_left = ctk.CTkFrame(bottom_frame, corner_radius=15, width=300)
     frame_left.pack(padx=5, pady=5, side="left", fill="y")
 
     #Contenido del frame left #########################################################################
-
-    contribuyenteci_frame = ctk.CTkFrame(frame_left)
-    contribuyenteci_frame.pack(padx=10, pady=5, fill="x")
-
-    contribuyentenombre_frame = ctk.CTkFrame(frame_left)
-    contribuyentenombre_frame.pack(padx=10, pady=5, fill="x")
 
     inmueble_frame = ctk.CTkFrame(frame_left)
     inmueble_frame.pack(padx=10, pady=5, anchor="w")
@@ -148,7 +157,26 @@ def ifasignar(bottom_frame, top_frame2):
 
     sector_frame = ctk.CTkFrame(frame_left)
     sector_frame.pack(padx=10, pady=5, fill="x")
+<<<<<<< Updated upstream
 
+=======
+    
+    cont_frame = ctk.CTkFrame(frame_left)
+    cont_frame.pack(padx=10, pady=5, fill="x")
+    
+    text_label=ctk.CTkLabel(cont_frame, text="Contribuyente", font=poppins14bold)
+    text_label.pack(pady=5)
+    
+    
+    frame2 = ctk.CTkFrame(cont_frame, corner_radius=10, width=240, height=40)
+    frame2.pack(pady=8, padx=10)
+    frame2.pack_propagate(False)
+    
+    
+    text_label2=ctk.CTkLabel(frame2, text="", font=poppins14bold)
+    text_label2.pack(pady=5)
+    
+>>>>>>> Stashed changes
     #############################################
 
     refrescartabla = ctk.CTkButton(top_frame2, text="Refrescar tabla", font=poppins14bold, width=80, command=lambda: loaddata())
@@ -161,43 +189,13 @@ def ifasignar(bottom_frame, top_frame2):
     busquedainm.pack(padx=5, pady=5, side="right")
 
     #############################################
+    
 
     # Entrys del frame contribuyente
-    contribuyenteci = ctk.CTkEntry(contribuyenteci_frame, placeholder_text="Cedula Contribuyente", font=poppins14bold, width=250)
-    contribuyenteci.pack(pady=5, padx=5, side="left")
 
-    contribuyentenombre = ctk.CTkEntry(contribuyentenombre_frame, placeholder_text="Contribuyente", font=poppins14bold, width=250)
-    contribuyentenombre.pack(pady=5, padx=5, side="left")
 
-    ########################################################
-    def autofill_nombre_apellido(event):
-        ci = contribuyenteci.get().strip()
-        if not ci:
-            return
 
-        try:
-            with connection() as conn:
-                cursor = conn.cursor()
-                cursor.execute(
-                    "SELECT nombres, apellidos FROM contribuyentes WHERE ci_contribuyente = ?",
-                    (ci,)
-                )
-                result = cursor.fetchone()
-                if result:
-                    # Concatenate nombre and apellido
-                    full_name = f"{result[0]} {result[1]}"
-                    contribuyentenombre.delete(0, 'end')
-                    contribuyentenombre.insert(0, full_name)  # Set full name
-                else:
-                    # Clear field if no match
-                    contribuyentenombre.delete(0, 'end')
-        except Exception as e:
-            print(f"Error fetching contribuyente data: {e}")
-        # Bind the function to contribuyenteci
-    contribuyenteci.bind("<FocusOut>", autofill_nombre_apellido) 
-    ########################################################
-
-    inmueble = ctk.CTkEntry(inmueble_frame,placeholder_text="Inmueble", font=poppins14bold, width=250)
+    inmueble = ctk.CTkEntry(inmueble_frame,placeholder_text="Nombre del Inmueble", font=poppins14bold, width=250)
     inmueble.pack(padx=5, pady=5, side="left")
 
     inmueblecod = ctk.CTkEntry(inmueblecod_frame, placeholder_text="Codigo Catastral", font=poppins14bold, width=250)
@@ -219,10 +217,18 @@ def ifasignar(bottom_frame, top_frame2):
 
     sector = ctk.CTkOptionMenu(sector_frame, values=sector_names, font=poppins14bold, width=250)
     sector.pack(pady=5, padx=5, side="left")
+    
+    id_contr=""
 
-    btnsave = ctk.CTkButton(frame_left, text="Guardar", command=lambda: asignar_inmueble(contribuyenteci, contribuyentenombre, inmueble, inmueblecod, uso, sector), font=poppins14bold)
+    btnsave = ctk.CTkButton(frame_left, text="Guardar", font=poppins14bold, command=lambda: guardar_inmueble(inmueble, inmueblecod, uso, sector, id_contr))
     btnsave.pack(padx=10, pady=10, anchor="e", side="bottom")
 
+<<<<<<< Updated upstream
+=======
+    btnvolver = ctk.CTkButton(frame_left, text="Atrás", command=lambda: inmuebles(window, last_window), font=poppins14bold)
+    btnvolver.pack(padx=10, pady=10, anchor="e", side="bottom")
+
+>>>>>>> Stashed changes
     # Fin del contenido del left frame #########################################################################
 
     # Contenido del RIGHT FRAME
@@ -238,13 +244,11 @@ def ifasignar(bottom_frame, top_frame2):
     my_tree = ttk.Treeview(frame_tree, style="Custom.Treeview", show="headings")
     my_tree.pack(pady=10, padx=10, fill="both", expand=True)
     
-    horizontal_scrollbar = ttk.Scrollbar(frame_tree, orient="horizontal", command=my_tree.xview)
 
-    my_tree.configure(xscrollcommand=horizontal_scrollbar.set)
-
-    horizontal_scrollbar.pack(side="bottom", fill="x")
-
-    my_tree['columns'] = ( 'CI', 'Contribuyente', 'Inmueble', 'Codigo Catastral', 'Uso', 'Sector')
+    my_tree['columns'] = ('ID', 'Nombre', 'Apellido', 'CI')
+    
+    my_tree.column('ID', width=0, stretch=tk.NO)
+    my_tree.heading('ID', text='', anchor='center')
 
     for col in my_tree['columns']:
         my_tree.heading(col, text=col.capitalize(), anchor='center')  # Con el metodo de string capitalize() mostramos el texto en mayusculas
@@ -253,25 +257,52 @@ def ifasignar(bottom_frame, top_frame2):
     canvas = ctk.CTkCanvas(frame_tree, width=0, height=0, highlightthickness=0, bg='white')
     canvas.pack()  # Posicionamos el canvas
     rectangle(canvas, 10, 10, 0, 0, r=5, fill='lightgray', outline='black')
-    def loaddata():    
+
+    def cargar_contribuyentes():
+        original_data = []
         try:
             with connection() as conn:
                 cursor = conn.cursor()
-                sql = """
-                SELECT c.ci_contribuyente, c.nombres || ' ' || c.apellidos AS contribuyente, i.nom_inmueble, i.cod_catastral, i.uso, s.nom_sector AS sector
-                FROM inmuebles i
-                JOIN contribuyentes c ON i.id_contribuyente = c.id_contribuyente
-                JOIN sectores s ON i.id_sector = s.id_sector
-                """
+                sql = '''
+                SELECT 
+                    id_contribuyente,
+                    nombres,
+                    apellidos,
+                    v_e || "-" || ci_contribuyente AS cedula_completa
+                FROM contribuyentes
+                ORDER BY ci_contribuyente ASC
+                '''
                 cursor.execute(sql)
-                results = cursor.fetchall()
-                for row in results:
-                    my_tree.insert("", "end", values=row)
+                original_data = cursor.fetchall()
+                
+                print(f"Fetched {len(original_data)} rows from the database.")
+        except Exception as e:
+            print(f"Error during database operation: {e}")
 
+        return original_data
+
+    def loaddata():    
+        try:
+            data = cargar_contribuyentes()
+            for row in data:
+                my_tree.insert("", "end", values=row)
         except Exception as e:
             print(f"Error fetching data: {e}")
+
+    def on_tree_select(event):
+        global id_contr
+        selected_item = my_tree.selection()
+        if selected_item:
+            item = my_tree.item(selected_item)
+            values = item['values']
+            text_label2.configure(text=f"{values[1]} {values[2]}")
+            id_contr=f"{values[0]}"
+
+    my_tree.bind("<<TreeviewSelect>>", on_tree_select)
+
     loaddata()
 
+<<<<<<< Updated upstream
     def asignar_inmueble(contribuyenteci, contribuyentenombre, inmueble, inmueblecod, uso, sector):
         # Get values from entry fields
         contribuyenteci = contribuyenteci.get()
@@ -339,6 +370,24 @@ def ifasignar(bottom_frame, top_frame2):
 
 def ifgestionar(window, bottom_frame, top_frame2):
     global busquedainm, busquedabtn, refrescartabla
+=======
+def guardar_inmueble(inmueble, inmueblecod, uso, sector, id_contr):
+    try:
+        with connection() as conn:
+            cursor = conn.cursor()
+            id_contribuyente = id_contr
+            cursor.execute('''
+                INSERT INTO inmuebles (nom_inmueble, cod_catastral, uso, id_contribuyente, id_sector)
+                VALUES (?, ?, ?, ?, (SELECT id_sector FROM sectores WHERE nom_sector = ?))
+            ''', (inmueble.get(), inmueblecod.get(), uso.get(), id_contribuyente, sector.get()))
+            conn.commit()
+            print("Inmueble guardado exitosamente.")
+    except Exception as e:
+        print(f"Error al guardar el inmueble: {e}")
+
+def ifgestionar(window, bottom_frame, top_frame2, last_window):
+    global busquedainm, busquedabtn, refrescartabla, id_contr
+>>>>>>> Stashed changes
 
     if busquedabtn:
         busquedabtn.pack_forget()
@@ -375,6 +424,15 @@ def ifgestionar(window, bottom_frame, top_frame2):
 
     sector_frame = ctk.CTkFrame(frame_left)
     sector_frame.pack(padx=10, pady=5, fill="x")
+<<<<<<< Updated upstream
+=======
+    
+    frameinformacion = ctk.CTkFrame(frame_left)
+    frameinformacion.pack(padx=10, pady=5, fill="x")
+
+    frameinformacion2 = ctk.CTkFrame(frameinformacion)
+    frameinformacion2.pack(padx=10, pady=5, fill="x", side="bottom")
+>>>>>>> Stashed changes
 
     ################################
     refrescartabla = ctk.CTkButton(top_frame2, text="Refrescar Tabla", font=poppins14bold, width=80, command=lambda: reload_treeview(my_tree))
@@ -391,9 +449,21 @@ def ifgestionar(window, bottom_frame, top_frame2):
 
     contribuyenteci = ctk.CTkEntry(contribuyenteci_frame, placeholder_text="Cedula Contribuyente", font=poppins14bold, width=250)
     contribuyenteci.pack(pady=5, padx=5, side="left")
+<<<<<<< Updated upstream
 
     contribuyentenombre = ctk.CTkEntry(contribuyentenombre_frame, placeholder_text="Contribuyente", font=poppins14bold, width=250)
     contribuyentenombre.pack(pady=5, padx=5, side="left")
+=======
+    #hide the contribuyenteci
+    contribuyenteci.pack_forget()
+    contribuyenteci_frame.pack_forget()
+
+    contribuyentenombre = ctk.CTkEntry(contribuyentenombre_frame, placeholder_text="Contribuyente", font=poppins14bold, width=250)
+    contribuyentenombre.pack(pady=5, padx=5, side="left")
+    #hide the contribuyentenombre
+    contribuyentenombre.pack_forget()
+    contribuyentenombre_frame.pack_forget()
+>>>>>>> Stashed changes
 
     inmueble = ctk.CTkEntry(inmueble_frame, placeholder_text="Inmueble", font=poppins14bold, width=250)
     inmueble.pack(padx=5, pady=5, side="left")
@@ -409,6 +479,16 @@ def ifgestionar(window, bottom_frame, top_frame2):
     sector = ctk.CTkOptionMenu(sector_frame, values=valuesector, font=poppins14bold, width=250)
     sector.pack(pady=5, padx=5, side="left")
 
+    # Informacion del contribuyente ##################################################
+
+    labelcontribuyente = ctk.CTkLabel(frameinformacion, text="Informacion del Contribuyente", font=poppins14bold)
+    labelcontribuyente.pack(pady=5)
+
+    labelcontri = ctk.CTkLabel(frameinformacion2, text="", font=poppins14bold)
+    labelcontri.pack(pady=5, side="bottom")
+
+    
+
     selected_item = None  # Initialize selected_item
 
     def cancel_action():
@@ -419,7 +499,27 @@ def ifgestionar(window, bottom_frame, top_frame2):
         uso.set("")
         sector.set("")
         my_tree.bind("<ButtonRelease-1>", on_tree_select)
+<<<<<<< Updated upstream
+=======
 
+    def clear():
+        contribuyenteci.delete(0, ctk.END)
+        contribuyenteci.configure(placeholder_text="")
+>>>>>>> Stashed changes
+
+        contribuyentenombre.delete(0, ctk.END)
+        contribuyentenombre.configure(placeholder_text="")
+
+        inmueble.delete(0, ctk.END)
+        inmueble.configure(placeholder_text="Inmueble")
+
+        inmueblecod.delete(0, ctk.END)
+        inmueblecod.configure(placeholder_text="Codigo Catastral")
+
+        uso.set("Selecciona un Inmueble") 
+        sector.set("Selecciona un Sector")
+
+        
     def on_tree_select(event):
         nonlocal selected_item  # Use nonlocal to modify the outer variable
         selected_item = my_tree.selection()[0]
@@ -440,7 +540,14 @@ def ifgestionar(window, bottom_frame, top_frame2):
         uso.set(values[4])
         sector.set(values[5])
 
+<<<<<<< Updated upstream
         my_tree.unbind("<ButtonRelease-1>")
+=======
+        labelcontri.configure(text=f"{values[1]}")
+
+        my_tree.unbind("<ButtonRelease-1>")
+        my_tree.bind("<<TreeviewSelect>>", on_tree_select)
+>>>>>>> Stashed changes
 
     def save_changes(selected_item):
         new_values = (
@@ -473,7 +580,10 @@ def ifgestionar(window, bottom_frame, top_frame2):
                 conn.commit()
                 print("Changes saved successfully!")
                 reload_treeview(my_tree)
+                clear()
+                labelcontri.configure(text='')
                 my_tree.bind("<ButtonRelease-1>", on_tree_select)
+
 
         except Exception as e:
             print(f"Error saving changes: {e}")
@@ -507,8 +617,13 @@ def ifgestionar(window, bottom_frame, top_frame2):
     btncancel = ctk.CTkButton(frame_left, text="Cancelar", command=cancel_action, font=poppins14bold)
     btncancel.pack(padx=10, pady=10, anchor="e", side="bottom")
 
+<<<<<<< Updated upstream
     btndelete = ctk.CTkButton(frame_left, text="Eliminar", command=confirm_delete, font=poppins14bold)
     btndelete.pack(padx=10, pady=10, anchor="e", side="bottom")
+=======
+    btnvolver = ctk.CTkButton(frame_left, text="Volver", command=lambda: inmuebles(window, last_window), font=poppins14bold)
+    btnvolver.pack(padx=10, pady=10, anchor="e", side="bottom")
+>>>>>>> Stashed changes
 
     frame_tree = ctk.CTkFrame(frame_right, fg_color="white")
     frame_tree.pack(pady=10, padx=10, expand=True, fill="both")
