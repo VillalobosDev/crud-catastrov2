@@ -1,9 +1,29 @@
 import customtkinter as ctk
 import tkinter as tk
+from PIL import Image
 from modulos.transitions import transition_to_next_ui
 from config.config_temas import open_config_window
 from config.config import centrar_ventana
 import json
+
+
+
+
+def cargar_imagen_uni(frame):
+    try:
+        # Cargar la imagen desde la carpeta assets
+        imagen = Image.open("assets/uni_claro.png")
+        imagendark = Image.open("assets/uni_oscuro.png")
+
+        imagen_tk = ctk.CTkImage(light_image=imagen, dark_image=imagendark, size=(300,300))
+
+        # Crear un Label para mostrar la imagen
+        label_imagen = ctk.CTkLabel(frame, image=imagen_tk, text="")
+        label_imagen.image = imagen_tk  # Guardar una referencia de la imagen para evitar que sea recolectada por el garbage collector
+        label_imagen.pack(pady=30, padx=45, side="right")
+
+    except Exception as e:
+        print(f"Error al cargar la imagen: {e}")
 
 def set_menu_bar_color(menubar_frame, mode, menu_button, config_button, support_button, exit_button, window):
     if mode == "light":
@@ -78,11 +98,23 @@ def creditos(parent):
     config_window.geometry("700x400")
     config_window.grab_set()
     config_window.resizable(False, False)
-
     centrar_ventana(config_window, 700, 400)
+    
+
+    
+    
+
+    
+
+    
     
     left_frame = ctk.CTkFrame(config_window, corner_radius=15)
     left_frame.pack(fill="y", side="left", pady=5, padx=5)
+    
+    atras_button = ctk.CTkButton(config_window, text="Atrás", command=config_window.destroy, font=poppins12bold)
+    atras_button.pack(padx=10, pady=10, side="bottom", anchor="e") 
+    
+    cargar_imagen_uni(config_window)   
     
     
     top = ctk.CTkLabel(left_frame, text="Desarrolladadores:", font=poppins16)
@@ -93,8 +125,8 @@ def creditos(parent):
     frame_height = 60
 
     frame = ctk.CTkFrame(left_frame, corner_radius=15, width=frame_width, height=frame_height)
-    frame.pack(pady=5, padx=5, side="top", anchor="w")
-    frame.pack_propagate(False)  # Evita que el tamaño del frame cambie según su contenido
+    frame.pack(pady=5, padx=5, side="top", anchor="w", fill="y")
+    frame.pack_propagate(False)
 
     frame2 = ctk.CTkFrame(left_frame, corner_radius=15, width=frame_width, height=frame_height)
     frame2.pack(pady=5, padx=5, side="top", anchor="w")
@@ -116,8 +148,9 @@ def creditos(parent):
     nombre4 = ctk.CTkLabel(left_frame, text="Hecho en Python y CustomTkinter :)", font=poppins10bold)
     nombre4.pack(pady=5, padx=20, side="left", anchor="s")
     
+
+
     
-    atras_button = ctk.CTkButton(config_window, text="Atrás", command=config_window.destroy, font=poppins12bold)
-    atras_button.pack(padx=10, pady=10, side="right", anchor="s")
+
     
 

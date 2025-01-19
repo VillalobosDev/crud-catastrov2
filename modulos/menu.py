@@ -8,8 +8,23 @@ from modulos.consulta_general import consulta
 from modulos.sectores import sectores
 from PIL import Image, ImageTk
 
-#q
 
+
+def cargar_imagen_alcaldia(frame):
+    try:
+        # Cargar la imagen desde la carpeta assets
+        imagen = Image.open("assets/alcaldia_claro.png")
+        imagendark = Image.open("assets/alcaldia_oscuro.png")
+
+        imagen_tk = ctk.CTkImage(light_image=imagen, dark_image=imagendark, size=(400,400))
+
+        # Crear un Label para mostrar la imagen
+        label_imagen = ctk.CTkLabel(frame, image=imagen_tk, text="")
+        label_imagen.image = imagen_tk  # Guardar una referencia de la imagen para evitar que sea recolectada por el garbage collector
+        label_imagen.pack(pady=100, anchor="center")
+
+    except Exception as e:
+        print(f"Error al cargar la imagen: {e}")
 
 def menu(window):
 
@@ -50,13 +65,18 @@ def menu(window):
     inmuebles_btn = ctk.CTkButton(left_frame, text="Inmuebles", command=lambda: inmuebles(window, menu), width=190, font=poppins20bold)
     inmuebles_btn.pack(pady=30, padx=50, anchor="center", expand=True)
 
-    sector_btn = ctk.CTkButton(left_frame, text="Sectores", command=lambda: sectores(window, menu), width=190, font=poppins20bold)
-    sector_btn.pack(pady=30, padx=50, anchor="center", expand=True)
-    
     liquidacion_btn = ctk.CTkButton(left_frame, text="Liquidación", command=lambda: liquidacion(window, menu), width=190, font=poppins20bold)
     liquidacion_btn.pack(pady=30, padx=50, anchor="center", expand=True)
     
+    sector_btn = ctk.CTkButton(left_frame, text="Sectores", command=lambda: sectores(window, menu), width=190, font=poppins20bold)
+    sector_btn.pack(pady=30, padx=50, anchor="center", expand=True)    
+    
     consulta_btn = ctk.CTkButton(left_frame, text="Consultar", command=lambda: consulta(window, menu), width=190, font=poppins20bold)
     consulta_btn.pack(pady=30, padx=50, anchor="center", expand=True)
+    
+    
+    #frame right
+    cargar_imagen_alcaldia(right_frame)
+    
 
  # Define main window

@@ -3,6 +3,7 @@ from .menubar import menubar
 from functions.functions import * 
 from tkinter import ttk
 from functions.rectangle import rectangle
+from tkinter import messagebox
 
 def inmuebles(window, last_window):
     global busquedabtn, busquedainm, refrescartabla
@@ -34,7 +35,7 @@ def inmuebles(window, last_window):
     volver_btn = ctk.CTkButton(top_frame, text="Volver", command=lambda: menu(window), font=poppins20bold)
     volver_btn.pack(padx=10, pady=10, side="left")
     
-    window_title = ctk.CTkLabel(top_frame, text="Sección de Gestion Inmuebles", font=poppins30bold)
+    window_title = ctk.CTkLabel(top_frame, text="Gestión de Inmuebles", font=poppins30bold)
     window_title.pack(padx=10, pady=10, side="left")
 
     #Contenido del top frame 2
@@ -291,22 +292,33 @@ def ifasignar(bottom_frame, top_frame2, window, last_window):
 
 
 def guardar_inmueble(inmueble, inmueblecod, uso, sector, id_contr):
+    # Verificar que todos los campos estén rellenados
+    if not inmueble.get() or not inmueblecod.get() or not uso.get() or not sector.get():
+        messagebox.showwarning("Advertencia", "Todos los campos deben estar rellenados")
+        return
+
+    # Verificar que se haya seleccionado un contribuyente
+    if not id_contr:
+        messagebox.showwarning("Advertencia", "Debe seleccionar un contribuyente")
+        return
+
     try:
         with connection() as conn:
             cursor = conn.cursor()
             id_contribuyente = id_contr
             cursor.execute('''
                 INSERT INTO inmuebles (nom_inmueble, cod_catastral, uso, id_contribuyente, id_sector)
-                VALUES (?, ?, ?, ?, ?)
-                '''
-                cursor.execute(sql, (inmueble, inmueblecod, uso, id_contribuyente, id_sector))
-                conn.commit()
-                print("Inmueble successfully assigned!")
-                # Inside asignar_inmueble
-                reload_treeview(my_tree)
-
-        except Exception as e:
-            print(f"Error: {e}")
+                VALUES (?, ?, ?, ?, (SELECT id_sector FROM sectores WHERE nom_sector = ?))
+            ''', (inmueble.get(), inmueblecod.get(), uso.get(), id_contribuyente, sector.get()))
+            conn.commit()
+            messagebox.showinfo("Información", "Inmueble registrado correctamente")
+            print("Inmueble guardado exitosamente.")
+    except Exception as e:
+        print(f"Error al guardar el inmueble: {e}")
+        messagebox.showerror("Error", f"Error al guardar el inmueble: {e}")
+        
+        
+        
 
 def ifgestionar(window, bottom_frame, top_frame2, last_window):
     global busquedainm, busquedabtn, refrescartabla
@@ -492,7 +504,7 @@ def ifgestionar(window, bottom_frame, top_frame2, last_window):
     btndelete = ctk.CTkButton(frame_left, text="Eliminar", command=lambda: confirm_delete(selected_item), font=poppins14bold)
     btndelete.pack(padx=10, pady=10, anchor="e", side="bottom")
 
-    btnvolver = ctk.CTkButton(frame_left, text="Volver", command=lambda: inmuebles(window, last_window), font=poppins14bold)
+    btnvolver = ctk.CTkButton(frame_left, text="Atrás", command=lambda: inmuebles(window, last_window), font=poppins14bold)
     btnvolver.pack(padx=10, pady=10, anchor="e", side="bottom")
 
     frame_tree = ctk.CTkFrame(frame_right, fg_color="white")

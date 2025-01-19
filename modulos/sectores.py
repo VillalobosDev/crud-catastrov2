@@ -33,12 +33,14 @@ def cargar_imagen(frameimg, img_label1):
         img_label.pack(expand=True, padx=10, pady=10)
         img_label.image = image_tk  # Guardar referencia para evitar que la imagen sea recolectada por el garbage collector
         
-def ifasignar(bottom_frame, window, last_window):
+def ifasignar(bottom_frame, window, last_window, busqueda, busquedabtn):
+    busqueda.destroy()
+    busquedabtn.destroy()
     global center_frame, image_path  # Definir image_path como variable global
     image_path = ""  # Inicializar image_path
 
     poppins14bold = ("Poppins", 14, "bold")
-    poppins30bold = ("Poppins", 30, "bold")
+    poppins18bold = ("Poppins", 18, "bold")
     poppins20bold = ("Poppins", 20, "bold")
     poppins12 = ("Poppins", 12)
 
@@ -55,7 +57,7 @@ def ifasignar(bottom_frame, window, last_window):
     right_frame_bajo = ctk.CTkFrame(bottom_frame, corner_radius=15)
     right_frame_bajo.pack(side="right", padx=10, pady=10, fill="both")    
 
-    text = ctk.CTkLabel(left_frame, text="Nuevo Sector", font=poppins14bold, width=250)
+    text = ctk.CTkLabel(left_frame, text="Nuevo Sector", font=poppins18bold, width=250)
     text.pack(padx=10, pady=10)    
   
     nom_sectores_frame = ctk.CTkFrame(left_frame)
@@ -98,8 +100,7 @@ def ifasignar(bottom_frame, window, last_window):
         codigo = cod_sectores.get()
         
         if not nombre or not codigo:
-            text = ctk.CTkLabel(left_frame, text="Todos los campos son obligatorios", text_color="red", font=poppins14bold)
-            text.place(x=15, y=350)
+            messagebox.showwarning("Advertencia", "Por favor complete todos los campos.")
             return
         
         try:
@@ -108,26 +109,19 @@ def ifasignar(bottom_frame, window, last_window):
                 # Verificar si el código ya existe
                 cursor.execute('SELECT COUNT(*) FROM sectores WHERE cod_sector = ?', (codigo,))
                 if cursor.fetchone()[0] > 0:
-                    text = ctk.CTkLabel(left_frame, text="       El código del sector ya existe     ", text_color="red", font=poppins14bold, width=260)
-                    text.place(x=10, y=370)
+                    messagebox.showwarning("Advertencia", "El código del sector ya existe.")
                 else:
                     # Asignar ruta predeterminada si no se selecciona ninguna imagen
                     if not image_path:
-                        image_path = "assets/default.jpg"
-                    else:
-                        # Copiar la imagen a la carpeta de imágenes
-                        image_folder = create_image_folder()
-                        image_name = os.path.basename(image_path)
-                        image_save_path = os.path.join(image_folder, image_name)
-                        shutil.copy(image_path, image_save_path)
+                        image_path = "assets/default.png"
                     
+                    # Guardar la ruta de la imagen directamente en la base de datos
                     sql = 'INSERT INTO sectores (nom_sector, cod_sector, image_path) VALUES (?, ?, ?)'
-                    cursor.execute(sql, (nombre, codigo, image_save_path))
+                    cursor.execute(sql, (nombre, codigo, image_path))
                     conn.commit()
 
                     print("Datos guardados exitosamente.")
-                    text = ctk.CTkLabel(left_frame, text="Datos guardados correctamente", text_color="green", font=poppins14bold, width=250)
-                    text.place(x=10, y=370)
+                    messagebox.showinfo("Información", "Datos guardados exitosamente.")
                     
                     nom_sectores.delete(0, tk.END)
                     cod_sectores.delete(0, tk.END)
@@ -183,21 +177,7 @@ def ifasignar(bottom_frame, window, last_window):
     canvas.pack()  # Posicionamos el canvas
     rectangle(canvas, 10, 10, 0, 0, r=5, fill='lightgray', outline='black')
     
-    try:
-        with connection() as conn:
-            print("Database connection established.")
-            cursor = conn.cursor()
-            sql = 'SELECT nom_sector, cod_sector FROM sectores'
-            cursor.execute(sql)
-            results = cursor.fetchall()
-            print(f"Query executed successfully, fetched results: {results}")
-
-            # Ensure data fits Treeview structure
-            for row in results:
-                my_tree.insert("", "end", values=row)
-
-    except Exception as e:
-        print(f"Error during database operation: {e}")
+    loaddata(my_tree)
 
 def sectores(window, last_window):
     for widget in window.winfo_children():
@@ -224,15 +204,18 @@ def sectores(window, last_window):
     volver_btn = ctk.CTkButton(top_frame, text="Volver", command=lambda: menu(window), font=poppins20bold)
     volver_btn.pack(padx=10, pady=10, side="left")
     
-    window_title = ctk.CTkLabel(top_frame, text="Explorador de Sectores", font=poppins30bold)
+    window_title = ctk.CTkLabel(top_frame, text="Gestión de Sectores", font=poppins30bold)
     window_title.pack(padx=10, pady=10, side="left")
 
     # Contenido del top frame 2
-    crear = ctk.CTkButton(top_frame2, text="Agregar", command=lambda: ifasignar(bottom_frame, window, last_window), font=poppins14bold)
+    crear = ctk.CTkButton(top_frame2, text="Agregar", command=lambda: ifasignar(bottom_frame, window, last_window, busqueda, busquedabtn), font=poppins14bold)
     crear.pack(padx=5, pady=5, side="left")
 
-    gestionar = ctk.CTkButton(top_frame2, text="Modificar", command=lambda: ifgestionar(bottom_frame, window, last_window), font=poppins14bold)
+    gestionar = ctk.CTkButton(top_frame2, text="Modificar", command=lambda: ifgestionar(bottom_frame, window, last_window, busqueda, busquedabtn), font=poppins14bold)
     gestionar.pack(padx=5, pady=5, side="left")
+    
+    busquedabtn = ctk.CTkButton(top_frame2, text="Buscar", font=poppins14bold, width=80, command=lambda: reload_treeviewsearch(my_tree, busqueda))
+    busquedabtn.pack(padx=5, pady=5, side="right")
     
     busqueda = ctk.CTkEntry(top_frame2, placeholder_text="Buscar por codigo", font=poppins14bold, width=200)
     busqueda.pack(padx=5, pady=5, side="right")
@@ -300,21 +283,9 @@ def sectores(window, last_window):
 
     my_tree.bind("<<TreeviewSelect>>", on_tree_select)
 
-    try:
-        with connection() as conn:
-            print("Database connection established.")
-            cursor = conn.cursor()
-            sql = 'SELECT id_sector, nom_sector, cod_sector FROM sectores'
-            cursor.execute(sql)
-            results = cursor.fetchall()
-            print(f"Query executed successfully, fetched results: {results}")
+    loaddata(my_tree)
 
-            # Ensure data fits Treeview structure
-            for row in results:
-                my_tree.insert("", "end", values=row)
 
-    except Exception as e:
-        print(f"Error during database operation: {e}")
 
     def confirmar():
         selected_item = my_tree.selection()
@@ -366,16 +337,17 @@ def crear_arbol_inmuebles(parent_frame, sector_id):
     except Exception as e:
         print(f"Error loading inmuebles: {e}")
 
-
-
-
-
-def ifgestionar(bottom_frame, window, last_window):
-    global image_save_path, id_sector, center_frame  # Definir image_save_path, id_sector y center_frame como variables globales
+def ifgestionar(bottom_frame, window, last_window, busqueda, busquedabtn):
+    global image_save_path, id_sector, center_frame
     image_save_path = ""  # Inicializar image_save_path
     id_sector = None  # Inicializar id_sector
+    busqueda.destroy()
+    busquedabtn.destroy()
+    
+    
 
     poppins14bold = ("Poppins", 14, "bold")
+    poppins18bold = ("Poppins", 18, "bold")
     poppins30bold = ("Poppins", 30, "bold")
     poppins20bold = ("Poppins", 20, "bold")
     poppins12 = ("Poppins", 12)
@@ -393,7 +365,7 @@ def ifgestionar(bottom_frame, window, last_window):
     right_frame_bajo = ctk.CTkFrame(bottom_frame, corner_radius=15)
     right_frame_bajo.pack(side="right", padx=10, pady=10, fill="both")    
 
-    text = ctk.CTkLabel(left_frame, text="Modificar Sector", font=poppins14bold, width=250)
+    text = ctk.CTkLabel(left_frame, text="Modificar Sector", font=poppins18bold, width=250)
     text.pack(padx=10, pady=10)    
   
     nom_sectores_frame = ctk.CTkFrame(left_frame)
@@ -438,15 +410,13 @@ def ifgestionar(bottom_frame, window, last_window):
 
     btncargar = ctk.CTkButton(center_frame, text="Buscar", command=cambiar_imagen, font=poppins14bold)
     btncargar.pack(padx=30, pady=10)
-    
+
     def guardar_datos():
         global image_save_path, id_sector  # Usar las variables globales image_save_path y id_sector
         nombre = nom_sectores.get()
         codigo = cod_sectores.get()
         
         if not nombre or not codigo:
-            text = ctk.CTkLabel(left_frame, text="Todos los campos son obligatorios", text_color="red", font=poppins14bold)
-            text.place(x=15, y=350)
             return
         
         try:
@@ -477,13 +447,14 @@ def ifgestionar(bottom_frame, window, last_window):
                 text = ctk.CTkLabel(left_frame, text="Datos Actualizados Correctamente", text_color="green", font=poppins14bold, width=250)
                 text.place(x=10, y=350)
                 print("Datos actualizados exitosamente.")
+                messagebox.showinfo("Información", "Datos actualizados exitosamente.")
                 
                 # Actualizar el Treeview
                 selected_item = my_tree.selection()[0]
                 my_tree.item(selected_item, values=(id_sector, nombre, codigo))
                 
-                # Eliminar la imagen anterior si es diferente de la nueva
-                if old_image_path and old_image_path != image_save_path and os.path.exists(old_image_path):
+                # Eliminar la imagen anterior si es diferente de la nueva y no es default.png
+                if old_image_path and old_image_path != image_save_path and os.path.exists(old_image_path) and "assets/default.png" not in old_image_path:
                     os.remove(old_image_path)
                     print("Imagen anterior eliminada exitosamente.")
         except Exception as e:
@@ -512,7 +483,7 @@ def ifgestionar(bottom_frame, window, last_window):
                         my_tree.delete(selected_item)
                         
                         # Eliminar la imagen del sistema de archivos
-                        if image_path and os.path.exists(image_path):
+                        if image_path and os.path.exists(image_path) and "assets/default.png" not in image_path:
                             os.remove(image_path)
                             print("Imagen eliminada exitosamente.")
                         
@@ -520,22 +491,12 @@ def ifgestionar(bottom_frame, window, last_window):
                         nom_sectores.delete(0, tk.END)
                         cod_sectores.delete(0, tk.END)
                         
-                        # Recargar el frame de center_frame
-                        center_frame.destroy()
-                        center_frame = ctk.CTkFrame(bottom_frame, corner_radius=15, width=300)
-                        center_frame.pack(padx=10, pady=10, side="left", fill="both", expand=True)
                         
-                        img_sectores_frame = ctk.CTkFrame(center_frame, width=260, height=260, corner_radius=15)
-                        img_sectores_frame.pack(pady=50)
-                        img_sectores_frame.pack_propagate(False)
-                        image_label = ctk.CTkLabel(img_sectores_frame, text="", font=poppins14bold)
-                        image_label.pack(expand=True, padx=10, pady=10)
-                        
-                        btncargar = ctk.CTkButton(center_frame, text="Buscar", command=cambiar_imagen, font=poppins14bold)
-                        btncargar.pack(padx=30, pady=10)
                 except Exception as e:
                     print(f"Error al eliminar los datos: {e}")
-
+                    
+                    
+                    
     btnsave = ctk.CTkButton(left_frame, text="Guardar", command=guardar_datos, font=poppins14bold)
     btnsave.pack(padx=10, pady=10, anchor="e", side="bottom")
     
@@ -612,6 +573,39 @@ def ifgestionar(bottom_frame, window, last_window):
 
     my_tree.bind("<<TreeviewSelect>>", on_tree_select)
 
+    loaddata(my_tree)
+
+        
+        
+def reload_treeviewsearch(my_tree, busqueda):
+    busqueda = busqueda.get()
+    if not busqueda:
+        messagebox.showwarning("Advertencia", "Por favor ingrese un codigo de sector para buscar.")
+        loaddata(my_tree)
+        return
+    try:
+        with connection() as conn:
+            cursor = conn.cursor()
+            sql = 'SELECT id_sector, nom_sector, cod_sector FROM sectores WHERE cod_sector = ?'
+            cursor.execute(sql, (busqueda,))
+            results = cursor.fetchall()
+
+            # Clear existing rows
+            for row in my_tree.get_children():
+                my_tree.delete(row)
+
+            if not results:
+                messagebox.showerror("Error", "No se ha encontrado el código del sector.")
+                loaddata(my_tree)
+                return
+
+            # Insert updated rows
+            for row in results:
+                my_tree.insert("", "end", iid=row[0], values=row)
+    except Exception as e:
+        print(f"Error refreshing Treeview: {e}")
+
+def loaddata(my_tree):
     try:
         with connection() as conn:
             print("Database connection established.")
@@ -621,9 +615,12 @@ def ifgestionar(bottom_frame, window, last_window):
             results = cursor.fetchall()
             print(f"Query executed successfully, fetched results: {results}")
 
+            # Clear existing rows
+            for row in my_tree.get_children():
+                my_tree.delete(row)
+
             # Ensure data fits Treeview structure
             for row in results:
                 my_tree.insert("", "end", values=row)
-
     except Exception as e:
-        print(f"Error during database operation: {e}")
+        print(f"Error refreshing Treeview: {e}")
