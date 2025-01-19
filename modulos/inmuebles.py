@@ -415,6 +415,23 @@ def ifgestionar(window, bottom_frame, top_frame2, last_window):
         sector.set("")
         my_tree.bind("<ButtonRelease-1>", on_tree_select)
 
+    def clear():
+        contribuyenteci.delete(0, ctk.END)
+        contribuyenteci.configure(placeholder_text="")
+
+        contribuyentenombre.delete(0, ctk.END)
+        contribuyentenombre.configure(placeholder_text="")
+
+        inmueble.delete(0, ctk.END)
+        inmueble.configure(placeholder_text="Inmueble")
+
+        inmueblecod.delete(0, ctk.END)
+        inmueblecod.configure(placeholder_text="Codigo Catastral")
+
+        uso.set("Selecciona un Inmueble") 
+        sector.set("Selecciona un Sector")
+
+        
     def on_tree_select(event):
         nonlocal selected_item  # Use nonlocal to modify the outer variable
         selected_item = my_tree.selection()[0]
@@ -471,7 +488,10 @@ def ifgestionar(window, bottom_frame, top_frame2, last_window):
                 conn.commit()
                 print("Changes saved successfully!")
                 reload_treeview(my_tree)
+                clear()
+                labelcontri.configure(text='')
                 my_tree.bind("<ButtonRelease-1>", on_tree_select)
+
 
         except Exception as e:
             print(f"Error saving changes: {e}")
