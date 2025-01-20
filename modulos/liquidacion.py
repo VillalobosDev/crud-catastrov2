@@ -12,6 +12,8 @@ import openpyxl
 import sqlite3
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 
+selected_id_liquidacion = None
+
 def setup_treeview(frame):
     style = ttk.Style()
     style.configure("Custom.Treeview", font=("Poppins", 12), rowheight=25)
@@ -231,28 +233,10 @@ def save_liquidacion(my_tree, ci_entry, nombre_entry, inmueble_menu, monto1_entr
                 else:
                     print("Inmueble no encontrado.")
             else:
-                print("Contribuyente no encontrado.")
+                print("Al guardar, Contribuyente no encontrado.")
     except Exception as e:
         print(f"Error guardando la liquidación: {e}")
-
-def gestionar_liquidacion(treeview, ci_entry, nombre_entry, inmueble_menu, monto1_entry, monto2_entry, fecha1_entry, fecha2_entry):
-    selected_item = treeview.selection()
-    if selected_item:
-        item = treeview.item(selected_item)
-        values = item['values']
-        ci_entry.delete(0, tk.END)
-        ci_entry.insert(0, values[0])
-        nombre_entry.delete(0, tk.END)
-        nombre_entry.insert(0, values[1])
-        inmueble_menu.set(values[2])
-        monto1_entry.delete(0, tk.END)
-        monto1_entry.insert(0, values[3])
-        monto2_entry.delete(0, tk.END)
-        monto2_entry.insert(0, values[4])
-        fecha1_entry.delete(0, tk.END)
-        fecha1_entry.insert(0, values[5])
-        fecha2_entry.delete(0, tk.END)
-        fecha2_entry.insert(0, values[6])
+    
 
 def clearentrys(ci_entry, nombre_entry, inmueble_menu, monto1_entry, monto2_entry, fecha1_entry, fecha2_entry):
         ci_entry.delete(0, tk.END)
@@ -276,13 +260,15 @@ def clearentrys(ci_entry, nombre_entry, inmueble_menu, monto1_entry, monto2_entr
         inmueble_menu.set("Inmuebles")
 
 def update_liquidacion(tree, ci_entry, nombre_entry, inmueble_menu, monto1_entry, monto2_entry, fecha1_entry, fecha2_entry):
+    global selected_id_liquidacion
     ci_contribuyente = ci_entry.get()
     inmueble = inmueble_menu.get()
     monto1 = monto1_entry.get()
     monto2 = monto2_entry.get()
     fecha1 = fecha1_entry.get()
     fecha2 = fecha2_entry.get()
-
+    ci_contribuyente = ci_contribuyente[2:]
+    print(ci_contribuyente)
     try:
         with connection() as conn:
             cursor = conn.cursor()
@@ -294,8 +280,8 @@ def update_liquidacion(tree, ci_entry, nombre_entry, inmueble_menu, monto1_entry
                 inmueble = cursor.fetchone()
                 if inmueble:
                     id_inmueble = inmueble[0]
-                    cursor.execute("UPDATE liquidaciones SET monto_1 = ?, monto_2 = ?, fecha_Liquidacion_1 = ?, fecha_Liquidacion_2 = ? WHERE id_inmueble = ?",
-                                   (monto1, monto2, fecha1, fecha2, id_inmueble))
+                    cursor.execute("UPDATE liquidaciones SET monto_1 = ?, monto_2 = ?, fecha_Liquidacion_1 = ?, fecha_Liquidacion_2 = ?, id_inmueble = ? WHERE id_liquidacion = ?",
+                                   (monto1, monto2, fecha1, fecha2, id_inmueble, selected_id_liquidacion))
                     conn.commit()
                     load_liquidaciones_data(tree)
                     clearentrys(ci_entry, nombre_entry, inmueble_menu, monto1_entry, monto2_entry, fecha1_entry, fecha2_entry)
@@ -304,7 +290,7 @@ def update_liquidacion(tree, ci_entry, nombre_entry, inmueble_menu, monto1_entry
                 else:
                     print("Inmueble no encontrado.")
             else:
-                print("Contribuyente no encontrado.")
+                print("Error al actualizar el registro")
     except Exception as e:
         print(f"Error actualizando la liquidación: {e}")
 
@@ -334,7 +320,7 @@ def delete_liquidacion(ci_entry, inmueble_menu, my_tree):
                 else:
                     print("Inmueble no encontrado.")
             else:
-                print("Contribuyente no encontrado.")
+                print("Error al eliminar la liquidacion")
     except Exception as e:
         print(f"Error eliminando la liquidación: {e}")
 
@@ -456,12 +442,27 @@ def ifgestionar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold
     text.pack(padx=10, pady=10)
 
 
-    # Add UI elements for the left frame
+    # # Add UI elements for the left frame
     ci_frame = ctk.CTkFrame(frame_left)
-    ci_frame.pack(padx=10, pady=5, fill="x")
+    # ci_frame.pack(padx=10, pady=5, fill="x")
 
     nombre_frame = ctk.CTkFrame(frame_left)
-    nombre_frame.pack(padx=10, pady=5, fill="x")
+    # nombre_frame.pack(padx=10, pady=5, fill="x")
+
+    contframe = ctk.CTkFrame(frame_left)
+    contframe.pack(padx=10, pady=5, fill="x")
+
+    labeltitle = ctk.CTkLabel(contframe, text='Contribuyente', font=poppins14bold)
+    labeltitle.pack(pady=5)
+
+    contframe2 = ctk.CTkFrame(contframe, corner_radius=10, width=240, height=40)
+    contframe2.pack(padx=10, pady=10)
+    contframe2.pack_propagate(False)
+
+    labeltitle2 = ctk.CTkLabel(contframe2, text='', font=poppins14bold)
+    labeltitle2.pack(pady=10)
+
+    #############################################
 
     monto1_frame = ctk.CTkFrame(frame_left)
     monto1_frame.pack(padx=10, pady=5, fill="x")
@@ -478,11 +479,13 @@ def ifgestionar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold
     inmueble_frame = ctk.CTkFrame(frame_left)
     inmueble_frame.pack(padx=10, pady=5, fill="x")
 
+    ######################### ENTRYS
+
     ci_entry = ctk.CTkEntry(ci_frame, placeholder_text="Cedula Contribuyente", font=poppins14bold, width=250)
-    ci_entry.pack(pady=5, padx=5, side="left", fill="x", expand=True)
+    # ci_entry.pack(pady=5, padx=5, side="left", fill="x", expand=True)
 
     nombre_entry = ctk.CTkEntry(nombre_frame, placeholder_text="Nombre Contribuyente", font=poppins14bold, width=250)
-    nombre_entry.pack(pady=5, padx=5, side="left", fill="x", expand=True)
+    # nombre_entry.pack(pady=5, padx=5, side="left", fill="x", expand=True)
 
     monto1 = ctk.CTkEntry(monto1_frame, placeholder_text="Monto 1", font=poppins14bold, width=250)
     monto1.pack(pady=5, padx=5, side="left", fill="x", expand=True)
@@ -502,7 +505,8 @@ def ifgestionar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold
     fecha2_btn = ctk.CTkButton(fecha2_frame, text="📅", command=lambda: open_calendar_popup(fecha2), font=poppins14bold, width=50)
     fecha2_btn.pack(pady=5, padx=5, side="left")
 
-    inmueble_menu = ctk.CTkOptionMenu(inmueble_frame, values=["Inmuebles"], font=poppins14bold, width=250)
+    inmuebles = []
+    inmueble_menu = ctk.CTkOptionMenu(inmueble_frame, values=inmuebles, font=poppins14bold, width=250)
     inmueble_menu.pack(pady=5, padx=5, side="left", fill="x", expand=True)
 
     ci_entry.bind("<FocusOut>", lambda e: update_contribuyente_info(ci_entry, nombre_entry, inmueble_menu))
@@ -530,7 +534,7 @@ def ifgestionar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold
 
     horizontal_scrollbar.pack(side="bottom", fill="x")
 
-    my_tree.bind("<ButtonRelease-1>", lambda e: gestionar_liquidacion(my_tree, ci_entry, nombre_entry, inmueble_menu, monto1, monto2, fecha1, fecha2))  
+    my_tree.bind("<<TreeviewSelect>>", lambda e: gestionar_liquidacion(inmuebles))  
     
     recargarbusqueda = ctk.CTkButton(top_frame2, text="🔁", font=poppins14bold, width=30, command=lambda: load_liquidaciones_data(my_tree))
     recargarbusqueda.pack(padx=5, pady=5, side="right")      
@@ -540,6 +544,55 @@ def ifgestionar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold
 
     busquedaliq = ctk.CTkEntry(top_frame2, placeholder_text="Buscar por cedula", font=poppins14bold, width=200)
     busquedaliq.pack(padx=5, pady=5, side="right")
+    
+    def gestionar_liquidacion(inmuebles):
+        global selected_id_liquidacion
+        selected_item = my_tree.selection()
+        if selected_item:
+            selected_iid = selected_item[0]
+            selected_id_liquidacion = selected_iid
+            print(selected_iid)
+            item = my_tree.item(selected_item)
+            values = item['values']
+            ci_entry.delete(0, tk.END)
+            ci_entry.insert(0, values[0])
+            nombre_entry.delete(0, tk.END)
+            nombre_entry.insert(0, values[1])
+            labeltitle2.configure(text=values[1])
+
+            try:
+                with connection() as conn:
+                    cursor = conn.cursor()
+                    sql1 = '''SELECT id_contribuyente FROM contribuyentes WHERE ci_contribuyente = ?'''
+                    cedula = values[0][2:]
+                    cursor.execute(sql1, (cedula,))
+                    result = cursor.fetchone()
+                    if result:
+                        id_contribuyente = result[0]
+                        sql = "SELECT nom_inmueble FROM inmuebles WHERE id_contribuyente = ?"
+                        cursor.execute(sql, (id_contribuyente,))
+                        inmuebles_list = cursor.fetchall()
+                        inmuebles.clear()
+                        inmuebles.extend([inmueble[0] for inmueble in inmuebles_list])
+                    else:
+                        print("Contribuyente no encontrado.")
+            except Exception as e:
+                print(f'Error al cargar los inmuebles en el CtkOptionMenu: {e}')
+
+            inmueble_menu.configure(values=inmuebles)
+            if inmuebles:
+                inmueble_menu.set(inmuebles[0])
+            monto1.delete(0, tk.END)
+            monto1.insert(0, values[3])
+            monto2.delete(0, tk.END)
+            monto2.insert(0, values[4])
+            fecha1.delete(0, tk.END)
+            fecha1.insert(0, values[5])
+            fecha2.delete(0, tk.END)
+            fecha2.insert(0, values[6])
+
+            return selected_iid
+    
 
 def ifasignar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold, last_window):
     global busquedabtn, busquedaliq, recargarbusqueda
@@ -565,14 +618,29 @@ def ifasignar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold, 
     text = ctk.CTkLabel(frame_left, text="Asignar Liquidación", font=poppins18, width=250)
     text.pack(padx=10, pady=10)
 
+    ####################################################### Informacion del contribuyente
 
+    contframe = ctk.CTkFrame(frame_left)
+    contframe.pack(padx=10, pady=5, fill="x")
+
+    labeltitle = ctk.CTkLabel(contframe, text='Contribuyente', font=poppins14bold)
+    labeltitle.pack(pady=5)
+
+    contframe2 = ctk.CTkFrame(contframe, corner_radius=10, width=240, height=40)
+    contframe2.pack(padx=10, pady=10)
+    contframe2.pack_propagate(False)
+
+    labeltitle2 = ctk.CTkLabel(contframe2, text='', font=poppins14bold)
+    labeltitle2.pack(pady=10)
+
+    ############################################
 
     # Add UI elements for the left frame
     ci_frame = ctk.CTkFrame(frame_left)
-    ci_frame.pack(padx=10, pady=5, fill="x")
+    # ci_frame.pack(padx=10, pady=5, fill="x")
 
     nombre_frame = ctk.CTkFrame(frame_left)
-    nombre_frame.pack(padx=10, pady=5, fill="x")
+    # nombre_frame.pack(padx=10, pady=5, fill="x")
 
     monto1_frame = ctk.CTkFrame(frame_left)
     monto1_frame.pack(padx=10, pady=5, fill="x")
@@ -589,11 +657,13 @@ def ifasignar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold, 
     inmueble_frame = ctk.CTkFrame(frame_left)
     inmueble_frame.pack(padx=10, pady=5, fill="x")
 
+    ##############################################
+
     ci_entry = ctk.CTkEntry(ci_frame, placeholder_text="Cedula Contribuyente", font=poppins14bold, width=250)
-    ci_entry.pack(pady=5, padx=5, side="left", fill="x", expand=True)
+    # ci_entry.pack(pady=5, padx=5, side="left", fill="x", expand=True)
 
     nombre_entry = ctk.CTkEntry(nombre_frame, placeholder_text="Nombre Contribuyente", font=poppins14bold)
-    nombre_entry.pack(pady=5, padx=5, side="left", fill="x", expand=True)
+    # nombre_entry.pack(pady=5, padx=5, side="left", fill="x", expand=True)
 
     monto1 = ctk.CTkEntry(monto1_frame, placeholder_text="Monto 1", font=poppins14bold)
     monto1.pack(pady=5, padx=5, side="left", fill="x", expand=True)
@@ -634,7 +704,6 @@ def ifasignar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold, 
     
     btnvolver = ctk.CTkButton(frame_left, text="Volver", command=lambda: liquidacion(window, last_window), font=poppins14bold)
     btnvolver.pack(padx=10, pady=10, anchor="e", side="bottom")
-
     
     btnsave = ctk.CTkButton(frame_left, text="Guardar", command=lambda: save_liquidacion(my_tree, ci_entry, nombre_entry, inmueble_menu, monto1, monto2, fecha1, fecha2), font=poppins14bold)
     btnsave.pack(padx=10, pady=10, anchor="e", side="bottom")
@@ -650,6 +719,17 @@ def ifasignar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold, 
 
     busquedaliq = ctk.CTkEntry(top_frame2, placeholder_text="Buscar por cedula", font=poppins14bold, width=200)
     busquedaliq.pack(padx=5, pady=5, side="right")
+
+    def on_tree_select(event):
+        global id_contr
+        selected_item = my_tree.selection()
+        if selected_item:
+            item = my_tree.item(selected_item)
+            values = item['values']
+            labeltitle2.configure(text=f"{values[1]} {values[2]}")
+            id_contr=f"{values[0]}"
+
+    my_tree.bind("<<TreeviewSelect>>", on_tree_select)    
 
 def exportar_a_excel():
     try:
