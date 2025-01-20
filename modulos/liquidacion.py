@@ -268,7 +268,6 @@ def update_liquidacion(tree, ci_entry, nombre_entry, inmueble_menu, monto1_entry
     fecha1 = fecha1_entry.get()
     fecha2 = fecha2_entry.get()
     ci_contribuyente = ci_contribuyente[2:]
-    print(ci_contribuyente)
     try:
         with connection() as conn:
             cursor = conn.cursor()
@@ -551,7 +550,6 @@ def ifgestionar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold
         if selected_item:
             selected_iid = selected_item[0]
             selected_id_liquidacion = selected_iid
-            print(selected_iid)
             item = my_tree.item(selected_item)
             values = item['values']
             ci_entry.delete(0, tk.END)
