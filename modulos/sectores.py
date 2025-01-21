@@ -107,42 +107,40 @@ def ifasignar(bottom_frame, window, last_window, busqueda, busquedabtn, recargar
         try:
             with connection() as conn:
                 cursor = conn.cursor()
-                # Verificar si el código ya existe
-                cursor.execute('SELECT COUNT(*) FROM sectores WHERE cod_sector = ?', (codigo,))
-                if cursor.fetchone()[0] > 0:
-                    messagebox.showwarning("Advertencia", "El código del sector ya existe.")
-                else:
-                    # Asignar ruta predeterminada si no se selecciona ninguna imagen
-                    if not image_path:
-                        image_path = "assets/default.png"
-                    
-                    # Guardar la ruta de la imagen directamente en la base de datos
-                    sql = 'INSERT INTO sectores (nom_sector, cod_sector, image_path) VALUES (?, ?, ?)'
-                    cursor.execute(sql, (nombre, codigo, image_path))
-                    conn.commit()
 
-                    print("Datos guardados exitosamente.")
-                    messagebox.showinfo("Información", "Datos guardados exitosamente.")
-                    
-                    nom_sectores.delete(0, tk.END)
-                    cod_sectores.delete(0, tk.END)
-                    
-                    # Recargar el frame de center_frame
-                    center_frame.destroy()
-                    center_frame = ctk.CTkFrame(bottom_frame, corner_radius=15, width=300)
-                    center_frame.pack(padx=10, pady=10, side="left", fill="both", expand=True)
-                    
-                    img_sectores_frame = ctk.CTkFrame(center_frame, width=260, height=260, corner_radius=15)
-                    img_sectores_frame.pack(pady=50)
-                    img_sectores_frame.pack_propagate(False)
-                    img_label1 = ctk.CTkLabel(img_sectores_frame, text="Insertar Imagen", font=poppins14bold, width=240, height=240)
-                    img_label1.place(x=10, y=10)
-                    
-                    btncargar = ctk.CTkButton(center_frame, text="Cargar", command=lambda: cargar_imagen(img_sectores_frame, img_label1), font=poppins14bold)
-                    btncargar.pack(padx=30, pady=10) 
-                    
-                    # Actualizar el Treeview
-                    my_tree.insert("", "end", values=(nombre, codigo))
+
+
+
+                if not image_path:
+                    image_path = "assets/default.png"
+                
+                # Guardar la ruta de la imagen directamente en la base de datos
+                sql = 'INSERT INTO sectores (nom_sector, cod_sector, image_path) VALUES (?, ?, ?)'
+                cursor.execute(sql, (nombre, codigo, image_path))
+                conn.commit()
+
+                print("Datos guardados exitosamente.")
+                messagebox.showinfo("Información", "Datos guardados exitosamente.")
+                
+                nom_sectores.delete(0, tk.END)
+                cod_sectores.delete(0, tk.END)
+                
+                # Recargar el frame de center_frame
+                center_frame.destroy()
+                center_frame = ctk.CTkFrame(bottom_frame, corner_radius=15, width=300)
+                center_frame.pack(padx=10, pady=10, side="left", fill="both", expand=True)
+                
+                img_sectores_frame = ctk.CTkFrame(center_frame, width=260, height=260, corner_radius=15)
+                img_sectores_frame.pack(pady=50)
+                img_sectores_frame.pack_propagate(False)
+                img_label1 = ctk.CTkLabel(img_sectores_frame, text="Insertar Imagen", font=poppins14bold, width=240, height=240)
+                img_label1.place(x=10, y=10)
+                
+                btncargar = ctk.CTkButton(center_frame, text="Cargar", command=lambda: cargar_imagen(img_sectores_frame, img_label1), font=poppins14bold)
+                btncargar.pack(padx=30, pady=10) 
+                
+                # Actualizar el Treeview
+                my_tree.insert("", "end", values=(id_sector, nombre, codigo))
         except Exception as e:
             print(f"Error al guardar los datos: {e}")
 
@@ -168,7 +166,10 @@ def ifasignar(bottom_frame, window, last_window, busqueda, busquedabtn, recargar
     my_tree.configure(xscrollcommand=horizontal_scrollbar.set)
     horizontal_scrollbar.pack(side="bottom", fill="x")
 
-    my_tree['columns'] = ('Nombre sector', 'Codigo del sector')
+    my_tree['columns'] = ('ID','Nombre sector', 'Codigo del sector')
+    
+    my_tree.column('ID', width=0, stretch=tk.NO)
+    my_tree.heading('ID', text='', anchor='center')
 
     for col in my_tree['columns']:
         my_tree.heading(col, text=col.capitalize(), anchor='center')  # Con el metodo de string capitalize() mostramos el texto en mayusculas
@@ -448,8 +449,6 @@ def ifgestionar(bottom_frame, window, last_window, busqueda, busquedabtn, recarg
                 sql = 'UPDATE sectores SET nom_sector = ?, cod_sector = ?, image_path = ? WHERE id_sector = ?'
                 cursor.execute(sql, (nombre, codigo, image_save_path, id_sector))
                 conn.commit()
-                text = ctk.CTkLabel(left_frame, text="Datos Actualizados Correctamente", text_color="green", font=poppins14bold, width=250)
-                text.place(x=10, y=350)
                 print("Datos actualizados exitosamente.")
                 messagebox.showinfo("Información", "Datos actualizados exitosamente.")
                 
@@ -566,8 +565,6 @@ def ifgestionar(bottom_frame, window, last_window, busqueda, busquedabtn, recarg
                     nom_sectores.insert(0, sector_name)
                     cod_sectores.delete(0, tk.END)
                     cod_sectores.insert(0, sector_code)
-                    text = ctk.CTkLabel(left_frame, text="", text_color="green", font=poppins14bold, width=270)
-                    text.place(x=0, y=350)
             except Exception as e:
                 print(f"Error loading image: {e}")
 

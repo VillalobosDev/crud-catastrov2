@@ -342,9 +342,6 @@ def ifgestionar(bottom_frame, top_frame2, window, last_window):
 
     def save_changes(cedula_entry, nombre_entry, apellido_entry, rif_entry, telefono_entry, correo_entry, cedula_indicator, rif_indicator):
         
-        text = ctk.CTkLabel(frame_left, text="La cédula de identidad ya existe", text_color="red", font=poppins14bold, width=250)
-        text.place(x=10, y=400)
-        
         selected_item = my_tree.selection()
         if selected_item:
             item = my_tree.item(selected_item)
