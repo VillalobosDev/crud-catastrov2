@@ -49,7 +49,7 @@ def inmuebles(window, last_window):
     gestionarinm = ctk.CTkButton(top_frame2, text="Gestionar", command=lambda: ifgestionar(window, bottom_frame, top_frame2, last_window, window_title), font=poppins14bold)
     gestionarinm.pack(padx=5, pady=5, side="left")
 
-    refrescartabla = ctk.CTkButton(top_frame2, text="Refrescar Tabla", font=poppins14bold, width=80, command=lambda: loaddata())
+    refrescartabla = ctk.CTkButton(top_frame2, text="🔁", font=poppins14bold, width=30, command=lambda: loaddata())
     refrescartabla.pack(padx=5, pady=5, side="right")
 
     busquedabtn = ctk.CTkButton(top_frame2, text="Buscar", font=poppins14bold, width=80, command=lambda: reload_treeviewsearch(my_tree, busquedainm))
@@ -102,6 +102,10 @@ def inmuebles(window, last_window):
                 """
                 cursor.execute(sql)
                 results = cursor.fetchall()
+                
+                # Clear existing rows
+                for row in my_tree.get_children():
+                    my_tree.delete(row)
 
                 # Ensure data fits Treeview structure
                 for row in results:
@@ -179,11 +183,11 @@ def ifasignar(bottom_frame, top_frame2, window, last_window, window_title):
     
     
     #############################################
-
-    refrescartabla = ctk.CTkButton(top_frame2, text="Refrescar tabla", font=poppins14bold, width=80, command=lambda: loaddata())
+    
+    refrescartabla = ctk.CTkButton(top_frame2, text="🔁", font=poppins14bold, width=30, command=lambda: loaddata())
     refrescartabla.pack(padx=5, pady=5, side="right")
 
-    busquedabtn = ctk.CTkButton(top_frame2, text="Buscar", font=poppins14bold, width=80, command=lambda: reload_treeviewsearch(my_tree, busquedainm))
+    busquedabtn = ctk.CTkButton(top_frame2, text="Buscar", font=poppins14bold, width=80, command=lambda: busca(busquedainm))
     busquedabtn.pack(padx=5, pady=5, side="right")
 
     busquedainm = ctk.CTkEntry(top_frame2, placeholder_text="Buscar por cedula", font=poppins14bold, width=200)
@@ -218,7 +222,7 @@ def ifasignar(bottom_frame, top_frame2, window, last_window, window_title):
     uso.pack(pady=5, padx=5, side="left")
     uso.configure(command=on_uso_change)
 
-    sector_names = ["Sectores"]
+    sector_names = ["Sector"]
     try:
         with connection() as conn:
             cursor = conn.cursor()
@@ -229,16 +233,17 @@ def ifasignar(bottom_frame, top_frame2, window, last_window, window_title):
         print(f"Error loading sectors: {e}")
 
     sector = ctk.CTkOptionMenu(sector_frame, values=sector_names, font=poppins14bold, width=250)
-    sector.set("Sectores")
+    sector.set("Sector")
     sector.pack(pady=5, padx=5, side="left")
     
     id_contr=""
-
-    btnsave = ctk.CTkButton(frame_left, text="Guardar", font=poppins14bold, command=lambda: guardar_inmueble(inmueble, inmueblecod, uso, sector, id_contr, inmuebleubic))
-    btnsave.pack(padx=10, pady=10, anchor="e", side="bottom")
-
+    
+    
     btnvolver = ctk.CTkButton(frame_left, text="Atrás", command=lambda: inmuebles(window, last_window), font=poppins14bold)
     btnvolver.pack(padx=10, pady=10, anchor="e", side="bottom")
+    
+    btnsave = ctk.CTkButton(frame_left, text="Guardar", font=poppins14bold, command=lambda: guardar_inmueble(inmueble, inmueblecod, uso, sector, id_contr, inmuebleubic))
+    btnsave.pack(padx=10, pady=10, anchor="e", side="bottom")
 
     # Fin del contenido del left frame #########################################################################
 
@@ -292,9 +297,15 @@ def ifasignar(bottom_frame, top_frame2, window, last_window, window_title):
 
         return original_data
 
-    def loaddata():    
+    def loaddata():
         try:
             data = cargar_contribuyentes()
+            
+            # Clear existing rows
+            for row in my_tree.get_children():
+                my_tree.delete(row)
+            
+            # Insert new rows
             for row in data:
                 my_tree.insert("", "end", values=row)
         except Exception as e:
@@ -312,6 +323,43 @@ def ifasignar(bottom_frame, top_frame2, window, last_window, window_title):
     my_tree.bind("<<TreeviewSelect>>", on_tree_select)
 
     loaddata()
+    
+    def busca(ci):
+        ci_value = ci.get()
+        if not ci_value:
+            messagebox.showwarning("Advertencia", "Por favor ingrese una cedula para buscar")
+            return
+
+        try:
+            with connection() as conn:
+                cursor = conn.cursor()
+                sql = ''' 
+                SELECT 
+                    id_contribuyente,
+                    nombres,
+                    apellidos,
+                    v_e || "-" || ci_contribuyente AS cedula_completa
+                FROM contribuyentes
+                WHERE ci_contribuyente = ?
+                ORDER BY ci_contribuyente ASC
+                '''
+                cursor.execute(sql, (ci_value,))
+                results = cursor.fetchall()
+                
+                if not results:
+                    messagebox.showerror("Error", "No se ha encontrado la cédula del contribuyente.")
+                    loaddata()
+                    return
+
+                # Clear existing rows
+                for row in my_tree.get_children():
+                    my_tree.delete(row)
+
+                # Insert updated rows
+                for row in results:
+                    my_tree.insert("", "end", values=row)
+        except Exception as e:
+            print(f"Error refreshing Treeview: {e}")
 
 def guardar_inmueble(inmueble, inmueblecod, uso, sector, id_contr, inmuebleubic):
     try:
@@ -324,13 +372,26 @@ def guardar_inmueble(inmueble, inmueblecod, uso, sector, id_contr, inmuebleubic)
             ''', (inmueble.get(),inmuebleubic.get(), inmueblecod.get(), uso.get(), id_contribuyente, sector.get()))
             conn.commit()
             messagebox.showinfo("Información","Se ha guardado el inmueble correctamente")
+            clear()
             print("Inmueble guardado exitosamente.")
     except Exception as e:
         print(f"Error al guardar el inmueble: {e}")
 
         messagebox.showerror("Error", f"Error al guardar el inmueble: {e}")
+        
+    def clear():
 
- 
+        inmueble.delete(0, ctk.END)
+        inmueble.configure(placeholder_text="Inmueble")
+
+        inmueblecod.delete(0, ctk.END)
+        inmueblecod.configure(placeholder_text="Codigo Catastral")
+        
+        inmuebleubic.delete(0, ctk.END)
+        inmuebleubic.configure(placeholder_text="Ubicación del inmueble")
+
+        uso.set("Comercial") 
+        sector.set("Sector")
         
 def ifgestionar(window, bottom_frame, top_frame2, last_window, window_title):
     global busquedainm, busquedabtn, refrescartabla, id_contr
@@ -386,8 +447,9 @@ def ifgestionar(window, bottom_frame, top_frame2, last_window, window_title):
     
 
     ################################
-    refrescartabla = ctk.CTkButton(top_frame2, text="Refrescar Tabla", font=poppins14bold, width=80, command=lambda: reload_treeview(my_tree))
+    refrescartabla = ctk.CTkButton(top_frame2, text="🔁", font=poppins14bold, width=30, command=lambda: reload_treeview())
     refrescartabla.pack(padx=5, pady=5, side="right")
+
 
     busquedabtn = ctk.CTkButton(top_frame2, text="Buscar", font=poppins14bold, width=80, command=lambda: reload_treeviewsearch(my_tree, busquedainm))
     busquedabtn.pack(padx=5, pady=5, side="right")
@@ -445,7 +507,7 @@ def ifgestionar(window, bottom_frame, top_frame2, last_window, window_title):
 
 
 
-    sector_names = ["Sectores"]
+    sector_names = ["Sector"]
     try:
         with connection() as conn:
             cursor = conn.cursor()
@@ -456,7 +518,7 @@ def ifgestionar(window, bottom_frame, top_frame2, last_window, window_title):
         print(f"Error loading sectors: {e}")
 
     sector = ctk.CTkOptionMenu(sector_frame, values=sector_names, font=poppins14bold, width=250)
-    sector.set("Sectores")
+    sector.set("Sector")
     sector.pack(pady=5, padx=5, side="left")
 
     # Informacion del contribuyente ##################################################
@@ -482,7 +544,7 @@ def ifgestionar(window, bottom_frame, top_frame2, last_window, window_title):
         inmuebleubic.configure(placeholder_text="Ubicación del inmueble")
 
         uso.set("Comercial") 
-        sector.set("Sectores")
+        sector.set("Sector")
 
         
     def on_tree_select(event):
@@ -521,8 +583,7 @@ def ifgestionar(window, bottom_frame, top_frame2, last_window, window_title):
 
         my_tree.unbind("<ButtonRelease-1>")
         my_tree.bind("<<TreeviewSelect>>", on_tree_select)
-            
-            
+                     
     def save_changes(selected_item):
         new_values = (
             contribuyenteci.get(),
@@ -563,45 +624,37 @@ def ifgestionar(window, bottom_frame, top_frame2, last_window, window_title):
             print(f"Error saving changes: {e}")
 
     def delete_record(selected_item):
-        try:
-            with connection() as conn:
-                cursor = conn.cursor()
-                cursor.execute("DELETE FROM inmuebles WHERE id_inmueble = ?", (selected_item,))
-                conn.commit()
-                print("Record deleted successfully!")
-                reload_treeview(my_tree)
-                reset_selection()
-        except Exception as e:
-            print(f"Error deleting record: {e}")
+        if not selected_item:
+            print("no se selecciono nah")
+            return
 
-    def confirm_delete(selected_item):
-        if selected_item:
-            confirm = ctk.CTkToplevel(window)
-            confirm.title("Confirm Delete")
-            confirm.geometry("300x150")
-
-            label = ctk.CTkLabel(confirm, text="Are you sure you want to delete this record?", font=poppins14bold)
-            label.pack(pady=20)
-
-            btn_yes = ctk.CTkButton(confirm, text="Yes", command=lambda: [delete_record(selected_item), confirm.destroy()], font=poppins14bold)
-            btn_yes.pack(side="left", padx=20, pady=20)
-
-            btn_no = ctk.CTkButton(confirm, text="No", command=confirm.destroy, font=poppins14bold)
-            btn_no.pack(side="right", padx=20, pady=20)
+        if messagebox.askyesno("Confirmar eliminación", "¿Estás seguro que deseas eliminar este inmueble?"):
+            try:
+                with connection() as conn:
+                    cursor = conn.cursor()
+                    cursor.execute("DELETE FROM inmuebles WHERE id_inmueble = ?", (selected_item,))
+                    conn.commit()
+                    print("Record deleted successfully!")
+                    clear()
+                    messagebox.showinfo("Información", "Se ha eliminado el inmueble correctamente")
+                    reload_treeview(my_tree)
+                    reset_selection()
+            except Exception as e:
+                print(f"Error deleting record: {e}")
 
     def reset_selection():
         nonlocal selected_item
         selected_item = None
         my_tree.bind("<ButtonRelease-1>", on_tree_select)
 
+    btnvolver = ctk.CTkButton(frame_left, text="Atrás", command=lambda: inmuebles(window, last_window), font=poppins14bold)
+    btnvolver.pack(padx=10, pady=10, anchor="e", side="bottom")
+
     btnsave = ctk.CTkButton(frame_left, text="Guardar", command=lambda: save_changes(selected_item), font=poppins14bold)
     btnsave.pack(padx=10, pady=10, anchor="e", side="bottom")
 
-    btndelete = ctk.CTkButton(frame_left, text="Eliminar", command=lambda: confirm_delete(selected_item), font=poppins14bold)
+    btndelete = ctk.CTkButton(frame_left, text="Eliminar", command=lambda: delete_record(selected_item), font=poppins14bold)
     btndelete.pack(padx=10, pady=10, anchor="e", side="bottom")
-
-    btnvolver = ctk.CTkButton(frame_left, text="Volver", command=lambda: inmuebles(window, last_window), font=poppins14bold)
-    btnvolver.pack(padx=10, pady=10, anchor="e", side="bottom")
 
     frame_tree = ctk.CTkFrame(frame_right, fg_color="white")
     frame_tree.pack(pady=10, padx=10, expand=True, fill="both")
@@ -653,7 +706,11 @@ def reload_treeview(treeview):
         print(f"Error fetching data: {e}")
 
 def reload_treeviewsearch(treeview, ci):
-    ci = ci.get()
+    ci_value = ci.get()
+    if not ci_value:
+        messagebox.showwarning("Advertencia", "Por favor ingrese una cedula para buscar")
+        return
+
     try:
         with connection() as conn:
             cursor = conn.cursor()
@@ -664,8 +721,13 @@ def reload_treeviewsearch(treeview, ci):
             JOIN sectores s ON i.id_sector = s.id_sector
             WHERE c.ci_contribuyente = ?
             '''
-            cursor.execute(sql,(ci,))
+            cursor.execute(sql, (ci_value,))
             results = cursor.fetchall()
+            
+            if not results:
+                messagebox.showerror("Error", "No se ha encontrado la cédula del contribuyente.")
+                reload_treeview(treeview)
+                return
 
             # Clear existing rows
             for row in treeview.get_children():
