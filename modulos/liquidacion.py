@@ -30,6 +30,22 @@ def setup_treeview(frame):
     return treeview
 
 
+def setup_treeview2(frame):
+    style = ttk.Style()
+    style.configure("Custom.Treeview", font=("Poppins", 12), rowheight=25)
+    style.configure("Custom.Treeview.Heading", font=("Poppins", 14, "bold"))
+
+    treeview = ttk.Treeview(frame, style="Custom.Treeview", show="headings")
+    treeview.pack(pady=10, padx=10, fill="both", expand=True)
+
+    treeview["columns"] = ("CI", "Contribuyente")
+    for col in treeview["columns"]:
+        treeview.heading(col, text=col.capitalize(), anchor="center")
+        treeview.column(col, anchor="center")
+
+    return treeview
+
+
 def liqui_info(data):
     
     poppins30bold = ("Poppins", 25, "bold")
@@ -179,6 +195,28 @@ def load_liquidaciones_data(treeview):
     except Exception as e:
         print(f"Error fetching data: {e}")
 
+def load_liquidaciones_data2(treeview):
+    try:
+        with connection() as conn:
+            cursor = conn.cursor()
+            sql = """
+            SELECT c.ci_contribuyente, c.nombres || ' ' || c.apellidos AS contribuyente_nombre
+            FROM contribuyentes c
+            """
+            cursor.execute(sql)
+            results = cursor.fetchall()
+
+            # Clear existing rows
+            for row in treeview.get_children():
+                treeview.delete(row)
+
+            # Insert updated rows
+            for row in results:
+                treeview.insert("", "end", values=row)
+
+    except Exception as e:
+        print(f"Error fetching data: {e}")
+
 def update_contribuyente_info(ci_entry, nombre_entry, inmueble_menu):
     ci_contribuyente = ci_entry.get()
     try:
@@ -200,44 +238,7 @@ def update_contribuyente_info(ci_entry, nombre_entry, inmueble_menu):
     except Exception as e:
         print(f"Error updating contribuyente info: {e}")
 
-def save_liquidacion(my_tree, ci_entry, nombre_entry, inmueble_menu, monto1_entry, monto2_entry, fecha1_entry, fecha2_entry):
-    ci_contribuyente = ci_entry.get()
-    inmueble = inmueble_menu.get()
-    monto1 = monto1_entry.get()
-    monto2 = monto2_entry.get()
-    fecha1 = fecha1_entry.get()
-    fecha2 = fecha2_entry.get()
-
-    try:
-        with connection() as conn:
-            cursor = conn.cursor()
-            cursor.execute("SELECT id_contribuyente FROM contribuyentes WHERE ci_contribuyente = ?", (ci_contribuyente,))
-            contribuyente = cursor.fetchone()
-            if contribuyente:
-                id_contribuyente = contribuyente[0]
-                cursor.execute("SELECT id_inmueble FROM inmuebles WHERE nom_inmueble = ? AND id_contribuyente = ?", (inmueble, id_contribuyente))
-                inmueble = cursor.fetchone()
-                if inmueble:
-                    id_inmueble = inmueble[0]
-                    cursor.execute("SELECT * FROM liquidaciones WHERE id_inmueble = ?", (id_inmueble,))
-                    liquidacion = cursor.fetchone()
-                    if liquidacion:
-                        print("Ya existe una liquidación para este inmueble.")
-                    else:
-                        cursor.execute("INSERT INTO liquidaciones (id_contribuyente, id_inmueble, monto_1, monto_2, fecha_Liquidacion_1, fecha_Liquidacion_2) VALUES (?, ?, ?, ?, ?, ?)",
-                                       (id_contribuyente, id_inmueble, monto1, monto2, fecha1, fecha2))
-                        conn.commit()
-                        load_liquidaciones_data(my_tree)
-                        print("Liquidación guardada exitosamente.")
-                        clearentrys(ci_entry, nombre_entry, inmueble_menu, monto1_entry, monto2_entry, fecha1_entry, fecha2_entry)
-                else:
-                    print("Inmueble no encontrado.")
-            else:
-                print("Al guardar, Contribuyente no encontrado.")
-    except Exception as e:
-        print(f"Error guardando la liquidación: {e}")
-    
-
+   
 def clearentrys(ci_entry, nombre_entry, inmueble_menu, monto1_entry, monto2_entry, fecha1_entry, fecha2_entry):
         ci_entry.delete(0, tk.END)
         ci_entry.configure(placeholder_text="Cedula Contribuyente")
@@ -285,7 +286,7 @@ def update_liquidacion(tree, ci_entry, nombre_entry, inmueble_menu, monto1_entry
                     conn.commit()
                     load_liquidaciones_data(tree)
                     clearentrys(ci_entry, nombre_entry, inmueble_menu, monto1_entry, monto2_entry, fecha1_entry, fecha2_entry)
-
+                    messagebox.showinfo("Informacion", "Se ha actualizado la liquidación exitosamente")
                     print("Liquidación actualizada exitosamente.")
                 else:
                     print("Inmueble no encontrado.")
@@ -293,10 +294,12 @@ def update_liquidacion(tree, ci_entry, nombre_entry, inmueble_menu, monto1_entry
                 print("Error al actualizar el registro")
     except Exception as e:
         print(f"Error actualizando la liquidación: {e}")
+        messagebox.showerror("Advertencia", f"Ha ocurrido un error: {e}")
 
 def delete_liquidacion(ci_entry, inmueble_menu, my_tree):
     ci_contribuyente = ci_entry.get()
     inmueble = inmueble_menu.get()
+    ci_contribuyente = ci_contribuyente[2:]
 
     confirm = messagebox.askyesno("Confirmación", "¿Está seguro de que desea eliminar esta liquidación?")
     if not confirm:
@@ -316,6 +319,8 @@ def delete_liquidacion(ci_entry, inmueble_menu, my_tree):
                     cursor.execute("DELETE FROM liquidaciones WHERE id_inmueble = ?", (id_inmueble,))
                     conn.commit()
                     print("Liquidación eliminada exitosamente.")
+                    messagebox.showinfo("Informacion", "Se a eliminado la liquidaición exitosamente")
+
                     load_liquidaciones_data(my_tree)
                 else:
                     print("Inmueble no encontrado.")
@@ -452,7 +457,7 @@ def ifgestionar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold
     contframe = ctk.CTkFrame(frame_left)
     contframe.pack(padx=10, pady=5, fill="x")
 
-    labeltitle = ctk.CTkLabel(contframe, text='Contribuyente', font=poppins14bold)
+    labeltitle = ctk.CTkLabel(contframe, text='Información del contribuyente', font=poppins14bold)
     labeltitle.pack(pady=5)
 
     contframe2 = ctk.CTkFrame(contframe, corner_radius=10, width=240, height=40)
@@ -512,7 +517,7 @@ def ifgestionar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold
     ci_entry.bind("<FocusOut>", lambda e: update_contribuyente_info(ci_entry, nombre_entry, inmueble_menu))
 
 
-    btnvolver = ctk.CTkButton(frame_left, text="CancelPcopcar", command=lambda: liquidacion(window, last_window), font=poppins14bold)
+    btnvolver = ctk.CTkButton(frame_left, text="Atrás", command=lambda: liquidacion(window, last_window), font=poppins14bold)
     btnvolver.pack(padx=10, pady=10, anchor="e", side="bottom")
 
     btndelete = ctk.CTkButton(frame_left, text="Eliminar", command=lambda: delete_liquidacion(ci_entry, inmueble_menu, my_tree), font=poppins14bold)
@@ -534,7 +539,6 @@ def ifgestionar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold
 
     horizontal_scrollbar.pack(side="bottom", fill="x")
 
-    my_tree.bind("<<TreeviewSelect>>", lambda e: gestionar_liquidacion(inmuebles))  
     
     recargarbusqueda = ctk.CTkButton(top_frame2, text="🔁", font=poppins14bold, width=30, command=lambda: load_liquidaciones_data(my_tree))
     recargarbusqueda.pack(padx=5, pady=5, side="right")      
@@ -544,6 +548,8 @@ def ifgestionar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold
 
     busquedaliq = ctk.CTkEntry(top_frame2, placeholder_text="Buscar por cedula", font=poppins14bold, width=200)
     busquedaliq.pack(padx=5, pady=5, side="right")
+    
+    my_tree.bind("<<TreeviewSelect>>", lambda e: gestionar_liquidacion(inmuebles))  
     
     def gestionar_liquidacion(inmuebles):
         global selected_id_liquidacion
@@ -581,7 +587,7 @@ def ifgestionar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold
 
             inmueble_menu.configure(values=inmuebles)
             if inmuebles:
-                inmueble_menu.set(inmuebles[0])
+                inmueble_menu.set(values[2])
             monto1.delete(0, tk.END)
             monto1.insert(0, values[3])
             monto2.delete(0, tk.END)
@@ -593,7 +599,6 @@ def ifgestionar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold
 
             return selected_iid
     
-
 def ifasignar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold, last_window):
     global busquedabtn, busquedaliq, recargarbusqueda
     if busquedabtnold:
@@ -623,7 +628,7 @@ def ifasignar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold, 
     contframe = ctk.CTkFrame(frame_left)
     contframe.pack(padx=10, pady=5, fill="x")
 
-    labeltitle = ctk.CTkLabel(contframe, text='Contribuyente', font=poppins14bold)
+    labeltitle = ctk.CTkLabel(contframe, text='Información del contribuyente', font=poppins14bold)
     labeltitle.pack(pady=5)
 
     contframe2 = ctk.CTkFrame(contframe, corner_radius=10, width=240, height=40)
@@ -682,18 +687,17 @@ def ifasignar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold, 
 
     fecha2_btn = ctk.CTkButton(fecha2_frame, text="📅", command=lambda: open_calendar_popup(fecha2), font=poppins14bold, width=30)
     fecha2_btn.pack(pady=5, padx=5, side="left")
-
-    inmueble_menu = ctk.CTkOptionMenu(inmueble_frame, values=["Inmuebles"], font=poppins14bold)
+    
+    inmuebles = []
+    inmueble_menu = ctk.CTkOptionMenu(inmueble_frame, values=inmuebles, font=poppins14bold, width=250)
     inmueble_menu.pack(pady=5, padx=5, side="left", fill="x", expand=True)
-
-    ci_entry.bind("<FocusOut>", lambda e: update_contribuyente_info( ci_entry, nombre_entry, inmueble_menu))
 
     ###################################### Add Treeview for the right frame
     frame_tree = ctk.CTkFrame(frame_right, fg_color="white")
     frame_tree.pack(pady=10, padx=10, expand=True, fill="both")
     
     ######################################
-    my_tree = setup_treeview(frame_tree)
+    my_tree = setup_treeview2(frame_tree)
     ######################################
 
     horizontal_scrollbar = ttk.Scrollbar(frame_tree, orient="horizontal", command=my_tree.xview)
@@ -702,15 +706,15 @@ def ifasignar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold, 
 
     horizontal_scrollbar.pack(side="bottom", fill="x")
     
-    btnvolver = ctk.CTkButton(frame_left, text="Volver", command=lambda: liquidacion(window, last_window), font=poppins14bold)
-    btnvolver.pack(padx=10, pady=10, anchor="e", side="bottom")
-    
     btnsave = ctk.CTkButton(frame_left, text="Guardar", command=lambda: save_liquidacion(my_tree, ci_entry, nombre_entry, inmueble_menu, monto1, monto2, fecha1, fecha2), font=poppins14bold)
     btnsave.pack(padx=10, pady=10, anchor="e", side="bottom")
-
-    load_liquidaciones_data(my_tree)
     
-    recargarbusqueda = ctk.CTkButton(top_frame2, text="🔁", font=poppins14bold, width=30, command=lambda: load_liquidaciones_data(my_tree))
+    btnvolver = ctk.CTkButton(frame_left, text="Atrás", command=lambda: liquidacion(window, last_window), font=poppins14bold)
+    btnvolver.pack(padx=10, pady=10, anchor="e", side="bottom")
+
+    load_liquidaciones_data2(my_tree)
+    
+    recargarbusqueda = ctk.CTkButton(top_frame2, text="🔁", font=poppins14bold, width=30, command=lambda: load_liquidaciones_data2(my_tree))
     recargarbusqueda.pack(padx=5, pady=5, side="right")
 
 
@@ -720,16 +724,86 @@ def ifasignar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold, 
     busquedaliq = ctk.CTkEntry(top_frame2, placeholder_text="Buscar por cedula", font=poppins14bold, width=200)
     busquedaliq.pack(padx=5, pady=5, side="right")
 
-    def on_tree_select(event):
+    my_tree.bind("<<TreeviewSelect>>", lambda e: on_tree_select(inmuebles))    
+
+
+    def on_tree_select(inmuebles):
         global id_contr
         selected_item = my_tree.selection()
         if selected_item:
             item = my_tree.item(selected_item)
             values = item['values']
-            labeltitle2.configure(text=f"{values[1]} {values[2]}")
+            labeltitle2.configure(text=f"{values[1]}")
             id_contr=f"{values[0]}"
+            ci_entry.delete(0, tk.END)
+            ci_entry.insert(0, values[0])
+            nombre_entry.delete(0, tk.END)
+            nombre_entry.insert(0, values[1])
 
-    my_tree.bind("<<TreeviewSelect>>", on_tree_select)    
+        try:
+            with connection() as conn:
+                cursor = conn.cursor()
+                sql1 = '''SELECT id_contribuyente FROM contribuyentes WHERE ci_contribuyente = ?'''
+                cedula = values[0]
+                cursor.execute(sql1, (cedula,))
+                result = cursor.fetchone()
+                if result:
+                    id_contribuyente = result[0]
+                    sql = "SELECT cod_catastral FROM inmuebles WHERE id_contribuyente = ?"
+                    cursor.execute(sql, (id_contribuyente,))
+                    inmuebles_list = cursor.fetchall()
+                    inmuebles.clear()
+                    inmuebles.extend([str(inmueble[0]) for inmueble in inmuebles_list])  # Convert to strings
+                else:
+                    print("Contribuyente no encontrado.")
+        except Exception as e:
+            print(f'Error al cargar los inmuebles en el CtkOptionMenu de ifasignar: {e}')
+
+        inmueble_menu.configure(values=inmuebles)
+        if inmuebles:
+            inmueble_menu.set(inmuebles[0])
+
+    def save_liquidacion(my_tree, ci_entry, nombre_entry, inmueble_menu, monto1_entry, monto2_entry, fecha1_entry, fecha2_entry):
+        ci_contribuyente = ci_entry.get()
+        inmueble = inmueble_menu.get()
+        monto1 = monto1_entry.get()
+        monto2 = monto2_entry.get()
+        fecha1 = fecha1_entry.get()
+        fecha2 = fecha2_entry.get()
+
+        try:
+            with connection() as conn:
+                cursor = conn.cursor()
+                cursor.execute("SELECT id_contribuyente FROM contribuyentes WHERE ci_contribuyente = ?", (ci_contribuyente,))
+                contribuyente = cursor.fetchone()
+                if contribuyente:
+                    id_contribuyente = contribuyente[0]
+                    cursor.execute("SELECT id_inmueble FROM inmuebles WHERE cod_catastral = ? AND id_contribuyente = ?", (inmueble, id_contribuyente))
+                    inmueble = cursor.fetchone()
+                    if inmueble:
+                        id_inmueble = inmueble[0]
+                        cursor.execute("SELECT * FROM liquidaciones WHERE id_inmueble = ?", (id_inmueble,))
+                        liquidacion = cursor.fetchone()
+                        if liquidacion:
+                            print("Ya existe una liquidación para este inmueble.")
+                            messagebox.showwarning("Advertencia", "Ya existe una liquidación para este inmueble")
+                        else:
+                            cursor.execute("INSERT INTO liquidaciones (id_contribuyente, id_inmueble, monto_1, monto_2, fecha_Liquidacion_1, fecha_Liquidacion_2) VALUES (?, ?, ?, ?, ?, ?)",
+                                           (id_contribuyente, id_inmueble, monto1, monto2, fecha1, fecha2))
+                            conn.commit()
+                            load_liquidaciones_data2(my_tree)
+                            messagebox.showinfo("Informacion", "Se ha asignado la liquidación exitosamente")
+                            print("Liquidación guardada exitosamente.")
+                            my_tree.bind("<ButtonRelease-1>", on_tree_select)
+                            clearentrys(ci_entry, nombre_entry, inmueble_menu, monto1_entry, monto2_entry, fecha1_entry, fecha2_entry)
+                    else:
+                        print("Inmueble no encontrado.")
+                else:
+                    print("Al guardar, Contribuyente no encontrado.")
+        except Exception as e:
+            print(f"Error guardando la liquidación: {e}")
+ 
+
 
 def exportar_a_excel():
     try:
