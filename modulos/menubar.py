@@ -82,6 +82,7 @@ def menubar(window):
         from modulos.login_fun import login
         current_window.destroy()
         new_window = ctk.CTk()
+        new_window.configure(fg_color="black")
         new_window.title("Axio")
         new_window.geometry("1080x720")
         centrar_ventana(new_window, 1080, 720)
