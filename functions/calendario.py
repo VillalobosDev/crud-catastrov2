@@ -5,17 +5,33 @@ from tkinter import ttk
 from tkinter import Toplevel
 from tkcalendar import Calendar
 from functions.rango_fecha import rango_fecha_search
+from config.config import centrar_ventana
 
 
 def open_calendar_popup(entry_widget):
+    
+    poppins12bold = ("Poppins", 12, "bold")
+
+
+    poppins8bold = ("Poppins", 8)
+    
     """Open a calendar popup to select a date."""
-    calendar_popup = Toplevel()
-    calendar_popup.title("Seleccionar Fecha")
-    calendar_popup.geometry("300x300")
+    calendar_popup = ctk.CTkToplevel()
+    calendar_popup.grab_set()
+    calendar_popup.title("Fecha")
+    calendar_popup.geometry("320x310")
     calendar_popup.resizable(width=False, height=False)
+    
+    centrar_ventana(calendar_popup, 320, 310)
+    
+    top_container = ctk.CTkFrame(calendar_popup, corner_radius=15)
+    top_container.pack(fill="x", padx=5, pady=5, side="top")
+    
+    frame_calendar=ctk.CTkFrame(top_container, corner_radius=15)
+    frame_calendar.pack(pady=5, padx=5)
 
     # Add Calendar widget
-    calendar = Calendar(calendar_popup, date_pattern="dd-mm-yyyy")  # Use desired format
+    calendar = Calendar(frame_calendar, date_pattern="dd-mm-yyyy", font=poppins8bold)  # Use desired format
     calendar.pack(padx=10, pady=10)
 
     # Function to handle date selection
@@ -26,8 +42,8 @@ def open_calendar_popup(entry_widget):
         calendar_popup.destroy()  # Close the calendar popup
 
     # Add button to confirm date selection
-    select_button = ctk.CTkButton(calendar_popup, text="Seleccionar", command=select_date)
-    select_button.pack(pady=10)
+    select_button = ctk.CTkButton(top_container, text="Seleccionar", command=select_date, font=poppins12bold)
+    select_button.pack(pady=10, side="bottom")
 
 
 def create_date_range_selector(parent_frame, searchbtn, my_tree, original_data):

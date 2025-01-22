@@ -13,7 +13,7 @@ def set_initial_background(window, original_image, background_label):
         window.resizable(False, False)  # Disable resizing
         
         # Resize the image to fit the window dimensions
-        resized_image = original_image.resize((1080, 720), Image.Resampling.LANCZOS)
+        resized_image = original_image.resize((1380, 920), Image.Resampling.LANCZOS)
         background_photo = ImageTk.PhotoImage(resized_image)
         background_label.configure(image=background_photo)
         background_label.image = background_photo

@@ -33,7 +33,8 @@ def cargar_imagen(frameimg, img_label1):
         img_label.pack(expand=True, padx=10, pady=10)
         img_label.image = image_tk  # Guardar referencia para evitar que la imagen sea recolectada por el garbage collector
         
-def ifasignar(bottom_frame, window, last_window, busqueda, busquedabtn, recargarbusqueda):
+def ifasignar(bottom_frame, window, last_window, busqueda, busquedabtn, recargarbusqueda, window_title):
+    window_title.configure(text="Gestión de Sectores | Agregar")
     busqueda.destroy()
     busquedabtn.destroy()
     recargarbusqueda.destroy()
@@ -56,10 +57,7 @@ def ifasignar(bottom_frame, window, last_window, busqueda, busquedabtn, recargar
     center_frame.pack(padx=10, pady=10, side="left", fill="both", expand=True)
     
     right_frame_bajo = ctk.CTkFrame(bottom_frame, corner_radius=15)
-    right_frame_bajo.pack(side="right", padx=10, pady=10, fill="both")    
-
-    text = ctk.CTkLabel(left_frame, text="Nuevo Sector", font=poppins18bold, width=250)
-    text.pack(padx=10, pady=10)    
+    right_frame_bajo.pack(side="right", padx=10, pady=10, fill="both")       
   
     nom_sectores_frame = ctk.CTkFrame(left_frame)
     nom_sectores_frame.pack(padx=10, pady=5, fill="x")    
@@ -210,10 +208,10 @@ def sectores(window, last_window):
     window_title.pack(padx=10, pady=10, side="left")
 
     # Contenido del top frame 2
-    crear = ctk.CTkButton(top_frame2, text="Agregar", command=lambda: ifasignar(bottom_frame, window, last_window, busqueda, busquedabtn, recargarbusqueda), font=poppins14bold)
+    crear = ctk.CTkButton(top_frame2, text="Agregar", command=lambda: ifasignar(bottom_frame, window, last_window, busqueda, busquedabtn, recargarbusqueda, window_title), font=poppins14bold)
     crear.pack(padx=5, pady=5, side="left")
 
-    gestionar = ctk.CTkButton(top_frame2, text="Modificar", command=lambda: ifgestionar(bottom_frame, window, last_window, busqueda, busquedabtn, recargarbusqueda), font=poppins14bold)
+    gestionar = ctk.CTkButton(top_frame2, text="Modificar", command=lambda: ifgestionar(bottom_frame, window, last_window, busqueda, busquedabtn, recargarbusqueda, window_title), font=poppins14bold)
     gestionar.pack(padx=5, pady=5, side="left")
     
     
@@ -343,7 +341,8 @@ def crear_arbol_inmuebles(parent_frame, sector_id):
     except Exception as e:
         print(f"Error loading inmuebles: {e}")
 
-def ifgestionar(bottom_frame, window, last_window, busqueda, busquedabtn, recargarbusqueda):
+def ifgestionar(bottom_frame, window, last_window, busqueda, busquedabtn, recargarbusqueda, window_title):
+    window_title.configure(text="Gestión de Sectores | Modificar")
     global image_save_path, id_sector, center_frame
     image_save_path = ""  # Inicializar image_save_path
     id_sector = None  # Inicializar id_sector
@@ -369,9 +368,6 @@ def ifgestionar(bottom_frame, window, last_window, busqueda, busquedabtn, recarg
     
     right_frame_bajo = ctk.CTkFrame(bottom_frame, corner_radius=15)
     right_frame_bajo.pack(side="right", padx=10, pady=10, fill="both")    
-
-    text = ctk.CTkLabel(left_frame, text="Modificar Sector", font=poppins18bold, width=250)
-    text.pack(padx=10, pady=10)    
   
     nom_sectores_frame = ctk.CTkFrame(left_frame)
     nom_sectores_frame.pack(padx=10, pady=5, fill="x")    

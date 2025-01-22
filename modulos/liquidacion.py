@@ -374,10 +374,10 @@ def liquidacion(window, last_window):
 
     
 
-    crearinm = ctk.CTkButton(top_frame2, text="Asignar", command=lambda: ifasignar(window, bottom_frame, top_frame2, busquedabtn, busquedaliq, last_window), font=poppins14bold)
+    crearinm = ctk.CTkButton(top_frame2, text="Asignar", command=lambda: ifasignar(window, bottom_frame, top_frame2, busquedabtn, busquedaliq, last_window, window_title), font=poppins14bold)
     crearinm.pack(padx=5, pady=5, side="left")
 
-    gestionarinm = ctk.CTkButton(top_frame2, text="Gestionar", command=lambda: ifgestionar(window, bottom_frame, top_frame2, busquedabtn, busquedaliq, last_window), font=poppins14bold)
+    gestionarinm = ctk.CTkButton(top_frame2, text="Gestionar", command=lambda: ifgestionar(window, bottom_frame, top_frame2, busquedabtn, busquedaliq, last_window, window_title), font=poppins14bold)
     gestionarinm.pack(padx=5, pady=5, side="left")
 
     btn_exportar = ctk.CTkButton(top_frame2, text="Exportar Excel", command=exportar_a_excel, font=poppins14bold)
@@ -416,8 +416,9 @@ def liquidacion(window, last_window):
     # Añadir evento de doble clic
     my_tree.bind("<Double-1>", on_double_click)
 
-def ifgestionar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold, last_window):
+def ifgestionar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold, last_window, window_title):
     global busquedabtn, busquedaliq, recargarbusqueda
+    window_title.configure(text="Gestión de liquidaciones | Gestionar")
 
     if busquedabtnold:
         busquedabtnold.pack_forget()
@@ -443,9 +444,6 @@ def ifgestionar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold
     frame_right.pack(padx=5, pady=5, side="right", fill="both", expand=True)
 
 
-    text = ctk.CTkLabel(frame_left, text="Gestionar Liquidación", font=poppins18, width=250)
-    text.pack(padx=10, pady=10)
-
 
     # # Add UI elements for the left frame
     ci_frame = ctk.CTkFrame(frame_left)
@@ -468,15 +466,14 @@ def ifgestionar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold
     labeltitle2.pack(pady=10)
 
     #############################################
-
+    fecha1_frame = ctk.CTkFrame(frame_left)
+    fecha1_frame.pack(padx=10, pady=5, fill="x")
+    
     monto1_frame = ctk.CTkFrame(frame_left)
     monto1_frame.pack(padx=10, pady=5, fill="x")
 
     monto2_frame = ctk.CTkFrame(frame_left)
     monto2_frame.pack(padx=10, pady=5, fill="x")
-
-    fecha1_frame = ctk.CTkFrame(frame_left)
-    fecha1_frame.pack(padx=10, pady=5, fill="x")
 
     fecha2_frame = ctk.CTkFrame(frame_left)
     fecha2_frame.pack(padx=10, pady=5, fill="x")
@@ -492,26 +489,27 @@ def ifgestionar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold
     nombre_entry = ctk.CTkEntry(nombre_frame, placeholder_text="Nombre Contribuyente", font=poppins14bold, width=250)
     # nombre_entry.pack(pady=5, padx=5, side="left", fill="x", expand=True)
 
-    monto1 = ctk.CTkEntry(monto1_frame, placeholder_text="Monto 1", font=poppins14bold, width=250)
+    monto1 = ctk.CTkEntry(monto1_frame, placeholder_text="Monto del Inm-Urbano", font=poppins14bold, width=250)
     monto1.pack(pady=5, padx=5, side="left", fill="x", expand=True)
 
-    monto2 = ctk.CTkEntry(monto2_frame, placeholder_text="Monto 2", font=poppins14bold, width=250)
+    monto2 = ctk.CTkEntry(monto2_frame, placeholder_text="Monto del Imp-Ocup", font=poppins14bold, width=250)
     monto2.pack(pady=5, padx=5, side="left", fill="x", expand=True)
 
-    fecha1 = ctk.CTkEntry(fecha1_frame, placeholder_text="Fecha Liquidacion 1", font=poppins14bold, width=190)
+    fecha1 = ctk.CTkEntry(fecha1_frame, placeholder_text="Fecha de pago Info", font=poppins14bold, width=190)
     fecha1.pack(pady=5, padx=5, side="left", fill="x", expand=True)
 
     fecha1_btn = ctk.CTkButton(fecha1_frame, text="📅", command=lambda: open_calendar_popup(fecha1), font=poppins14bold, width=50)
     fecha1_btn.pack(pady=5, padx=5, side="left")
 
-    fecha2 = ctk.CTkEntry(fecha2_frame, placeholder_text="Fecha Liquidacion 2", font=poppins14bold, width=190)
+    fecha2 = ctk.CTkEntry(fecha2_frame, placeholder_text="Fecha de pago Final", font=poppins14bold, width=190)
     fecha2.pack(pady=5, padx=5, side="left", fill="x", expand=True)
 
     fecha2_btn = ctk.CTkButton(fecha2_frame, text="📅", command=lambda: open_calendar_popup(fecha2), font=poppins14bold, width=50)
     fecha2_btn.pack(pady=5, padx=5, side="left")
 
-    inmuebles = []
+    inmuebles = ["Código Catastral"]
     inmueble_menu = ctk.CTkOptionMenu(inmueble_frame, values=inmuebles, font=poppins14bold, width=250)
+    inmueble_menu.set("Código Catastral")
     inmueble_menu.pack(pady=5, padx=5, side="left", fill="x", expand=True)
 
     ci_entry.bind("<FocusOut>", lambda e: update_contribuyente_info(ci_entry, nombre_entry, inmueble_menu))
@@ -599,8 +597,10 @@ def ifgestionar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold
 
             return selected_iid
     
-def ifasignar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold, last_window):
+def ifasignar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold, last_window, window_title):
     global busquedabtn, busquedaliq, recargarbusqueda
+    
+    window_title.configure(text="Gestión de liquidaciones | Asignar")
     if busquedabtnold:
         busquedabtnold.pack_forget()
     if busquedaliqold:
@@ -619,9 +619,6 @@ def ifasignar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold, 
     
     frame_right = ctk.CTkFrame(bottom_frame, corner_radius=15)
     frame_right.pack(padx=5, pady=5, side="right", fill="both", expand=True)
-
-    text = ctk.CTkLabel(frame_left, text="Asignar Liquidación", font=poppins18, width=250)
-    text.pack(padx=10, pady=10)
 
     ####################################################### Informacion del contribuyente
 
@@ -646,6 +643,9 @@ def ifasignar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold, 
 
     nombre_frame = ctk.CTkFrame(frame_left)
     # nombre_frame.pack(padx=10, pady=5, fill="x")
+    
+    fecha1_frame = ctk.CTkFrame(frame_left)
+    fecha1_frame.pack(padx=10, pady=5, fill="x")
 
     monto1_frame = ctk.CTkFrame(frame_left)
     monto1_frame.pack(padx=10, pady=5, fill="x")
@@ -653,8 +653,6 @@ def ifasignar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold, 
     monto2_frame = ctk.CTkFrame(frame_left)
     monto2_frame.pack(padx=10, pady=5, fill="x")
 
-    fecha1_frame = ctk.CTkFrame(frame_left)
-    fecha1_frame.pack(padx=10, pady=5, fill="x")
 
     fecha2_frame = ctk.CTkFrame(frame_left)
     fecha2_frame.pack(padx=10, pady=5, fill="x")
@@ -670,26 +668,27 @@ def ifasignar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold, 
     nombre_entry = ctk.CTkEntry(nombre_frame, placeholder_text="Nombre Contribuyente", font=poppins14bold)
     # nombre_entry.pack(pady=5, padx=5, side="left", fill="x", expand=True)
 
-    monto1 = ctk.CTkEntry(monto1_frame, placeholder_text="Monto 1", font=poppins14bold)
+    monto1 = ctk.CTkEntry(monto1_frame, placeholder_text="Monto del Inm-Urbano", font=poppins14bold, width=250)
     monto1.pack(pady=5, padx=5, side="left", fill="x", expand=True)
 
-    monto2 = ctk.CTkEntry(monto2_frame, placeholder_text="Monto 2", font=poppins14bold)
+    monto2 = ctk.CTkEntry(monto2_frame, placeholder_text="Monto del Imp-Ocup", font=poppins14bold, width=250)
     monto2.pack(pady=5, padx=5, side="left", fill="x", expand=True)
 
-    fecha1 = ctk.CTkEntry(fecha1_frame, placeholder_text="Fecha Liquidacion 1", font=poppins14bold)
+    fecha1 = ctk.CTkEntry(fecha1_frame, placeholder_text="Fecha de pago Info", font=poppins14bold, width=190)
     fecha1.pack(pady=5, padx=5, side="left", fill="x", expand=True)
 
-    fecha1_btn = ctk.CTkButton(fecha1_frame, text="📅", command=lambda: open_calendar_popup(fecha1), font=poppins14bold, width=30)
+    fecha1_btn = ctk.CTkButton(fecha1_frame, text="📅", command=lambda: open_calendar_popup(fecha1), font=poppins14bold, width=50)
     fecha1_btn.pack(pady=5, padx=5, side="left")
 
-    fecha2 = ctk.CTkEntry(fecha2_frame, placeholder_text="Fecha Liquidacion 2", font=poppins14bold)
+    fecha2 = ctk.CTkEntry(fecha2_frame, placeholder_text="Fecha de pago Final", font=poppins14bold, width=190)
     fecha2.pack(pady=5, padx=5, side="left", fill="x", expand=True)
-
-    fecha2_btn = ctk.CTkButton(fecha2_frame, text="📅", command=lambda: open_calendar_popup(fecha2), font=poppins14bold, width=30)
+    
+    fecha2_btn = ctk.CTkButton(fecha2_frame, text="📅", command=lambda: open_calendar_popup(fecha2), font=poppins14bold, width=50)
     fecha2_btn.pack(pady=5, padx=5, side="left")
     
-    inmuebles = []
+    inmuebles = ["Código Catastral"]
     inmueble_menu = ctk.CTkOptionMenu(inmueble_frame, values=inmuebles, font=poppins14bold, width=250)
+    inmueble_menu.set("Código Catastral")
     inmueble_menu.pack(pady=5, padx=5, side="left", fill="x", expand=True)
 
     ###################################### Add Treeview for the right frame

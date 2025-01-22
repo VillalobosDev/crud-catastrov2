@@ -242,7 +242,7 @@ def ifasignar(bottom_frame, top_frame2, window, last_window, window_title):
     btnvolver = ctk.CTkButton(frame_left, text="Atrás", command=lambda: inmuebles(window, last_window), font=poppins14bold)
     btnvolver.pack(padx=10, pady=10, anchor="e", side="bottom")
     
-    btnsave = ctk.CTkButton(frame_left, text="Guardar", font=poppins14bold, command=lambda: guardar_inmueble(inmueble, inmueblecod, uso, sector, id_contr, inmuebleubic))
+    btnsave = ctk.CTkButton(frame_left, text="Guardar", font=poppins14bold, command=lambda: guardar_inmueble(inmueble, inmueblecod, uso, sector, id_contr, inmuebleubic, text_label2))
     btnsave.pack(padx=10, pady=10, anchor="e", side="bottom")
 
     # Fin del contenido del left frame #########################################################################
@@ -361,7 +361,7 @@ def ifasignar(bottom_frame, top_frame2, window, last_window, window_title):
         except Exception as e:
             print(f"Error refreshing Treeview: {e}")
 
-def guardar_inmueble(inmueble, inmueblecod, uso, sector, id_contr, inmuebleubic):
+def guardar_inmueble(inmueble, inmueblecod, uso, sector, id_contr, inmuebleubic, label):
     try:
         with connection() as conn:
             cursor = conn.cursor()
@@ -372,26 +372,26 @@ def guardar_inmueble(inmueble, inmueblecod, uso, sector, id_contr, inmuebleubic)
             ''', (inmueble.get(),inmuebleubic.get(), inmueblecod.get(), uso.get(), id_contribuyente, sector.get()))
             conn.commit()
             messagebox.showinfo("Información","Se ha guardado el inmueble correctamente")
-            clear()
+
+            label.configure(text="")
+
+            inmueble.delete(0, ctk.END)
+            inmueble.configure(placeholder_text="Inmueble")
+
+            inmueblecod.delete(0, ctk.END)
+            inmueblecod.configure(placeholder_text="Codigo Catastral")
+            
+            inmuebleubic.delete(0, ctk.END)
+            inmuebleubic.configure(placeholder_text="Ubicación del inmueble")
+
+            uso.set("Comercial") 
+            sector.set("Sector")
+    
             print("Inmueble guardado exitosamente.")
     except Exception as e:
         print(f"Error al guardar el inmueble: {e}")
 
         messagebox.showerror("Error", f"Error al guardar el inmueble: {e}")
-        
-    def clear():
-
-        inmueble.delete(0, ctk.END)
-        inmueble.configure(placeholder_text="Inmueble")
-
-        inmueblecod.delete(0, ctk.END)
-        inmueblecod.configure(placeholder_text="Codigo Catastral")
-        
-        inmuebleubic.delete(0, ctk.END)
-        inmuebleubic.configure(placeholder_text="Ubicación del inmueble")
-
-        uso.set("Comercial") 
-        sector.set("Sector")
         
 def ifgestionar(window, bottom_frame, top_frame2, last_window, window_title):
     global busquedainm, busquedabtn, refrescartabla, id_contr

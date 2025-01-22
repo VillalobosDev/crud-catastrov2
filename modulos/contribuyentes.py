@@ -8,9 +8,10 @@ from config.config import centrar_ventana
 import tkinter
 
 
-def ifagregar(bottom_frame, top_frame2, window, last_window):
+def ifasignar(bottom_frame, top_frame2, window, last_window, window_title):
     global busquedainm, busquedabtn, recargarbusqueda
     
+    window_title.configure(text="Gestión Contribuyentes | Agregar")
 
     if busquedabtn:
         busquedabtn.pack_forget()
@@ -33,9 +34,6 @@ def ifagregar(bottom_frame, top_frame2, window, last_window):
     
     frame_right = ctk.CTkFrame(bottom_frame, corner_radius=15)
     frame_right.pack(padx=5, pady=5, side="right", fill="both", expand=True)
-
-    text = ctk.CTkLabel(frame_left, text="Nuevo Contribuyente", font=poppins18, width=250)
-    text.pack(padx=10, pady=10)
 
     # Contenido del frame left
 
@@ -132,8 +130,24 @@ def ifagregar(bottom_frame, top_frame2, window, last_window):
             print(f"Error during database operation: {e}")
 
     def guardar_datos():
-        text = ctk.CTkLabel(frame_left, text="", text_color="red", font=poppins14bold)
-        text.place(x=30, y=450)
+
+        print(type(nombre.get()))
+        print(type(apellido.get()))
+        # if type(nombre.get()) is not str:
+        #     messagebox.showinfo("Advertencia", "Debes introducir datos validos para el campo Nombre")
+        #     return
+        # elif type(apellido.get()) is not str:
+        #     messagebox.showinfo("Advertencia", "Debes introducir datos validos para el Apellido")
+        #     return
+        # elif type(cedula.get().strip()) is not int:
+        #     messagebox.showinfo("Advertencia", "Debes introducir datos validos para la Cedula")
+        #     return
+        # elif type(rif.get().strip()) is not int:
+        #     messagebox.showinfo("Advertencia", "Debes introducir datos validos para el RIF")
+        #     return
+        # elif type(telefono.get().strip()) is not int:
+        #     messagebox.showinfo("Advertencia", "Debes introducir datos validos para el número de telefono")
+        #     return
         try:
             with connection() as conn:
                 cursor = conn.cursor()
@@ -211,8 +225,11 @@ def ifagregar(bottom_frame, top_frame2, window, last_window):
 
     cargar_datos()  # Llamar a la función para cargar los datos inicialmente
 
-def ifgestionar(bottom_frame, top_frame2, window, last_window):
+def ifgestionar(bottom_frame, top_frame2, window, last_window, window_title):
     global busquedainm, busquedabtn, recargarbusqueda
+
+    window_title.configure(text="Gestión Contribuyentes | Gestionar")
+
 
     if busquedabtn:
         busquedabtn.pack_forget()
@@ -234,9 +251,6 @@ def ifgestionar(bottom_frame, top_frame2, window, last_window):
     frame_right = ctk.CTkFrame(bottom_frame, corner_radius=15)
     frame_right.pack(padx=5, pady=5, side="right", fill="both", expand=True)
     
-    text = ctk.CTkLabel(frame_left, text="Modificar Contribuyentes", font=poppins18, width=250)
-    text.pack(padx=10, pady=10)
-
     #Contenido del frame left
 
     nombre_contribuyente_frame = ctk.CTkFrame(frame_left)
@@ -498,15 +512,16 @@ def contribuyentes(window, last_window):
     volver_btn = ctk.CTkButton(top_frame, text="Volver", command=lambda: menu(window), font=poppins20bold)
     volver_btn.pack(padx=10, pady=10, side="left")
     
-    window_title = ctk.CTkLabel(top_frame, text="Contribuyentes Catastrales", font=poppins30bold)
+    window_title = ctk.CTkLabel(top_frame, text="", font=poppins30bold)
     window_title.pack(padx=10, pady=10, side="left")
+    window_title.configure(text="Gestión Contribuyentes")
 
     #Contenido del top frame 2
 
-    crearliq = ctk.CTkButton(top_frame2, text="Agregar", command=lambda: ifagregar(bottom_frame, top_frame2, window, last_window), font=poppins14bold)
+    crearliq = ctk.CTkButton(top_frame2, text="Agregar", command=lambda: ifasignar(bottom_frame, top_frame2, window, last_window, window_title), font=poppins14bold)
     crearliq.pack(padx=5, pady=5, side="left")
 
-    gestionarliq = ctk.CTkButton(top_frame2, text="Modificar", command=lambda:ifgestionar(bottom_frame, top_frame2, window, last_window), font=poppins14bold)
+    gestionarliq = ctk.CTkButton(top_frame2, text="Modificar", command=lambda:ifgestionar(bottom_frame, top_frame2, window, last_window, window_title), font=poppins14bold)
     gestionarliq.pack(padx=5, pady=5, side="left")
     
     
