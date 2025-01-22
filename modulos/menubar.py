@@ -93,12 +93,6 @@ def menubar(window):
     # Ajustar el color del menubar según el modo
     set_menu_bar_color(menubar_frame, mode, menu_button, config_button, support_button, exit_button, window)
 
-    #def logout(window):
-    #    from modulos.login_fun import login
-    #    transition_to_next_ui(window, None, login, duration=4000)
-    
-    
-    
 def creditos(parent):
     poppins16 = ("Poppins", 16, "bold")
     poppins12bold = ("Poppins", 12, "bold")

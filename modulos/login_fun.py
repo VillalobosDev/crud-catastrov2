@@ -1,48 +1,23 @@
 import tkinter as tk
 from PIL import Image, ImageTk
 import customtkinter as ctk
-import traceback
 from modulos.menu import menu
 from modulos2.menu import menu2
 from modulos.transitions import transition_to_next_ui
 
-
-
-def resize_background(window, original_image, background_label):
-    """Resize the background image dynamically when the window is resized."""
-    try:
-        if not background_label.winfo_exists():
-            return
-
-        width = window.winfo_width()
-        height = window.winfo_height()
-        img_width, img_height = original_image.size
-
-        new_width = width
-        new_height = int((img_height / img_width) * width)
-        
-        if new_height < height:
-            new_height = height
-            new_width = int((img_width / img_height) * height)
-
-        resized_image = original_image.resize((new_width, new_height), Image.Resampling.LANCZOS)
-        background_photo = ImageTk.PhotoImage(resized_image)
-        background_label.configure(image=background_photo)
-        background_label.image = background_photo
-        print(f"Resized background to {new_width}x{new_height}")
-    except Exception as e:
-        print(f"Error resizing background: {e}")
-
 def set_initial_background(window, original_image, background_label):
     """Set the initial background image once window is initialized."""
     try:
-        width = window.winfo_width()
-        height = window.winfo_height()
-        resized_image = original_image.resize((width, height), Image.Resampling.LANCZOS)
+        # Set the window size to fixed 1080x720
+        window.geometry("1080x720")
+        window.resizable(False, False)  # Disable resizing
+        
+        # Resize the image to fit the window dimensions
+        resized_image = original_image.resize((1080, 720), Image.Resampling.LANCZOS)
         background_photo = ImageTk.PhotoImage(resized_image)
         background_label.configure(image=background_photo)
         background_label.image = background_photo
-        print(f"Initial background set to {width}x{height}")
+        print(f"Initial background set to 1080x720")
     except Exception as e:
         print(f"Error setting initial background: {e}")
 
@@ -101,12 +76,8 @@ def login(window):
         # Load the login UI components immediately
         window.after(1, load_login_ui, window)
 
-        # Bind the resize event to dynamically resize the background
-        window.bind("<Configure>", lambda event: resize_background(window, original_image, background_label))
-
     except Exception as e:
         print(f"Error during login setup: {e}")
-        traceback.print_exc()
 
 def loginadmin(left_frame, window):
     """Pantalla de inicio de sesión del administrador"""
@@ -137,6 +108,17 @@ def check(entry, window, left_frame):
     """Validación de contraseña"""
     contr = "1234"
     if entry.get() == contr:
-        transition_to_next_ui(window, left_frame, menu, duration=500)
+        def logout(current_window):
+            from modulos.login_fun import login
+            from config.config import centrar_ventana
+            current_window.destroy()
+            new_window = ctk.CTk()
+            new_window.title("Axio")
+            new_window.geometry("1080x720")
+            centrar_ventana(new_window, 1080, 720)
+
+            menu(new_window)
+            new_window.mainloop()
+        logout(window)
     else:
         print("Contraseña incorrecta")
