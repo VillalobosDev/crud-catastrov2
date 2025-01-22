@@ -575,11 +575,11 @@ def ifgestionar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold
                     result = cursor.fetchone()
                     if result:
                         id_contribuyente = result[0]
-                        sql = "SELECT nom_inmueble FROM inmuebles WHERE id_contribuyente = ?"
+                        sql = "SELECT cod_catastral FROM inmuebles WHERE id_contribuyente = ?"
                         cursor.execute(sql, (id_contribuyente,))
                         inmuebles_list = cursor.fetchall()
                         inmuebles.clear()
-                        inmuebles.extend([inmueble[0] for inmueble in inmuebles_list])
+                        inmuebles.extend([str(inmueble[0]) for inmueble in inmuebles_list])
                     else:
                         print("Contribuyente no encontrado.")
             except Exception as e:
@@ -587,7 +587,7 @@ def ifgestionar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold
 
             inmueble_menu.configure(values=inmuebles)
             if inmuebles:
-                inmueble_menu.set(values[2])
+                inmueble_menu.set(inmuebles[0])
             monto1.delete(0, tk.END)
             monto1.insert(0, values[3])
             monto2.delete(0, tk.END)

@@ -6,6 +6,8 @@ from modulos.menu import menu
 from modulos2.menu import menu2
 from modulos.transitions import transition_to_next_ui
 
+
+
 def resize_background(window, original_image, background_label):
     """Resize the background image dynamically when the window is resized."""
     try:

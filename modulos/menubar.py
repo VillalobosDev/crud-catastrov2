@@ -75,8 +75,20 @@ def menubar(window):
     support_button.pack(side="left", padx=5, pady=5)
 
     # Botón "Salir"
-    exit_button = ctk.CTkButton(menubar_frame, text="Cerrar sesión", font=poppins12bold, width=100, hover_color="darkred",  command=lambda: window.quit())
+    exit_button = ctk.CTkButton(menubar_frame, text="Cerrar sesión", font=poppins12bold, width=100, hover_color="darkred",  command=lambda: logout(window))
     exit_button.pack(side="right", padx=5, pady=5)
+
+    def logout(current_window):
+        from modulos.login_fun import login
+        current_window.destroy()
+        new_window = ctk.CTk()
+        new_window.title("Axio")
+        new_window.geometry("1080x720")
+        centrar_ventana(new_window, 1080, 720)
+        
+        login(new_window)
+        new_window.mainloop()
+
 
     # Ajustar el color del menubar según el modo
     set_menu_bar_color(menubar_frame, mode, menu_button, config_button, support_button, exit_button, window)
