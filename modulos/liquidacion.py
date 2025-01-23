@@ -17,12 +17,12 @@ selected_id_liquidacion = None
 def setup_treeview(frame):
     style = ttk.Style()
     style.configure("Custom.Treeview", font=("Poppins", 12), rowheight=25)
-    style.configure("Custom.Treeview.Heading", font=("Poppins", 14, "bold"))
+    style.configure("Custom.Treeview.Heading", font=("Poppins", 12, "bold"))
 
     treeview = ttk.Treeview(frame, style="Custom.Treeview", show="headings")
     treeview.pack(pady=10, padx=10, fill="both", expand=True)
 
-    treeview["columns"] = ("CI", "Contribuyente", "Cod-Catastral", "Monto del Inm-Urbano", "Monto del Imp-Ocup", "Fecha de pago Info", "Fecha de pago Final")
+    treeview["columns"] = ("Cédula", "Contribuyente", "Cod-Catastral", "Monto del Inm-Urbano", "Monto del Imp-Ocup", "Fecha de pago Info", "Fecha de pago Final")
     for col in treeview["columns"]:
         treeview.heading(col, text=col.capitalize(), anchor="center")
         treeview.column(col, anchor="center")
@@ -33,12 +33,12 @@ def setup_treeview(frame):
 def setup_treeview2(frame):
     style = ttk.Style()
     style.configure("Custom.Treeview", font=("Poppins", 12), rowheight=25)
-    style.configure("Custom.Treeview.Heading", font=("Poppins", 14, "bold"))
+    style.configure("Custom.Treeview.Heading", font=("Poppins", 12, "bold"))
 
     treeview = ttk.Treeview(frame, style="Custom.Treeview", show="headings")
     treeview.pack(pady=10, padx=10, fill="both", expand=True)
 
-    treeview["columns"] = ("CI", "Contribuyente")
+    treeview["columns"] = ("Cédula", "Contribuyente")
     for col in treeview["columns"]:
         treeview.heading(col, text=col.capitalize(), anchor="center")
         treeview.column(col, anchor="center")
@@ -147,11 +147,12 @@ def reload_treeviewsearch(treeview, ci_contribuyente):
         with connection() as conn:
             cursor = conn.cursor()
             sql = ''' 
-            SELECT  l.id_liquidacion, c.ci_contribuyente, c.nombres || ' ' || c.apellidos AS contribuyente_nombre, i.nom_inmueble, l.monto_1, l.monto_2, l.fecha_Liquidacion_1, l.fecha_Liquidacion_2
+            SELECT  l.id_liquidacion, c.v_e || "-" || c.ci_contribuyente, c.nombres || ' ' || c.apellidos AS contribuyente_nombre, i.nom_inmueble, l.monto_1, l.monto_2, l.fecha_Liquidacion_1, l.fecha_Liquidacion_2
             FROM liquidaciones l
             JOIN inmuebles i ON l.id_inmueble = i.id_inmueble
             JOIN contribuyentes c ON l.id_contribuyente = c.id_contribuyente
             WHERE c.ci_contribuyente = ?
+            ORDER BY c.ci_contribuyente ASC
             '''
             cursor.execute(sql, (ci_contribuyente,))
             results = cursor.fetchall()
@@ -187,6 +188,7 @@ def load_liquidaciones_data(treeview):
             FROM liquidaciones l
             JOIN inmuebles i ON l.id_inmueble = i.id_inmueble
             JOIN contribuyentes c ON l.id_contribuyente = c.id_contribuyente
+            ORDER BY c.ci_contribuyente ASC
             """
             cursor.execute(sql)
             results = cursor.fetchall()
@@ -207,8 +209,9 @@ def load_liquidaciones_data2(treeview):
         with connection() as conn:
             cursor = conn.cursor()
             sql = """
-            SELECT c.ci_contribuyente, c.nombres || ' ' || c.apellidos AS contribuyente_nombre
+            SELECT c.v_e || "-" ||c.ci_contribuyente, c.nombres || ' ' || c.apellidos AS contribuyente_nombre
             FROM contribuyentes c
+            ORDER BY c.ci_contribuyente ASC
             """
             cursor.execute(sql)
             results = cursor.fetchall()
@@ -284,7 +287,7 @@ def update_liquidacion(tree, ci_entry, nombre_entry, inmueble_menu, monto1_entry
             contribuyente = cursor.fetchone()
             if contribuyente:
                 id_contribuyente = contribuyente[0]
-                cursor.execute("SELECT id_inmueble FROM inmuebles WHERE nom_inmueble = ? AND id_contribuyente = ?", (inmueble, id_contribuyente))
+                cursor.execute("SELECT id_inmueble FROM inmuebles WHERE cod_catastral = ? AND id_contribuyente = ?", (inmueble, id_contribuyente))
                 inmueble = cursor.fetchone()
                 if inmueble:
                     id_inmueble = inmueble[0]
@@ -413,7 +416,7 @@ def liquidacion(window, last_window):
     # Configuración del estilo del Treeview (usando ttk dentro de CustomTkinter)
     style = ttk.Style()
     style.configure("Custom.Treeview", font=("Poppins", 12), rowheight=25)
-    style.configure("Custom.Treeview.Heading", font=("Poppins", 14, "bold"))
+    style.configure("Custom.Treeview.Heading", font=("Poppins", 12, "bold"))
 
     # Crear el scrollbar vertical con CustomTkinter
     horizontal_scrollbar = ttk.Scrollbar(frame_tree, orient="horizontal", command=my_tree.xview)
@@ -750,7 +753,7 @@ def ifasignar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold, 
             with connection() as conn:
                 cursor = conn.cursor()
                 sql1 = '''SELECT id_contribuyente FROM contribuyentes WHERE ci_contribuyente = ?'''
-                cedula = values[0]
+                cedula = values[0][2:]
                 cursor.execute(sql1, (cedula,))
                 result = cursor.fetchone()
                 if result:
@@ -780,7 +783,7 @@ def ifasignar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold, 
         try:
             with connection() as conn:
                 cursor = conn.cursor()
-                cursor.execute("SELECT id_contribuyente FROM contribuyentes WHERE ci_contribuyente = ?", (ci_contribuyente,))
+                cursor.execute("SELECT id_contribuyente FROM contribuyentes WHERE ci_contribuyente = ?", (ci_contribuyente[2:],))
                 contribuyente = cursor.fetchone()
                 if contribuyente:
                     id_contribuyente = contribuyente[0]
@@ -809,8 +812,6 @@ def ifasignar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold, 
         except Exception as e:
             print(f"Error guardando la liquidación: {e}")
  
-
-
 def exportar_a_excel():
     try:
         # Conectar a la base de datos
@@ -825,6 +826,7 @@ def exportar_a_excel():
             JOIN inmuebles i ON l.id_inmueble = i.id_inmueble
             JOIN contribuyentes c ON l.id_contribuyente = c.id_contribuyente
             JOIN sectores s ON i.id_sector = s.id_sector
+            ORDER BY c.ci_contribuyente ASC
         ''')
         rows = cursor.fetchall()
 
@@ -842,7 +844,7 @@ def exportar_a_excel():
         headers = [
             "Fecha Liquidación", "N° Liquidación", "Inmueble", "Nombres y Apellidos",
             "Cédula", "Sector", "Código Catastral", "Uso", "Monto Liquidado",
-            "Recargo del 10%", "Recargo del 15%", "Imp derecho de ocupación", "Total a Pagar", "Observación", "Fecha Liquidación"
+            "Imp derecho de ocupación", "Total a Pagar", "Fecha Liquidación"
         ]
         sheet.append(headers)
 
@@ -859,11 +861,11 @@ def exportar_a_excel():
             
         # Resaltar las celdas de monto_2 y fecha_Liquidacion_2 en amarillo en los encabezados
         sheet["L1"].fill = yellow_fill  # monto_2
-        sheet["O1"].fill = yellow_fill  # fecha_Liquidacion_2
+        sheet["J1"].fill = yellow_fill  # fecha_Liquidacion_2
             
             
         # Ajustar el ancho de las columnas
-        column_widths = [30, 20, 25, 30, 20, 20, 30, 20, 30, 30, 30, 30, 30, 20, 30]
+        column_widths = [30, 20, 25, 30, 20, 20, 30, 20, 30, 30, 30,30]
         for i, column_width in enumerate(column_widths, start=1):
             sheet.column_dimensions[openpyxl.utils.get_column_letter(i)].width = column_width
 
@@ -879,11 +881,8 @@ def exportar_a_excel():
                 row_data[6],  # cod_catastral
                 row_data[7],  # uso
                 row_data[8],  # monto_1
-                "",           # Recargo del 10%
-                "",           # Recargo del 15%
                 row_data[9],  # monto_2
                 row_data[8] + row_data[9],  # total_a_pagar
-                "",           # Observación
                 row_data[10]  # fecha_Liquidacion_2
             ])
 
@@ -897,15 +896,15 @@ def exportar_a_excel():
         # Resaltar las celdas de monto_2 y fecha_Liquidacion_2 en amarillo
         yellow_fill = PatternFill(start_color="FFFF00", end_color="FFFF00", fill_type="solid")
         for row in sheet.iter_rows(min_row=2, max_row=sheet.max_row, min_col=1, max_col=sheet.max_column):
-            row[11].fill = yellow_fill  # monto_2
-            row[14].fill = yellow_fill  # fecha_Liquidacion_2
+            row[9].fill = yellow_fill  # monto_2
+            row[11].fill = yellow_fill  # fecha_Liquidacion_2
                 
                 
         # Resaltar las filas en rojo si las fechas están vacías
         red_fill = PatternFill(start_color="FF0000", end_color="FF0000", fill_type="solid")
         for row in sheet.iter_rows(min_row=2, max_row=sheet.max_row, min_col=1, max_col=sheet.max_column):
             fecha_liquidacion_1 = row[0].value
-            fecha_liquidacion_2 = row[14].value
+            fecha_liquidacion_2 = row[11].value
             if not fecha_liquidacion_1 or not fecha_liquidacion_2:
                 for cell in row:
                     cell.fill = red_fill

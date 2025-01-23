@@ -111,8 +111,6 @@ def creditos(parent):
     config_window.geometry("700x400")
     config_window.grab_set()
     config_window.resizable(False, False)
-    config_window.grab_set()
-    config_window.resizable(False, False)
     centrar_ventana(config_window, 700, 400)
     
 

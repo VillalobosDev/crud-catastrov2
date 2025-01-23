@@ -16,11 +16,11 @@ def inmuebles(window, last_window):
         
     def toggle_columns():
         if comer_rec.get():
-            my_tree["displaycolumns"] = ('CI', 'Contribuyente', 'Codigo Catastral', 'Uso', 'Ubicación', 'Sector')
+            my_tree["displaycolumns"] = ('Cédula', 'Contribuyente', 'Código Catastral', 'Uso', 'Ubicación', 'Sector')
             comer_rec.configure(text="Recidencial")
             loaddata("Recidencial")
         else:
-            my_tree["displaycolumns"] = ('CI', 'Contribuyente', 'Inmueble', 'Codigo Catastral', 'Uso', 'Ubicación', 'Sector')
+            my_tree["displaycolumns"] = ('Cédula', 'Contribuyente', 'Inmueble', 'Código Catastral', 'Uso', 'Ubicación', 'Sector')
             comer_rec.configure(text="Comercial")
             loaddata("Comercial")
     
@@ -65,7 +65,7 @@ def inmuebles(window, last_window):
     busquedabtn = ctk.CTkButton(top_frame2, text="Buscar", font=poppins14bold, width=80, command=lambda: reload_treeviewsearch(my_tree, busquedainm))
     busquedabtn.pack(padx=5, pady=5, side="right")
 
-    busquedainm = ctk.CTkEntry(top_frame2, placeholder_text="Buscar por cedula", font=poppins14bold, width=200)
+    busquedainm = ctk.CTkEntry(top_frame2, placeholder_text="Buscar por cédula", font=poppins14bold, width=200)
     busquedainm.pack(padx=5, pady=5, side="right")
 
     # Contenido del bottom frame
@@ -79,7 +79,7 @@ def inmuebles(window, last_window):
 
     style = ttk.Style()
     style.configure("Custom.Treeview", font=("Poppins", 12), rowheight=25)
-    style.configure("Custom.Treeview.Heading", font=("Poppins", 14, "bold"))
+    style.configure("Custom.Treeview.Heading", font=("Poppins", 12, "bold"))
 
     my_tree = ttk.Treeview(frame_tree, style="Custom.Treeview", show="headings")
     my_tree.pack(pady=10, padx=10, fill="both", expand=True)
@@ -90,7 +90,7 @@ def inmuebles(window, last_window):
 
     horizontal_scrollbar.pack(side="bottom", fill="x")
 
-    my_tree['columns'] = ('CI', 'Contribuyente', 'Inmueble', 'Codigo Catastral', 'Uso', 'Ubicación', 'Sector')
+    my_tree['columns'] = ('Cédula', 'Contribuyente', 'Inmueble', 'Código Catastral', 'Uso', 'Ubicación', 'Sector')
 
     for col in my_tree['columns']:
         my_tree.heading(col, text=col.capitalize(), anchor='center')  # Con el metodo de string capitalize() mostramos el texto en mayusculas
@@ -106,11 +106,12 @@ def inmuebles(window, last_window):
                 print("Database connection established.")
                 cursor = conn.cursor()
                 sql = """
-                SELECT c.ci_contribuyente, c.nombres || ' ' || c.apellidos AS contribuyente, i.nom_inmueble, i.cod_catastral, i.uso, i.ubicacion, s.nom_sector AS sector
+                SELECT c.v_e || "-" || c.ci_contribuyente, c.nombres || ' ' || c.apellidos AS contribuyente, i.nom_inmueble, i.cod_catastral, i.uso, i.ubicacion, s.nom_sector AS sector
                 FROM inmuebles i
                 JOIN contribuyentes c ON i.id_contribuyente = c.id_contribuyente
                 JOIN sectores s ON i.id_sector = s.id_sector
                 WHERE i.uso = ?
+                ORDER BY c.ci_contribuyente ASC
                 """
                 cursor.execute(sql, (uso,))
                 results = cursor.fetchall()
@@ -205,7 +206,7 @@ def ifasignar(bottom_frame, top_frame2, window, last_window, window_title, comer
     busquedabtn = ctk.CTkButton(top_frame2, text="Buscar", font=poppins14bold, width=80, command=lambda: busca(busquedainm))
     busquedabtn.pack(padx=5, pady=5, side="right")
 
-    busquedainm = ctk.CTkEntry(top_frame2, placeholder_text="Buscar por cedula", font=poppins14bold, width=200)
+    busquedainm = ctk.CTkEntry(top_frame2, placeholder_text="Buscar por cédula", font=poppins14bold, width=200)
     busquedainm.pack(padx=5, pady=5, side="right")
 
     #############################################
@@ -218,7 +219,7 @@ def ifasignar(bottom_frame, top_frame2, window, last_window, window_title, comer
     inmueble = ctk.CTkEntry(inmueble_frame,placeholder_text="Nombre del Inmueble", font=poppins14bold, width=250)
     inmueble.pack(padx=5, pady=5, side="left")
 
-    inmueblecod = ctk.CTkEntry(inmueblecod_frame, placeholder_text="Codigo Catastral", font=poppins14bold, width=250)
+    inmueblecod = ctk.CTkEntry(inmueblecod_frame, placeholder_text="Código Catastral", font=poppins14bold, width=250)
     inmueblecod.pack(pady=5, padx=5, side="left")
     
     inmuebleubic = ctk.CTkEntry(ubic_frame, placeholder_text="Ubicación del inmueble", font=poppins14bold, width=250)
@@ -270,13 +271,13 @@ def ifasignar(bottom_frame, top_frame2, window, last_window, window_title, comer
 
     style = ttk.Style()
     style.configure("Custom.Treeview", font=("Poppins", 12), rowheight=25)  
-    style.configure("Custom.Treeview.Heading", font=("Poppins", 14, "bold")) 
+    style.configure("Custom.Treeview.Heading", font=("Poppins", 12, "bold")) 
 
     my_tree = ttk.Treeview(frame_tree, style="Custom.Treeview", show="headings")
     my_tree.pack(pady=10, padx=10, fill="both", expand=True)
     
 
-    my_tree['columns'] = ('ID', 'Nombre', 'Apellido', 'CI')
+    my_tree['columns'] = ('ID', 'Nombre', 'Apellido', 'Cédula')
     
     my_tree.column('ID', width=0, stretch=tk.NO)
     my_tree.heading('ID', text='', anchor='center')
@@ -471,7 +472,7 @@ def ifgestionar(window, bottom_frame, top_frame2, last_window, window_title, com
     busquedabtn = ctk.CTkButton(top_frame2, text="Buscar", font=poppins14bold, width=80, command=lambda: reload_treeviewsearch(my_tree, busquedainm))
     busquedabtn.pack(padx=5, pady=5, side="right")
 
-    busquedainm = ctk.CTkEntry(top_frame2, placeholder_text="Buscar por cedula", font=poppins14bold, width=200)
+    busquedainm = ctk.CTkEntry(top_frame2, placeholder_text="Buscar por cédula", font=poppins14bold, width=200)
     busquedainm.pack(padx=5, pady=5, side="right")
     ################################
 
@@ -483,7 +484,7 @@ def ifgestionar(window, bottom_frame, top_frame2, last_window, window_title, com
     labelcontri = ctk.CTkLabel(frameinformacion2, text="", font=poppins14bold)
     labelcontri.pack(pady=5, side="bottom")
 
-    contribuyenteci = ctk.CTkEntry(contribuyenteci_frame, placeholder_text="Cedula Contribuyente", font=poppins14bold, width=250)
+    contribuyenteci = ctk.CTkEntry(contribuyenteci_frame, placeholder_text="Cédula Contribuyente", font=poppins14bold, width=250)
     contribuyenteci.pack(pady=5, padx=5, side="left")
     #hide the contribuyenteci
     contribuyenteci.pack_forget()
@@ -498,10 +499,10 @@ def ifgestionar(window, bottom_frame, top_frame2, last_window, window_title, com
     
     #######################################
 
-    inmueble = ctk.CTkEntry(inmueble_frame, placeholder_text="Inmueble", font=poppins14bold, width=250)
+    inmueble = ctk.CTkEntry(inmueble_frame, placeholder_text="Nombre del Inmueble", font=poppins14bold, width=250)
     inmueble.pack(padx=5, pady=5, side="left")
 
-    inmueblecod = ctk.CTkEntry(inmueblecod_frame, placeholder_text="Codigo Catastral", font=poppins14bold, width=250)
+    inmueblecod = ctk.CTkEntry(inmueblecod_frame, placeholder_text="Código Catastral", font=poppins14bold, width=250)
     inmueblecod.pack(pady=5, padx=5, side="left")
     
     inmuebleubic = ctk.CTkEntry(ubic_frame, placeholder_text="Ubicación del inmueble", font=poppins14bold, width=250)
@@ -552,7 +553,7 @@ def ifgestionar(window, bottom_frame, top_frame2, last_window, window_title, com
         contribuyentenombre.configure(placeholder_text="")
 
         inmueble.delete(0, ctk.END)
-        inmueble.configure(placeholder_text="Inmueble")
+        inmueble.configure(placeholder_text=" Nombre del Inmueble")
 
         inmueblecod.delete(0, ctk.END)
         inmueblecod.configure(placeholder_text="Codigo Catastral")
@@ -617,7 +618,7 @@ def ifgestionar(window, bottom_frame, top_frame2, last_window, window_title, com
                 cursor = conn.cursor()
 
                 # Get id_contribuyente from contribuyentes table
-                cursor.execute("SELECT id_contribuyente FROM contribuyentes WHERE ci_contribuyente = ?", (new_values[0],))
+                cursor.execute("SELECT id_contribuyente FROM contribuyentes WHERE ci_contribuyente = ?", (new_values[0][2:],))
                 id_contribuyente = cursor.fetchone()[0]
 
                 # Get id_sector from sectores table
@@ -678,7 +679,7 @@ def ifgestionar(window, bottom_frame, top_frame2, last_window, window_title, com
 
     style = ttk.Style()
     style.configure("Custom.Treeview", font=("Poppins", 12), rowheight=25)
-    style.configure("Custom.Treeview.Heading", font=("Poppins", 14, "bold"))
+    style.configure("Custom.Treeview.Heading", font=("Poppins", 12, "bold"))
 
     my_tree = ttk.Treeview(frame_tree, style="Custom.Treeview", show="headings")
     my_tree.pack(pady=10, padx=10, fill="both", expand=True)
@@ -688,7 +689,7 @@ def ifgestionar(window, bottom_frame, top_frame2, last_window, window_title, com
     horizontal_scrollbar.pack(side="bottom", fill="x")
 
 
-    my_tree["columns"] = ("CI", "Contribuyente", "Inmueble", "Codigo Catastral", "Uso", "Ubicación","Sector")
+    my_tree["columns"] = ("Cédula", "Contribuyente", "Inmueble", "Código Catastral", "Uso", "Ubicación","Sector")
     for col in my_tree["columns"]:
         my_tree.heading(col, text=col.capitalize(), anchor="center")
         my_tree.column(col, anchor="center")
@@ -703,10 +704,11 @@ def reload_treeview(treeview):
         with connection() as conn:
             cursor = conn.cursor()
             sql = """
-            SELECT i.id_inmueble, c.ci_contribuyente, c.nombres || ' ' || c.apellidos AS contribuyente, i.nom_inmueble, i.cod_catastral, i.uso, i.ubicacion, s.nom_sector AS sector
+            SELECT i.id_inmueble, c.v_e || "-" || c.ci_contribuyente, c.nombres || ' ' || c.apellidos AS contribuyente, i.nom_inmueble, i.cod_catastral, i.uso, i.ubicacion, s.nom_sector AS sector
             FROM inmuebles i
             JOIN contribuyentes c ON i.id_contribuyente = c.id_contribuyente
             JOIN sectores s ON i.id_sector = s.id_sector
+            ORDER BY c.ci_contribuyente ASC
             """
             cursor.execute(sql)
             results = cursor.fetchall()
@@ -732,11 +734,12 @@ def reload_treeviewsearch(treeview, ci):
         with connection() as conn:
             cursor = conn.cursor()
             sql = ''' 
-            SELECT c.ci_contribuyente, c.nombres || ' ' || c.apellidos AS contribuyente, i.nom_inmueble, i.cod_catastral, i.uso, i.ubicacion, s.nom_sector AS sector
+            SELECT c.v_e || "-" || c.ci_contribuyente, c.nombres || ' ' || c.apellidos AS contribuyente, i.nom_inmueble, i.cod_catastral, i.uso, i.ubicacion, s.nom_sector AS sector
             FROM inmuebles i
             JOIN contribuyentes c ON i.id_contribuyente = c.id_contribuyente
             JOIN sectores s ON i.id_sector = s.id_sector
             WHERE c.ci_contribuyente = ?
+            ORDER BY c.ci_contribuyente ASC
             '''
             cursor.execute(sql, (ci_value,))
             results = cursor.fetchall()
