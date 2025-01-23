@@ -133,21 +133,21 @@ def ifasignar(bottom_frame, top_frame2, window, last_window, window_title):
 
         print(type(nombre.get()))
         print(type(apellido.get()))
-        # if type(nombre.get()) is not str:
-        #     messagebox.showinfo("Advertencia", "Debes introducir datos validos para el campo Nombre")
-        #     return
-        # elif type(apellido.get()) is not str:
-        #     messagebox.showinfo("Advertencia", "Debes introducir datos validos para el Apellido")
-        #     return
-        # elif type(cedula.get().strip()) is not int:
-        #     messagebox.showinfo("Advertencia", "Debes introducir datos validos para la Cedula")
-        #     return
-        # elif type(rif.get().strip()) is not int:
-        #     messagebox.showinfo("Advertencia", "Debes introducir datos validos para el RIF")
-        #     return
-        # elif type(telefono.get().strip()) is not int:
-        #     messagebox.showinfo("Advertencia", "Debes introducir datos validos para el número de telefono")
-        #     return
+        if not nombre.get().isalpha():
+            messagebox.showinfo("Advertencia", "Debes introducir datos válidos para el campo Nombre")
+            return
+        elif not apellido.get().isalpha():
+            messagebox.showinfo("Advertencia", "Debes introducir datos válidos para el Apellido")
+            return
+        elif not cedula.get().strip().isdigit():
+            messagebox.showinfo("Advertencia", "Debes introducir datos válidos para la Cédula")
+            return
+        elif not rif.get().strip().isdigit():
+            messagebox.showinfo("Advertencia", "Debes introducir datos válidos para el RIF")
+            return
+        elif not telefono.get().strip().isdigit():
+            messagebox.showinfo("Advertencia", "Debes introducir datos válidos para el número de teléfono")
+            return
         try:
             with connection() as conn:
                 cursor = conn.cursor()
@@ -355,17 +355,33 @@ def ifgestionar(bottom_frame, top_frame2, window, last_window, window_title):
             print(f"Error during database operation: {e}")
 
     def save_changes(cedula_entry, nombre_entry, apellido_entry, rif_entry, telefono_entry, correo_entry, cedula_indicator, rif_indicator):
-        
         selected_item = my_tree.selection()
         if selected_item:
             item = my_tree.item(selected_item)
             values = item['values']
             print(f"Selected item values: {values}")  # Debug print statement
-            
+
             if len(values) < 7:
                 print("Error: Selected item does not have enough values.")
                 return
-                
+
+            # Data validation
+            if not nombre_entry.get().isalpha():
+                messagebox.showinfo("Advertencia", "Debes introducir datos válidos para el campo Nombre")
+                return
+            elif not apellido_entry.get().isalpha():
+                messagebox.showinfo("Advertencia", "Debes introducir datos válidos para el Apellido")
+                return
+            elif not cedula_entry.get().strip().isdigit():
+                messagebox.showinfo("Advertencia", "Debes introducir datos válidos para la Cédula")
+                return
+            elif not rif_entry.get().strip().isdigit():
+                messagebox.showinfo("Advertencia", "Debes introducir datos válidos para el RIF")
+                return
+            elif not telefono_entry.get().strip().isdigit():
+                messagebox.showinfo("Advertencia", "Debes introducir datos válidos para el número de teléfono")
+                return
+
             try:
                 with connection() as conn:
                     cursor = conn.cursor()
