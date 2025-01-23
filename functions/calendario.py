@@ -14,7 +14,7 @@ def open_calendar_popup(entry_widget):
     poppins14bold = ("Poppins", 14, "bold")
 
 
-    poppins8bold = ("Poppins", 10)
+    poppins8bold = ("Poppins", 8)
     
     """Open a calendar popup to select a date."""
     calendar_popup = ctk.CTkToplevel()

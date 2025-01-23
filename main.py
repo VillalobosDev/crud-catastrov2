@@ -28,7 +28,7 @@ apply_color(color)
 
 window = ctk.CTk()
 window.title("Axio")
-window.geometry("680x720")
+window.geometry("1080x720")
 # window.configure(fg_color="black")
 
 
@@ -44,11 +44,11 @@ def close_after_timeout(root, timeout):
 #inmuebles(window, menu)
 #inmuebles(window, menu)
 #Este es para usuarios4
-# menu(window)
+menu(window)
 # inmuebles(window, menu)
 #inmuebles(window, menu)
 #Para iniciar desde el login, la contraseña es 1234
-login(window)
+#login(window)
 # liquidacion(window, menu)
 
 

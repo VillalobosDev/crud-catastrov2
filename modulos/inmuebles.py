@@ -48,6 +48,8 @@ def inmuebles(window, last_window):
 
     gestionarinm = ctk.CTkButton(top_frame2, text="Gestionar", command=lambda: ifgestionar(window, bottom_frame, top_frame2, last_window, window_title), font=poppins14bold)
     gestionarinm.pack(padx=5, pady=5, side="left")
+    
+    comer_rec=ctk.ctk
 
     refrescartabla = ctk.CTkButton(top_frame2, text="🔁", font=poppins14bold, width=30, command=lambda: loaddata())
     refrescartabla.pack(padx=5, pady=5, side="right")
