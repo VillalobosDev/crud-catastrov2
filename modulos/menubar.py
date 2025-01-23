@@ -75,25 +75,31 @@ def menubar(window):
     support_button.pack(side="left", padx=5, pady=5)
 
     # Botón "Salir"
-    exit_button = ctk.CTkButton(menubar_frame, text="Cerrar sesión", font=poppins12bold, width=100, hover_color="darkred",  command=lambda: logout(window))
+    exit_button = ctk.CTkButton(menubar_frame, text="Cerrar sesión", font=poppins12bold, width=100, hover_color="darkred", command=lambda: logout_and_login(window))
     exit_button.pack(side="right", padx=5, pady=5)
 
-    def logout(current_window):
+    def logout_and_login(current_window):
         from modulos.login_fun import login
-        current_window.destroy()
-        new_window = ctk.CTk()
-        new_window.configure(fg_color="black")
-        new_window.title("Axio")
-        new_window.geometry("1080x720")
-        centrar_ventana(new_window, 1080, 720)
         
-        login(new_window)
-        new_window.mainloop()
+        current_window.destroy()
 
+        window = ctk.CTk()
+        window.title("Axio")
+        window.geometry("1080x720")
+
+        centrar_ventana(window, 1080, 720)
+
+        login(window)
 
     # Ajustar el color del menubar según el modo
     set_menu_bar_color(menubar_frame, mode, menu_button, config_button, support_button, exit_button, window)
 
+    #def logout(window):
+    #    from modulos.login_fun import login
+    #    transition_to_next_ui(window, None, login, duration=4000)
+    
+    
+    
 def creditos(parent):
     poppins16 = ("Poppins", 16, "bold")
     poppins12bold = ("Poppins", 12, "bold")
@@ -105,6 +111,8 @@ def creditos(parent):
     config_window.geometry("700x400")
     config_window.grab_set()
     config_window.resizable(False, False)
+    config_window.grab_set()
+    config_window.resizable(False, False)
     centrar_ventana(config_window, 700, 400)
     
 
@@ -113,8 +121,6 @@ def creditos(parent):
 
     
 
-    
-    
     left_frame = ctk.CTkFrame(config_window, corner_radius=15)
     left_frame.pack(fill="y", side="left", pady=5, padx=5)
     
@@ -154,10 +160,12 @@ def creditos(parent):
     
     nombre4 = ctk.CTkLabel(left_frame, text="Hecho en Python y CustomTkinter :)", font=poppins10bold)
     nombre4.pack(pady=5, padx=20, side="left", anchor="s")
-    
 
 
-    
 
-    
+
+
+
+
+
 
