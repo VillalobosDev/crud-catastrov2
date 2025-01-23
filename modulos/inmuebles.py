@@ -14,8 +14,15 @@ def inmuebles(window, last_window):
     for widget in window.winfo_children():
         widget.destroy()
         
-
-
+    def toggle_columns():
+        if comer_rec.get():
+            my_tree["displaycolumns"] = ('CI', 'Contribuyente', 'Codigo Catastral', 'Uso', 'Ubicación', 'Sector')
+            comer_rec.configure(text="Recidencial")
+            loaddata("Recidencial")
+        else:
+            my_tree["displaycolumns"] = ('CI', 'Contribuyente', 'Inmueble', 'Codigo Catastral', 'Uso', 'Ubicación', 'Sector')
+            comer_rec.configure(text="Comercial")
+            loaddata("Comercial")
     
     poppins30bold = ("Poppins", 30, "bold")
     poppins20bold = ("Poppins", 20, "bold")
@@ -43,15 +50,16 @@ def inmuebles(window, last_window):
 
     #Contenido del top frame 2
 
-    crearinm = ctk.CTkButton(top_frame2, text="Asignar", command=lambda: ifasignar(bottom_frame, top_frame2, window, last_window, window_title), font=poppins14bold)
+    crearinm = ctk.CTkButton(top_frame2, text="Asignar", command=lambda: ifasignar(bottom_frame, top_frame2, window, last_window, window_title, comer_rec), font=poppins14bold)
     crearinm.pack(padx=5, pady=5, side="left")
 
-    gestionarinm = ctk.CTkButton(top_frame2, text="Gestionar", command=lambda: ifgestionar(window, bottom_frame, top_frame2, last_window, window_title), font=poppins14bold)
+    gestionarinm = ctk.CTkButton(top_frame2, text="Gestionar", command=lambda: ifgestionar(window, bottom_frame, top_frame2, last_window, window_title, comer_rec), font=poppins14bold)
     gestionarinm.pack(padx=5, pady=5, side="left")
     
-    comer_rec=ctk.ctk
+    comer_rec = ctk.CTkSwitch(top_frame2, text="Comerciales", font=poppins14bold, command=toggle_columns)
+    comer_rec.pack(padx=5, pady=5, side="left")
 
-    refrescartabla = ctk.CTkButton(top_frame2, text="🔁", font=poppins14bold, width=30, command=lambda: loaddata())
+    refrescartabla = ctk.CTkButton(top_frame2, text="🔁", font=poppins14bold, width=30, command=lambda: loaddata("Comercial"))
     refrescartabla.pack(padx=5, pady=5, side="right")
 
     busquedabtn = ctk.CTkButton(top_frame2, text="Buscar", font=poppins14bold, width=80, command=lambda: reload_treeviewsearch(my_tree, busquedainm))
@@ -60,29 +68,29 @@ def inmuebles(window, last_window):
     busquedainm = ctk.CTkEntry(top_frame2, placeholder_text="Buscar por cedula", font=poppins14bold, width=200)
     busquedainm.pack(padx=5, pady=5, side="right")
 
-    #Contenido del bottom frame
+    # Contenido del bottom frame
 
     treeframe = ctk.CTkFrame(bottom_frame, corner_radius=15)
     treeframe.pack(padx=5, pady=5, fill="both", expand=True)
-    
+
     # Creando el treeview para mostrar los registros
     frame_tree = ctk.CTkFrame(treeframe, fg_color='white', width=580, height=360)
-    frame_tree.pack(pady=10, padx=10, expand=True, fill="both")  
+    frame_tree.pack(pady=10, padx=10, expand=True, fill="both")
 
     style = ttk.Style()
-    style.configure("Custom.Treeview", font=("Poppins", 12), rowheight=25)  
-    style.configure("Custom.Treeview.Heading", font=("Poppins", 14, "bold")) 
+    style.configure("Custom.Treeview", font=("Poppins", 12), rowheight=25)
+    style.configure("Custom.Treeview.Heading", font=("Poppins", 14, "bold"))
 
     my_tree = ttk.Treeview(frame_tree, style="Custom.Treeview", show="headings")
     my_tree.pack(pady=10, padx=10, fill="both", expand=True)
-    
+
     horizontal_scrollbar = ttk.Scrollbar(frame_tree, orient="horizontal", command=my_tree.xview)
 
     my_tree.configure(xscrollcommand=horizontal_scrollbar.set)
 
     horizontal_scrollbar.pack(side="bottom", fill="x")
 
-    my_tree['columns'] = ('CI', 'Contribuyente', 'Inmueble','Codigo Catastral', 'Uso', 'Ubicación','Sector')
+    my_tree['columns'] = ('CI', 'Contribuyente', 'Inmueble', 'Codigo Catastral', 'Uso', 'Ubicación', 'Sector')
 
     for col in my_tree['columns']:
         my_tree.heading(col, text=col.capitalize(), anchor='center')  # Con el metodo de string capitalize() mostramos el texto en mayusculas
@@ -91,7 +99,8 @@ def inmuebles(window, last_window):
     canvas = ctk.CTkCanvas(frame_tree, width=0, height=0, highlightthickness=0, bg='white')
     canvas.pack()  # Posicionamos el canvas
     rectangle(canvas, 10, 10, 0, 0, r=5, fill='lightgray', outline='black')
-    def loaddata():    
+
+    def loaddata(uso="Comercial"):
         try:
             with connection() as conn:
                 print("Database connection established.")
@@ -101,10 +110,11 @@ def inmuebles(window, last_window):
                 FROM inmuebles i
                 JOIN contribuyentes c ON i.id_contribuyente = c.id_contribuyente
                 JOIN sectores s ON i.id_sector = s.id_sector
+                WHERE i.uso = ?
                 """
-                cursor.execute(sql)
+                cursor.execute(sql, (uso,))
                 results = cursor.fetchall()
-                
+
                 # Clear existing rows
                 for row in my_tree.get_children():
                     my_tree.delete(row)
@@ -114,16 +124,19 @@ def inmuebles(window, last_window):
                     my_tree.insert("", "end", values=row)
 
         except Exception as e:
-
             print(f"Error during database operation: {e}")
-    loaddata()
+
+    # Load initial data as "Comercial"
+    loaddata("Comercial")
     return window
 
-def ifasignar(bottom_frame, top_frame2, window, last_window, window_title):
+def ifasignar(bottom_frame, top_frame2, window, last_window, window_title, comer_rec):
     global busquedainm, busquedabtn, refrescartabla, id_contr
 
     if busquedabtn:
         busquedabtn.pack_forget()
+    if comer_rec:
+        comer_rec.pack_forget()
     if busquedainm:
         busquedainm.pack_forget()
     if refrescartabla:
@@ -395,7 +408,7 @@ def guardar_inmueble(inmueble, inmueblecod, uso, sector, id_contr, inmuebleubic,
 
         messagebox.showerror("Error", f"Error al guardar el inmueble: {e}")
         
-def ifgestionar(window, bottom_frame, top_frame2, last_window, window_title):
+def ifgestionar(window, bottom_frame, top_frame2, last_window, window_title, comer_rec):
     global busquedainm, busquedabtn, refrescartabla, id_contr
     
     window_title.configure(text="Gestion Inmuebles | Gestionar")
@@ -406,6 +419,8 @@ def ifgestionar(window, bottom_frame, top_frame2, last_window, window_title):
         busquedainm.pack_forget()
     if refrescartabla:
         refrescartabla.pack_forget()
+    if comer_rec:
+        comer_rec.pack_forget()
 
     poppins14bold = ("Poppins", 14, "bold")
 
@@ -449,7 +464,7 @@ def ifgestionar(window, bottom_frame, top_frame2, last_window, window_title):
     
 
     ################################
-    refrescartabla = ctk.CTkButton(top_frame2, text="🔁", font=poppins14bold, width=30, command=lambda: reload_treeview())
+    refrescartabla = ctk.CTkButton(top_frame2, text="🔁", font=poppins14bold, width=30, command=lambda: reload_treeview(my_tree))
     refrescartabla.pack(padx=5, pady=5, side="right")
 
 
