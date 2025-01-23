@@ -426,9 +426,25 @@ def bottom_treeview(frame):
     
     # Define the columns
     columns = [
-        'Inmueble', 'Codigo Catastral', 'Uso', 'Contribuyente', 'CI', 'RIF', 
-        'Telefono', 'Correo', 'Sector', 'Codigo del Sector', 
-        'Liquidacion ID', 'Monto 1', 'Monto 2', 'Fecha Liquidacion 1', 'Fecha Liquidacion 2'
+        'Contribuyente',
+        'Cedula',
+        'Sector', 
+        'Cod-Sector', 
+        'Cod-Catastral', 
+
+        'Fecha de Pago Solicitud', 
+        'Monto Liquidado Inmueble', 
+        'Monto Pago Derecho-Ocupacion', 
+        'Fecha de Pago Inmueble', 
+        
+        'Correo', 
+        'Sector', 
+        'Codigo del Sector', 
+        'Liquidacion ID', 
+        'Monto 1', 
+        'Monto 2', 
+        'Fecha Liquidacion 1', 
+        'Fecha Liquidacion 2'
     ]
     my_tree["columns"] = columns
 
@@ -442,21 +458,26 @@ def bottom_treeview(frame):
         with connection() as conn:
             cursor = conn.cursor()
             sql = ''' SELECT 
-            inmuebles.nom_inmueble,
-            inmuebles.cod_catastral,
-            inmuebles.uso,
             contribuyentes.nombres || ' ' || contribuyentes.apellidos AS contribuyente,
             contribuyentes.v_e || "-" || contribuyentes.ci_contribuyente AS cedula_completa,
+            sectores.nom_sector,
+            sectores.cod_sector,
+            inmuebles.cod_catastral,
+            liquidaciones.fecha_Liquidacion_1,
+            liquidaciones.monto_1,
+            liquidaciones.monto_2,
+            liquidaciones.fecha_Liquidacion_2,
+
+
+
+
+            inmuebles.nom_inmueble,
+            inmuebles.ubicacion,
+            inmuebles.uso,
             contribuyentes.j_c_g || "-" || contribuyentes.rif,
             contribuyentes.telefono,
             contribuyentes.correo,
-            sectores.nom_sector,
-            sectores.cod_sector,
             liquidaciones.id_liquidacion,
-            liquidaciones.monto_1,
-            liquidaciones.monto_2,
-            liquidaciones.fecha_Liquidacion_1,
-            liquidaciones.fecha_Liquidacion_2
         FROM
             inmuebles
         JOIN contribuyentes ON inmuebles.id_contribuyente = contribuyentes.id_contribuyente

@@ -22,7 +22,7 @@ def setup_treeview(frame):
     treeview = ttk.Treeview(frame, style="Custom.Treeview", show="headings")
     treeview.pack(pady=10, padx=10, fill="both", expand=True)
 
-    treeview["columns"] = ("CI", "Contribuyente", "Inmueble", "Monto 1", "Monto 2", "Fecha Liq 1", "Fecha Liq 2")
+    treeview["columns"] = ("CI", "Contribuyente", "Cod-Catastral", "Monto del Inm-Urbano", "Monto del Imp-Ocup", "Fecha de pago Info", "Fecha de pago Final")
     for col in treeview["columns"]:
         treeview.heading(col, text=col.capitalize(), anchor="center")
         treeview.column(col, anchor="center")
@@ -176,7 +176,14 @@ def load_liquidaciones_data(treeview):
         with connection() as conn:
             cursor = conn.cursor()
             sql = """
-            SELECT l.id_liquidacion,  c.v_e || "-" || c.ci_contribuyente AS cedula_completa, c.nombres || ' ' || c.apellidos AS contribuyente_nombre, i.nom_inmueble, l.monto_1, l.monto_2, l.fecha_Liquidacion_1, l.fecha_Liquidacion_2
+            SELECT l.id_liquidacion,
+            c.v_e || "-" || c.ci_contribuyente AS cedula_completa,
+            c.nombres || ' ' || c.apellidos AS contribuyente_nombre,
+            i.cod_catastral,
+            l.monto_1,
+            l.monto_2,
+            l.fecha_Liquidacion_1, 
+            l.fecha_Liquidacion_2
             FROM liquidaciones l
             JOIN inmuebles i ON l.id_inmueble = i.id_inmueble
             JOIN contribuyentes c ON l.id_contribuyente = c.id_contribuyente
@@ -585,7 +592,7 @@ def ifgestionar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold
 
             inmueble_menu.configure(values=inmuebles)
             if inmuebles:
-                inmueble_menu.set(inmuebles[0])
+                inmueble_menu.set(values[2])
             monto1.delete(0, tk.END)
             monto1.insert(0, values[3])
             monto2.delete(0, tk.END)
