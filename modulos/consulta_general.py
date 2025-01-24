@@ -15,24 +15,44 @@ search_filter_shown = False
 column_switch_shown = False
 search_filter_created = False
 column_switches_created = False
- 
+
+# Global variable to store the column order
+COLUMN_ORDER = [
+    'Contribuyente',
+    'Cedula',
+    'Sector',
+    'Cod-Sector',
+    'Cod-Catastral',
+    'Fecha de Pago Solicitud',
+    'Monto Liquidado Inmueble',
+    'Monto Derecho-Ocupacion',
+    'Fecha de Pago Inmueble',
+    'Inmueble',
+    'Ubicacion',
+    'Uso',
+    'RIF',
+    'Telefono',
+    'Correo',
+]
+#######
 
 # Global dictionary to store the switch states
 column_switch_states = {
-    'Inmueble': True,
-    'Codigo Catastral': True,
-    'Uso': True,
     'Contribuyente': True,
-    'CI': True,
-    'RIF': True,
-    'Telefono': True,
-    'Correo': True,
+    'Cedula': True,
     'Sector': True,
-    'Codigo del Sector': True,
+    'Cod-Sector': True,
+    'Cod-Catastral': True,
     'Fecha de Pago Solicitud': True,
     'Monto Liquidado Inmueble': True,
-    'Monto Derecho-Ocupación': True,
-    'Fecha de Pago Inmueble': True
+    'Monto Derecho-Ocupacion': True,
+    'Fecha de Pago Inmueble': True,
+    'Inmueble': True,
+    'Ubicacion': True,
+    'Uso': True,
+    'RIF': True,
+    'Telefono': True,
+    'Correo': True
 }
 
 def display_column_switches(top_frame4, treeview, original_data, window):
@@ -65,16 +85,16 @@ def display_column_switches(top_frame4, treeview, original_data, window):
 
     # Treeview columns
     columns = [
-        'Inmueble', 'Codigo Catastral', 'Uso', 'Contribuyente', 'CI', 'RIF', 
+        'Inmueble', 'Cod-Catastral', 'Uso', 'Contribuyente', 'CI', 'RIF', 
         'Telefono', 'Correo', 'Sector', 'Uso',
          
-        'Monto Liquidado Inmueble', 'Monto Derecho-Ocupación', 'Fecha de Pago Solicitud', 'Fecha de Pago Inmueble'
+        'Monto Liquidado Inmueble', 'Monto Derecho-Ocupacion', 'Fecha de Pago Solicitud', 'Fecha de Pago Inmueble'
     ]
 
     # Define a fixed width for all frames
     frame_width = 186.5
 
-    # Group 1: Inmueble, Codigo Catastral, Uso
+    # Group 1: Inmueble, Cod-Catastral, Uso
     group1_frame = ctk.CTkFrame(switches_frame, width=frame_width)
     group1_frame.pack(side="left", padx=5, pady=5, fill="y")
     group1_frame.pack_propagate(False)
@@ -82,7 +102,7 @@ def display_column_switches(top_frame4, treeview, original_data, window):
     text_1.pack(pady=10, side="top")
 
 
-    for col_name in ['Inmueble', 'Codigo Catastral', 'Uso']:
+    for col_name in ['Inmueble', 'Cod-Catastral', 'Uso']:
         switch = ctk.CTkSwitch(
             group1_frame,
             text=col_name,
@@ -106,7 +126,7 @@ def display_column_switches(top_frame4, treeview, original_data, window):
     text_2.pack(pady=10, side="top")
 
 
-    for col_name in ['Contribuyente', 'CI', 'RIF', 'Telefono', 'Correo']:
+    for col_name in ['Contribuyente', 'Cedula', 'RIF', 'Telefono', 'Correo']:
         switch = ctk.CTkSwitch(
             group2_frame,
             text=col_name,
@@ -130,7 +150,7 @@ def display_column_switches(top_frame4, treeview, original_data, window):
     text_3.pack(pady=10, side="top")
 
 
-    for col_name in ['Sector', 'Codigo del Sector']:
+    for col_name in ['Sector', 'Cod-Sector']:
         switch = ctk.CTkSwitch(
             group3_frame,
             text=col_name,
@@ -155,7 +175,7 @@ def display_column_switches(top_frame4, treeview, original_data, window):
 
     
 
-    for col_name in ['Fecha de Pago Solicitud', 'Monto Derecho-Ocupación', 'Fecha de Pago Solicitud', 'Fecha de Pago Inmueble']:
+    for col_name in ['Fecha de Pago Solicitud', 'Monto Liquidado Inmueble','Monto Derecho-Ocupacion',  'Fecha de Pago Inmueble']:
         switch = ctk.CTkSwitch(
             group4_frame,
             text=col_name,
@@ -323,7 +343,7 @@ def display_search_filter(frame, my_tree, original_data):
 
     switches = {}
     switch_labels = ["Cedula", "Nombre", "Sector", "Inmueble", "Rango Fecha"]
-    placeholders = ["Ingrese Cédula", "Ingrese Nombre", "Ingrese Sector", "Ingrese Inmueble", "Rango Fecha"]
+    placeholders = ["Ingrese Cedula", "Ingrese Nombre", "Ingrese Sector", "Ingrese Inmueble", "Rango Fecha"]
 
     for label, placeholder in zip(switch_labels, placeholders):
         switch = ctk.CTkSwitch(
@@ -338,13 +358,20 @@ def display_search_filter(frame, my_tree, original_data):
     search_filter_created = True
     return searchbtn
 
+
 def refresh_treeview(treeview, column_switches):
     # Clear the Treeview before updating with new data
     for item in treeview.get_children():
         treeview.delete(item)
 
     # Select columns that are marked as visible in the column_switches
-    selected_columns = [col for col, switch in column_switches.items() if switch.get() == 1]
+    selected_columns = []
+    for col in COLUMN_ORDER:
+        try:
+            if column_switches[col].get() == 1:
+                selected_columns.append(col)
+        except KeyError as e:
+            print(f"KeyError: {e} for column {col}")
     
     # If no columns are selected, show an error and stop the function
     if not selected_columns:
@@ -354,22 +381,17 @@ def refresh_treeview(treeview, column_switches):
     # Map the user-friendly column names to actual database fields
     db_columns = {
         'Contribuyente': "contribuyentes.nombres || ' ' || contribuyentes.apellidos",
-        'CI': 'contribuyentes.v_e || "-" || contribuyentes.ci_contribuyente',
-
+        'Cedula': 'contribuyentes.v_e || "-" || contribuyentes.ci_contribuyente',
         'Sector': 'sectores.nom_sector',
-        'Codigo del Sector': 'sectores.cod_sector',
-
-        'Codigo Catastral': 'inmuebles.cod_catastral',
-
+        'Cod-Sector': 'sectores.cod_sector',
+        'Cod-Catastral': 'inmuebles.cod_catastral',
         'Fecha de Pago Solicitud': 'liquidaciones.fecha_liquidacion_1',
         'Monto Liquidado Inmueble': 'liquidaciones.monto_1',
-        'Monto Derecho-Ocupación': 'liquidaciones.monto_2',
+        'Monto Derecho-Ocupacion': 'liquidaciones.monto_2',
         'Fecha de Pago Inmueble': 'liquidaciones.fecha_liquidacion_2',
-
         'Inmueble': 'inmuebles.nom_inmueble',
-        'Inmueble': 'inmuebles.ubicacion',
+        'Ubicacion': 'inmuebles.ubicacion',
         'Uso': 'inmuebles.uso',
-
         'RIF': 'contribuyentes.j_c_g || "-" || contribuyentes.rif',
         'Telefono': 'contribuyentes.telefono',
         'Correo': 'contribuyentes.correo',
@@ -382,7 +404,7 @@ def refresh_treeview(treeview, column_switches):
     query = f"SELECT {', '.join(selected_db_columns)} FROM inmuebles " \
             f"JOIN contribuyentes ON inmuebles.id_contribuyente = contribuyentes.id_contribuyente " \
             f"JOIN sectores ON inmuebles.id_sector = sectores.id_sector " \
-            f"JOIN liquidaciones ON inmuebles.id_inmueble = liquidaciones.id_inmueble"
+            f"JOIN liquidaciones ON inmuebles.id_inmueble = liquidaciones.id_inmueble ORDER BY ci_contribuyente ASC"
 
     print(f"Executing Query: {query}")  # Debugging: Show the query being executed
     
@@ -390,9 +412,8 @@ def refresh_treeview(treeview, column_switches):
             
     for col in selected_columns:
         treeview.heading(col, text=col)
-        # print(f"Setting width for column {col} to 200")
+        print(f"Setting width for column {col} to 200")
         treeview.column(col, anchor="center")
-
 
     # Try to fetch the data from the database
     try:
@@ -410,7 +431,7 @@ def refresh_treeview(treeview, column_switches):
     except Exception as e:
         print(f"Error during query execution: {e}")
 
-# Asegúrate de llamar a esta función después de configurar las columnas en el Treeview
+
 def bottom_treeview(frame):
     # Treeview frame
     treeframe = ctk.CTkFrame(frame, corner_radius=15)
@@ -421,45 +442,21 @@ def bottom_treeview(frame):
     frame_tree.pack(pady=10, padx=10, expand=True, fill="both")
 
     style = ttk.Style()
-    style.configure("Custom.Treeview", font=("Poppins", 12), rowheight=25)  
-    style.configure("Custom.Treeview.Heading", font=("Poppins", 12, "bold")) 
+    style.configure("Custom.Treeview", font=("Poppins", 12), rowheight=25)
+    style.configure("Custom.Treeview.Heading", font=("Poppins", 12, "bold"))
 
     my_tree = ttk.Treeview(frame_tree, style="Custom.Treeview", show="headings")
     my_tree.pack(pady=10, padx=10, fill="both", expand=True)
 
-    ################SCROLLBAR X
+    # Scrollbar
     horizontal_scrollbar = ttk.Scrollbar(frame_tree, orient="horizontal", command=my_tree.xview)
     my_tree.configure(xscrollcommand=horizontal_scrollbar.set)
     horizontal_scrollbar.pack(side="bottom", fill="x")
-    
-    # Define the columns
-    columns = [
 
-        'Contribuyente',
-        'Cédula',
+    # Use the global COLUMN_ORDER variable
+    my_tree["columns"] = COLUMN_ORDER
 
-        'Sector', 
-        'Cod-Sector', 
-
-        'Cod-Catastral', 
-
-        'Fecha de Pago Solicitud', 
-        'Monto Liquidado Inmueble', 
-        'Monto Derecho-Ocupación', 
-        'Fecha de Pago Inmueble', 
-        
-        'Inmueble', 
-        'Ubicación', 
-        'Uso',
-         
-        'RIF',
-        'Teléfono',
-        'Correo',
-
-    ]
-    my_tree["columns"] = columns
-
-    for col in columns:
+    for col in COLUMN_ORDER:
         my_tree.heading(col, text=col)
         my_tree.column(col, anchor="center", width=200)
 
@@ -469,46 +466,32 @@ def bottom_treeview(frame):
         with connection() as conn:
             cursor = conn.cursor()
             sql = ''' SELECT 
-
             contribuyentes.nombres || ' ' || contribuyentes.apellidos AS contribuyente,
             contribuyentes.v_e || "-" || contribuyentes.ci_contribuyente AS cedula_completa,
-            
             sectores.nom_sector,
             sectores.cod_sector,
-
             inmuebles.cod_catastral,
-
             liquidaciones.fecha_Liquidacion_1,
             liquidaciones.monto_1,
             liquidaciones.monto_2,
             liquidaciones.fecha_Liquidacion_2,
-
-
-
-
             inmuebles.nom_inmueble,
             inmuebles.ubicacion,
             inmuebles.uso,
-
             contribuyentes.j_c_g || "-" || contribuyentes.rif,
             contribuyentes.telefono,
             contribuyentes.correo
-
-        FROM
-
+            FROM
             inmuebles
-        
-        JOIN contribuyentes ON inmuebles.id_contribuyente = contribuyentes.id_contribuyente
-        JOIN sectores ON inmuebles.id_sector = sectores.id_sector
-        JOIN liquidaciones ON inmuebles.id_inmueble = liquidaciones.id_inmueble 
-        ORDER BY contribuyentes.ci_contribuyente ASC
-        '''
+            JOIN contribuyentes ON inmuebles.id_contribuyente = contribuyentes.id_contribuyente
+            JOIN sectores ON inmuebles.id_sector = sectores.id_sector
+            JOIN liquidaciones ON inmuebles.id_inmueble = liquidaciones.id_inmueble 
+            ORDER BY contribuyentes.ci_contribuyente ASC
+            '''
             cursor.execute(sql)
             original_data = cursor.fetchall()
 
             print(f"Fetched {len(original_data)} rows from the database.")
-            # for row in original_data:
-            #     print(row) 
 
             # Insert all data into Treeview initially
             for row in original_data:
@@ -519,15 +502,14 @@ def bottom_treeview(frame):
 
     return my_tree, original_data  # Return both my_tree and original_data
 
-
 def cedula_search(my_tree, original_data, cedula_entry):
-    """Filter treeview data based on Cédula."""
+    """Filter treeview data based on Cedula."""
     cedula_value = cedula_entry.get().strip()
     if not cedula_value:
-        print("Cédula field is empty.")
+        print("Cedula field is empty.")
         return
 
-    # Filter the data based on the entered Cédula value
+    # Filter the data based on the entered Cedula value
     filtered_data = [row for row in original_data if cedula_value in str(row[4])]  # Assuming CI (index 4) matches
 
     # Update Treeview
