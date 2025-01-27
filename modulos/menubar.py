@@ -71,7 +71,7 @@ def menubar(window):
     config_button.pack(side="left", padx=5, pady=5)
 
     # Botón "Soporte"
-    support_button = ctk.CTkButton(menubar_frame, text="Soporte", font=poppins12bold, width=100, hover_color="gray", command=lambda: print("Soporte clicked"))
+    support_button = ctk.CTkButton(menubar_frame, text="Soporte", font=poppins12bold, width=100, hover_color="gray", command=lambda: soporte(window))
     support_button.pack(side="left", padx=5, pady=5)
 
     # Botón "Salir"
@@ -98,11 +98,7 @@ def menubar(window):
         window.mainloop()
 
     set_menu_bar_color(menubar_frame, mode, menu_button, config_button, support_button, exit_button, window)
-
-
-    
-    
-    
+  
 def creditos(parent):
     poppins16 = ("Poppins", 16, "bold")
     poppins12bold = ("Poppins", 12, "bold")
@@ -115,12 +111,6 @@ def creditos(parent):
     config_window.grab_set()
     config_window.resizable(False, False)
     centrar_ventana(config_window, 700, 400)
-    
-
-    
-    
-
-    
 
     left_frame = ctk.CTkFrame(config_window, corner_radius=15)
     left_frame.pack(fill="y", side="left", pady=5, padx=5)
@@ -161,6 +151,69 @@ def creditos(parent):
     
     nombre4 = ctk.CTkLabel(left_frame, text="Hecho en Python y CustomTkinter :)", font=poppins10bold)
     nombre4.pack(pady=5, padx=20, side="left", anchor="s")
+
+
+
+def soporte(parent):
+    poppins16 = ("Poppins", 16, "bold")
+    poppins12bold = ("Poppins", 12, "bold")
+    poppins10bold = ("Poppins", 10, "bold")
+    poppins14bold = ("Poppins", 14, "bold")
+    
+    sopor_window = ctk.CTkToplevel(parent)
+    sopor_window.title("Soporte")
+    sopor_window.geometry("700x400")
+    sopor_window.grab_set()
+    sopor_window.resizable(False, False)
+    centrar_ventana(sopor_window, 700, 400)
+    
+
+    
+    
+    left_frame = ctk.CTkFrame(sopor_window, corner_radius=15, width=300, height=400)
+    left_frame.pack(side="left", pady=5, padx=5)
+    left_frame.pack_propagate(False)
+    
+    botonatras=ctk.CTkButton(sopor_window, text="Atrás", font=poppins12bold, command=sopor_window.destroy)
+    botonatras.pack(pady=10, padx=10, side="bottom", anchor="e")  
+    
+      
+    text_top=ctk.CTkLabel(left_frame, text="Contactos", font=poppins16)
+    text_top.pack(pady=10, padx=10)
+    
+    text_con=ctk.CTkLabel(left_frame, text="• Correo: Axio@gmail.com", font=poppins14bold)
+    text_con.pack(pady=10, padx=10, anchor="w")
+    
+    text_con2=ctk.CTkLabel(left_frame, text="• Número: 0424-9691-737", font=poppins14bold)
+    text_con2.pack(pady=10, padx=10, anchor="w")
+    
+    
+    right_frame=ctk.CTkFrame(sopor_window, corner_radius=15, width=400, height=165)
+    right_frame.pack(anchor="ne", pady=5, padx=5)
+    right_frame.pack_propagate(False)
+    
+    manual_user=ctk.CTkButton(right_frame, text="Manual de Usuario", font=poppins12bold, command=abrir_manual_usuario)
+    manual_user.pack(anchor="center", pady=65)
+    
+    right_frame2=ctk.CTkFrame(sopor_window, corner_radius=15, width=400, height=165)
+    right_frame2.pack(anchor="se", pady=5, padx=5)
+    right_frame2.pack_propagate(False)
+    
+    manual_user2=ctk.CTkButton(right_frame2, text="Manual de Sistema", font=poppins12bold)
+    manual_user2.pack(anchor="center", pady=65)
+    
+import os
+import webbrowser
+
+def abrir_manual_usuario():
+    # Obtener la ruta absoluta del archivo PDF basado en la ubicación del script actual
+    ruta_base = os.path.dirname(os.path.abspath(__file__))
+    ruta_pdf = os.path.join(ruta_base, "../assets/manual_usuario.pdf")
+    ruta_pdf = os.path.abspath(ruta_pdf)  # Convertir a ruta absoluta
+
+    # Abrir el archivo PDF en el navegador
+    webbrowser.open(f"file:///{ruta_pdf}")
+    
 
 
 

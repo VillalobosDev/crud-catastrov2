@@ -3,6 +3,7 @@ from PIL import Image, ImageTk
 import customtkinter as ctk
 from modulos.menu import menu
 from modulos2.menu import menu2
+from modulos.menubar import soporte
 from config.config import centrar_ventana
 import json
 
@@ -60,7 +61,7 @@ def login(window):
         btn_cerrar=ctk.CTkButton(frame_login, text="❌", font=poppins14bold, width=50, command=window.destroy)
         btn_cerrar.pack(pady=5, padx=5, side="right", anchor="s")
         
-        btn_soporte=ctk.CTkButton(frame_login, text="📞", font=poppins14bold, width=50)
+        btn_soporte=ctk.CTkButton(frame_login, text="📞", font=poppins14bold, width=50, command=lambda: soporte(window))
         btn_soporte.pack(pady=5, padx=5, side="right", anchor="s")
  
 
