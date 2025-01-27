@@ -9,7 +9,7 @@ from modulos.liquidacion import liquidacion
 from modulos.contribuyentes import contribuyentes
 from modulos.sectores import sectores
 from modulos2.menu import menu2
-from modulos2.consulta_general import consulta
+# from modulos2.consulta_general import consulta
 # from modulos2.liquidacion import liquidacion
 # from modulos2.contribuyentes import contribuyentes
 from modulos2.sectores import sectores
@@ -42,15 +42,17 @@ def close_after_timeout(root, timeout):
 
 
 
-#inmuebles(window, menu)
-#inmuebles(window, menu)
 #Este es para usuarios4
-menu(window)
-# inmuebles(window, menu)
+
+# menu(window)
+
 #inmuebles(window, menu)
+
 #Para iniciar desde el login, la contraseña es 1234
-#login(window)
+# login(window)
+
 # liquidacion(window, menu)
+consulta(window, menu)
 
 
 window.mainloop()
