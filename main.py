@@ -49,10 +49,10 @@ def close_after_timeout(root, timeout):
 #inmuebles(window, menu)
 
 #Para iniciar desde el login, la contraseña es 1234
-# login(window)
+login(window)
 
 # liquidacion(window, menu)
-consulta(window, menu)
+# consulta(window, menu)
 
 
 window.mainloop()
