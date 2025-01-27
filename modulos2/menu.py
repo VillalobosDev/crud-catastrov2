@@ -1,6 +1,6 @@
 import customtkinter as ctk
 import tkinter as tk
-from modulos.menubar import menubar
+from modulos2.menubar import menubar
 from modulos2.contribuyentes import contribuyentes
 from modulos2.inmuebles import inmuebles
 from modulos2.liquidacion import liquidacion
@@ -36,7 +36,7 @@ def menu2(window):
     salir_btn = ctk.CTkButton(top_frame, text="Salir", command=window.quit, font=poppins20bold)
     salir_btn.pack(padx=10, pady=10, side="left")
 
-    window_title = ctk.CTkLabel(top_frame, text="Sistema de Gestion Catastral", font=poppins30bold)
+    window_title = ctk.CTkLabel(top_frame, text="Sistema de Gestion Catastral | Usuario", font=poppins30bold)
     window_title.pack(padx=10, pady=10, side="left")
 
 
@@ -47,13 +47,13 @@ def menu2(window):
 
     inmuebles_btn = ctk.CTkButton(left_frame, text="Inmuebles", command=lambda: inmuebles(window, menu2), width=190, font=poppins20bold)
     inmuebles_btn.pack(pady=30, padx=50, anchor="center", expand=True)
-
-    sector_btn = ctk.CTkButton(left_frame, text="Sectores", command=lambda: sectores(window, menu2), width=190, font=poppins20bold)
-    sector_btn.pack(pady=30, padx=50, anchor="center", expand=True)
-    
+ 
     liquidacion_btn = ctk.CTkButton(left_frame, text="Liquidación", command=lambda: liquidacion(window, menu2), width=190, font=poppins20bold)
     liquidacion_btn.pack(pady=30, padx=50, anchor="center", expand=True)
     
+    sector_btn = ctk.CTkButton(left_frame, text="Sectores", command=lambda: sectores(window, menu2), width=190, font=poppins20bold)
+    sector_btn.pack(pady=30, padx=50, anchor="center", expand=True)   
+     
     consulta_btn = ctk.CTkButton(left_frame, text="Consultar", command=lambda: consulta(window, menu2), width=190, font=poppins20bold)
     consulta_btn.pack(pady=30, padx=50, anchor="center", expand=True)
 

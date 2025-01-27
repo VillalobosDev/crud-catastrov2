@@ -321,7 +321,7 @@ def crear_arbol_inmuebles(parent_frame, sector_id):
     inmuebles_tree.configure(xscrollcommand=horizontal_scrollbar.set)
     horizontal_scrollbar.pack(side="bottom", fill="x")
 
-    inmuebles_tree['columns'] = ('Nombre inmueble', 'Codigo catastral', 'Uso')
+    inmuebles_tree['columns'] = ('Ubicación', 'Codigo catastral', 'Uso')
     for col in inmuebles_tree['columns']:
         inmuebles_tree.heading(col, text=col.capitalize(), anchor='center')
         inmuebles_tree.column(col, anchor='center')
@@ -330,7 +330,7 @@ def crear_arbol_inmuebles(parent_frame, sector_id):
         with connection() as conn:
             cursor = conn.cursor()
             cursor.execute("""
-                SELECT nom_inmueble, cod_catastral, uso 
+                SELECT ubicacion, cod_catastral, uso 
                 FROM inmuebles 
                 WHERE id_sector = ?
             """, (sector_id,))
