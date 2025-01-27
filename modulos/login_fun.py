@@ -41,8 +41,8 @@ def login(window):
         overlay_frame.place(x=0, y=0, anchor="nw")
         overlay_frame.pack_propagate(False)
 
-        frame_login = ctk.CTkFrame(overlay_frame, corner_radius=15, width=380, height=580)
-        frame_login.pack(pady=10, padx=10)
+        frame_login = ctk.CTkFrame(overlay_frame, corner_radius=15, width=395, height=595)
+        frame_login.pack(pady=5, padx=5)
         frame_login.pack_propagate(False)
     
     
@@ -57,10 +57,10 @@ def login(window):
         login_frame(frame_contenedor, window)
         
         
-        btn_cerrar=ctk.CTkButton(frame_login, text="Salir", font=poppins14bold, command=window.destroy)
-        btn_cerrar.pack(pady=5, padx=5, side="left", anchor="s")
+        btn_cerrar=ctk.CTkButton(frame_login, text="❌", font=poppins14bold, width=50, command=window.destroy)
+        btn_cerrar.pack(pady=5, padx=5, side="right", anchor="s")
         
-        btn_soporte=ctk.CTkButton(frame_login, text="Soporte", font=poppins14bold)
+        btn_soporte=ctk.CTkButton(frame_login, text="📞", font=poppins14bold, width=50)
         btn_soporte.pack(pady=5, padx=5, side="right", anchor="s")
  
 
