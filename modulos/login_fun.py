@@ -10,13 +10,30 @@ import json
 
 
 
+def cargar_img_axio(frame_login):
+    
+    try:
+        # Cargar la imagen desde la carpeta assets
+        imagen = Image.open("assets/axio_claro.png")
+        imagendark = Image.open("assets/axio_oscuro.png")
 
+        imagen_tk = ctk.CTkImage(light_image=imagen, dark_image=imagendark, size=(100,130))
+
+        # Crear un Label para mostrar la imagen
+        label_imagen = ctk.CTkLabel(frame_login, image=imagen_tk, text="")
+        label_imagen.image = imagen_tk  # Guardar una referencia de la imagen para evitar que sea recolectada por el garbage collector
+        label_imagen.pack(pady=30, side="top")
+
+    except Exception as e:
+        print(f"Error al cargar la imagen: {e}")
+
+    
 
 def login(window):
     
     poppins14bold = ("Poppins", 12, "bold")
     poppins18bold = ("Poppins", 14, "bold")
-    poppins20bold = ("Poppins", 20, "bold")
+    poppins20bold = ("Poppins", 24, "bold")
     poppins10 = ("Poppins", 10, "bold")
     
     for widget in window.winfo_children():
@@ -41,19 +58,21 @@ def login(window):
         overlay_frame = ctk.CTkFrame(window, width=400, height=600)
         overlay_frame.place(x=0, y=0, anchor="nw")
         overlay_frame.pack_propagate(False)
+    
 
         frame_login = ctk.CTkFrame(overlay_frame, corner_radius=15, width=395, height=595)
         frame_login.pack(pady=5, padx=5)
         frame_login.pack_propagate(False)
     
     
-
+        cargar_img_axio(frame_login)
+        
         text_inicio = ctk.CTkLabel(frame_login, text="Axio", font=poppins20bold)
-        text_inicio.pack(pady=10, anchor="center", expand=True)
+        text_inicio.pack(pady=1, side="top")
         
 
         frame_contenedor = ctk.CTkFrame(frame_login, corner_radius=15)
-        frame_contenedor.pack(padx=5, pady=5, expand=True, anchor="n")
+        frame_contenedor.pack(padx=20, pady=5, expand=True, anchor="n")
 
         login_frame(frame_contenedor, window)
         
