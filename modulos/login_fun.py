@@ -188,7 +188,7 @@ def check(entry, window, left_frame):
             new_window = ctk.CTk()
             new_window.title("Axio")
             new_window.geometry("1080x720")
-            new_window.iconbitmap(r"C:/Github/crud-catastrov2/assets/axiow.ico")
+            new_window.iconbitmap(r"assets/axiow.ico")
             centrar_ventana(new_window, 1080, 720)
 
             menu(new_window)
@@ -212,7 +212,7 @@ def check2(entry, window, left_frame):
             new_window = ctk.CTk()
             new_window.title("Axio")
             new_window.geometry("1080x720")
-            new_window.iconbitmap(r"C:/Github/crud-catastrov2/assets/axiow.ico")
+            new_window.iconbitmap(r"assets/axiow.ico")
             centrar_ventana(new_window, 1080, 720)
 
             menu2(new_window)

@@ -772,10 +772,6 @@ def export_treeview_to_xlsx(treeview, filename):
     workbook.save(filename)
     print(f"Data exported to {filename} successfully.")
     
-    
-    
-    
-
 def refresh(my_tree):
 
 
