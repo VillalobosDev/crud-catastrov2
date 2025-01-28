@@ -91,6 +91,7 @@ def menubar(window):
         window.title("Axio")
         window.geometry("1000x600")
         window.resizable(False, False)
+        window.iconbitmap(r"C:/Github/crud-catastrov2/assets/axiow.ico")
         centrar_ventana(window, 1000, 600)
 
         # Llamar a la función login con la nueva ventana

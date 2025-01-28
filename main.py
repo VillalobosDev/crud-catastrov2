@@ -29,16 +29,14 @@ apply_color(color)
 window = ctk.CTk()
 window.title("Axio")
 window.geometry("1080x720")
-
+window.iconbitmap(r"C:/Github/crud-catastrov2/assets/axiow.ico")
 # window.configure(fg_color="black")
 
 
 
 centrar_ventana(window, 1080, 720)
 
-def close_after_timeout(root, timeout):
-    """Close the window after a specified timeout (in milliseconds)."""
-    root.after(timeout, root.destroy)
+
 
 
 
