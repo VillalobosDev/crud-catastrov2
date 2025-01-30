@@ -133,21 +133,21 @@ def ifasignar(bottom_frame, top_frame2, window, last_window, window_title):
 
         print(type(nombre.get()))
         print(type(apellido.get()))
-        if not nombre.get().isalpha():
-            messagebox.showinfo("Advertencia", "Debes introducir datos válidos para el campo Nombre")
-            return
-        elif not apellido.get().isalpha():
-            messagebox.showinfo("Advertencia", "Debes introducir datos válidos para el Apellido")
-            return
-        elif not cedula.get().strip().isdigit():
-            messagebox.showinfo("Advertencia", "Debes introducir datos válidos para la Cédula")
-            return
-        elif not rif.get().strip().isdigit():
-            messagebox.showinfo("Advertencia", "Debes introducir datos válidos para el RIF")
-            return
-        elif not telefono.get().strip().isdigit():
-            messagebox.showinfo("Advertencia", "Debes introducir datos válidos para el número de teléfono")
-            return
+        # if not nombre.get().isalpha():
+        #     messagebox.showinfo("Advertencia", "Debes introducir datos válidos para el campo Nombre")
+        #     return
+        # elif not apellido.get().isalpha():
+        #     messagebox.showinfo("Advertencia", "Debes introducir datos válidos para el Apellido")
+        #     return
+        # elif not cedula.get().strip().isdigit():
+        #     messagebox.showinfo("Advertencia", "Debes introducir datos válidos para la Cédula")
+        #     return
+        # elif not rif.get().strip().isdigit():
+        #     messagebox.showinfo("Advertencia", "Debes introducir datos válidos para el RIF")
+        #     return
+        # elif not telefono.get().strip().isdigit():
+        #     messagebox.showinfo("Advertencia", "Debes introducir datos válidos para el número de teléfono")
+        #     return
         try:
             with connection() as conn:
                 cursor = conn.cursor()
@@ -361,26 +361,26 @@ def ifgestionar(bottom_frame, top_frame2, window, last_window, window_title):
             values = item['values']
             print(f"Selected item values: {values}")  # Debug print statement
 
-            if len(values) < 7:
-                print("Error: Selected item does not have enough values.")
-                return
+            # if len(values) < 7:
+            #     print("Error: Selected item does not have enough values.")
+            #     return
 
-            # Data validation
-            if not nombre_entry.get().isalpha():
-                messagebox.showinfo("Advertencia", "Debes introducir datos válidos para el campo Nombre")
-                return
-            elif not apellido_entry.get().isalpha():
-                messagebox.showinfo("Advertencia", "Debes introducir datos válidos para el Apellido")
-                return
-            elif not cedula_entry.get().strip().isdigit():
-                messagebox.showinfo("Advertencia", "Debes introducir datos válidos para la Cédula")
-                return
-            elif not rif_entry.get().strip().isdigit():
-                messagebox.showinfo("Advertencia", "Debes introducir datos válidos para el RIF")
-                return
-            elif not telefono_entry.get().strip().isdigit():
-                messagebox.showinfo("Advertencia", "Debes introducir datos válidos para el número de teléfono")
-                return
+            # # Data validation
+            # if not nombre_entry.get().isalpha():
+            #     messagebox.showinfo("Advertencia", "Debes introducir datos válidos para el campo Nombre")
+            #     return
+            # elif not apellido_entry.get().isalpha():
+            #     messagebox.showinfo("Advertencia", "Debes introducir datos válidos para el Apellido")
+            #     return
+            # elif not cedula_entry.get().strip().isdigit():
+            #     messagebox.showinfo("Advertencia", "Debes introducir datos válidos para la Cédula")
+            #     return
+            # elif not rif_entry.get().strip().isdigit():
+            #     messagebox.showinfo("Advertencia", "Debes introducir datos válidos para el RIF")
+            #     return
+            # elif not telefono_entry.get().strip().isdigit():
+            #     messagebox.showinfo("Advertencia", "Debes introducir datos válidos para el número de teléfono")
+            #     return
 
             try:
                 with connection() as conn:
