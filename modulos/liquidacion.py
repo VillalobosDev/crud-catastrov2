@@ -136,41 +136,111 @@ def liqui_info(data):
     fecha_liq2_value.pack(padx=10, pady=5, anchor="w")
     
 
+def reload_treeviewsearch2(treeview, ci_contribuyente):
+    ci = ci_contribuyente.get().strip()
+    if not ci:
+        messagebox.showerror('Error en la búsqueda', 'Debe ingresar un dato en el campo cédula')
+        print("Cedula field is empty.")
+        ci_contribuyente.delete(0, tk.END)
+        load_liquidaciones_data2(treeview)
+        return
+    elif not ci.isdigit():
+        messagebox.showerror('Error en la búsqueda', 'Debe ingresar un dato válido en el campo cédula')
+        ci_contribuyente.delete(0, tk.END)
+        load_liquidaciones_data2(treeview)
+        return
+
+    # Print headers of the tree
+    headers = treeview["columns"]
+    print("Tree Headers:", headers)
+
+    # Print data in the tree
+    tree_data = []
+    for item in treeview.get_children():
+        tree_data.append(treeview.item(item)["values"])
+    print("Tree Data:", tree_data)
+
+    # Find the index of the Cedula column in the tree headers
+    try:
+        cedula_index = headers.index('Cédula')
+    except ValueError:
+        print("Cedula column not found in tree headers.")
+        messagebox.showerror('Error en la búsqueda', 'No se encontró el campo Cédula en la tabla de resultados')
+        ci_contribuyente.delete(0, tk.END)
+        load_liquidaciones_data2(treeview)
+        return
+
+    # Filter the data based on the entered Cedula value
+    filtered_data = [row for row in tree_data if ci in str(row[cedula_index])]
+    if not filtered_data:
+        messagebox.showerror('Error en la búsqueda', 'No se encontraron resultados para la cédula ingresada')
+        ci_contribuyente.delete(0, tk.END)
+        print(treeview)
+        load_liquidaciones_data2(treeview)
+        return
+    # Print filtered data
+    print("Filtered Data:", filtered_data)
+
+    # Update Treeview
+    fetch_all_records(treeview, filtered_data)
+
+
 def reload_treeviewsearch(treeview, ci_contribuyente):
-    ci_contribuyente = ci_contribuyente.get()
-    if not ci_contribuyente:
-        messagebox.showwarning("Advertencia", "Por favor ingrese una cedula para buscar.")
+    ci = ci_contribuyente.get().strip()
+    if not ci:
+        messagebox.showerror('Error en la búsqueda', 'Debe ingresar un dato en el campo cédula')
+        print("Cedula field is empty.")
+        ci_contribuyente.delete(0, tk.END)
+        load_liquidaciones_data(treeview)
+        return
+    elif not ci.isdigit():
+        messagebox.showerror('Error en la búsqueda', 'Debe ingresar un dato válido en el campo cédula')
+        ci_contribuyente.delete(0, tk.END)
         load_liquidaciones_data(treeview)
         return
 
+    # Print headers of the tree
+    headers = treeview["columns"]
+    print("Tree Headers:", headers)
+
+    # Print data in the tree
+    tree_data = []
+    for item in treeview.get_children():
+        tree_data.append(treeview.item(item)["values"])
+    print("Tree Data:", tree_data)
+
+    # Find the index of the Cedula column in the tree headers
     try:
-        with connection() as conn:
-            cursor = conn.cursor()
-            sql = ''' 
-            SELECT  l.id_liquidacion, c.v_e || "-" || c.ci_contribuyente, c.nombres || ' ' || c.apellidos AS contribuyente_nombre, i.nom_inmueble, l.monto_1, l.monto_2, l.fecha_Liquidacion_1, l.fecha_Liquidacion_2
-            FROM liquidaciones l
-            JOIN inmuebles i ON l.id_inmueble = i.id_inmueble
-            JOIN contribuyentes c ON l.id_contribuyente = c.id_contribuyente
-            WHERE c.ci_contribuyente = ?
-            ORDER BY c.ci_contribuyente ASC
-            '''
-            cursor.execute(sql, (ci_contribuyente,))
-            results = cursor.fetchall()
+        cedula_index = headers.index('Cédula')
+    except ValueError:
+        print("Cedula column not found in tree headers.")
+        messagebox.showerror('Error en la búsqueda', 'No se encontró el campo Cédula en la tabla de resultados')
+        ci_contribuyente.delete(0, tk.END)
+        load_liquidaciones_data(treeview)
+        return
 
-            # Clear existing rows
-            for row in treeview.get_children():
-                treeview.delete(row)
+    # Filter the data based on the entered Cedula value
+    filtered_data = [row for row in tree_data if ci in str(row[cedula_index])]
+    if not filtered_data:
+        messagebox.showerror('Error en la búsqueda', 'No se encontraron resultados para la cédula ingresada')
+        ci_contribuyente.delete(0, tk.END)
+        print(treeview)
+        load_liquidaciones_data(treeview)
+        return
+    # Print filtered data
+    print("Filtered Data:", filtered_data)
 
-            if not results:
-                messagebox.showerror("Error", "No se ha encontrado la cédula del contribuyente.")
-                load_liquidaciones_data(treeview)
-                return
+    # Update Treeview
+    fetch_all_records(treeview, filtered_data)
 
-            # Insert updated rows
-            for row in results:
-                treeview.insert("", "end", iid=row[0], values=row[1:])
-    except Exception as e:
-        print(f"Error refreshing Treeview: {e}")
+def fetch_all_records(tree, data):
+    # Clear the treeview
+    for item in tree.get_children():
+        tree.delete(item)
+
+    # Insert all records from the original data
+    for record in data:
+        tree.insert("", "end", values=record)
 
 def load_liquidaciones_data(treeview):
     try:
@@ -727,7 +797,7 @@ def ifasignar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold, 
     recargarbusqueda.pack(padx=5, pady=5, side="right")
 
 
-    busquedabtn = ctk.CTkButton(top_frame2, text="Buscar", font=poppins14bold, width=80, command=lambda: reload_treeviewsearch(my_tree, busquedaliq))
+    busquedabtn = ctk.CTkButton(top_frame2, text="Buscar", font=poppins14bold, width=80, command=lambda: reload_treeviewsearch2(my_tree, busquedaliq))
     busquedabtn.pack(padx=5, pady=5, side="right")
 
     busquedaliq = ctk.CTkEntry(top_frame2, placeholder_text="Buscar por cedula", font=poppins14bold, width=200)

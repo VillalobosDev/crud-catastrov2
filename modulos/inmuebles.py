@@ -725,36 +725,47 @@ def reload_treeview(treeview):
         print(f"Error fetching data: {e}")
 
 def reload_treeviewsearch(treeview, ci):
-    ci_value = ci.get()
+    ci_value = ci.get().strip()
     if not ci_value:
-        messagebox.showwarning("Advertencia", "Por favor ingrese una cedula para buscar")
+        messagebox.showwarning("Advertencia", "Por favor ingrese una cédula para buscar")
+        print("Cedula field is empty.")
+        return
+    elif not ci_value.isdigit():
+        messagebox.showerror('Error en la búsqueda', 'Debe ingresar un dato válido en el campo cédula')
         return
 
+    # Print headers of the tree
+    headers = treeview["columns"]
+    print("Tree Headers:", headers)
+
+    # Print data in the tree
+    tree_data = []
+    for item in treeview.get_children():
+        tree_data.append(treeview.item(item)["values"])
+    print("Tree Data:", tree_data)
+
+    # Find the index of the Cedula column in the tree headers
     try:
-        with connection() as conn:
-            cursor = conn.cursor()
-            sql = ''' 
-            SELECT c.v_e || "-" || c.ci_contribuyente, c.nombres || ' ' || c.apellidos AS contribuyente, i.nom_inmueble, i.cod_catastral, i.uso, i.ubicacion, s.nom_sector AS sector
-            FROM inmuebles i
-            JOIN contribuyentes c ON i.id_contribuyente = c.id_contribuyente
-            JOIN sectores s ON i.id_sector = s.id_sector
-            WHERE c.ci_contribuyente = ?
-            ORDER BY c.ci_contribuyente ASC
-            '''
-            cursor.execute(sql, (ci_value,))
-            results = cursor.fetchall()
-            
-            if not results:
-                messagebox.showerror("Error", "No se ha encontrado la cédula del contribuyente.")
-                reload_treeview(treeview)
-                return
+        cedula_index = headers.index('Cédula')
+    except ValueError:
+        print("Cedula column not found in tree headers.")
+        messagebox.showerror('Error en la búsqueda', 'No se encontró el campo Cédula en la tabla de resultados')
+        return
 
-            # Clear existing rows
-            for row in treeview.get_children():
-                treeview.delete(row)
+    # Filter the data based on the entered Cedula value
+    filtered_data = [row for row in tree_data if ci_value in str(row[cedula_index])]
 
-            # Insert updated rows
-            for row in results:
-                treeview.insert("", "end", values=row)
-    except Exception as e:
-        print(f"Error refreshing Treeview: {e}")
+    # Print filtered data
+    print("Filtered Data:", filtered_data)
+
+    # Update Treeview
+    fetch_all_records(treeview, filtered_data)
+
+def fetch_all_records(tree, data):
+    # Clear the treeview
+    for item in tree.get_children():
+        tree.delete(item)
+
+    # Insert all records from the original data
+    for record in data:
+        tree.insert("", "end", values=record)
