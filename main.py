@@ -2,6 +2,7 @@ import customtkinter as ctk
 from modulos.login_fun import login
 from config.config_temas import load_config, apply_theme, apply_color
 from config.config import centrar_ventana
+from tkcalendar import Calendar
 
 # Cargar configuración
 config = load_config()

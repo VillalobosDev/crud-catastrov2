@@ -285,9 +285,6 @@ def consulta(window, last_window):
     export.pack(side="right", padx=10, pady=5)
 
     searchbtn = display_search_filter(top_frame3, my_tree, original_data)
-
-    recargarbusqueda = ctk.CTkButton(top_frame3, text="🔁", font=poppins14bold, width=30, command=lambda: refresh(my_tree))
-    recargarbusqueda.pack(padx=5, pady=5, side="right")
     # print(type(searchbtn)) 
 
     # create_date_range_selector(top_frame4, searchbtn, my_tree, original_data)
@@ -338,7 +335,7 @@ def display_search_filter(frame, my_tree, original_data):
                     searchbtn.configure(command=lambda: nombre_search(my_tree, original_data, new_entry))
                 elif switch_name == "Sector":
                     searchbtn.configure(command=lambda: sector_search(my_tree, original_data, new_entry))
-                elif switch_name == "Cod-Catastral":
+                elif switch_name == "Inmueble":
                     searchbtn.configure(command=lambda: inmueble_search(my_tree, original_data, new_entry))
         else:
             if not any(switch.get() == 1 for switch in switches.values()):
@@ -346,8 +343,8 @@ def display_search_filter(frame, my_tree, original_data):
 
 
     switches = {}
-    switch_labels = ["Cedula", "Nombre", "Sector", "Cod-Catastral", "Rango Fecha"]
-    placeholders = ["Ingrese Cedula", "Ingrese Nombre", "Ingrese Sector", "Ingrese Cod-Catastral", "Rango Fecha"]
+    switch_labels = ["Cedula", "Nombre", "Sector", "Inmueble", "Rango Fecha"]
+    placeholders = ["Ingrese Cedula", "Ingrese Nombre", "Ingrese Sector", "Ingrese Inmueble", "Rango Fecha"]
 
     for label, placeholder in zip(switch_labels, placeholders):
         switch = ctk.CTkSwitch(
@@ -362,76 +359,6 @@ def display_search_filter(frame, my_tree, original_data):
     search_filter_created = True
     return searchbtn
 
-
-def refresh_treeview(treeview, column_switches):
-    # Clear the Treeview before updating with new data
-    for item in treeview.get_children():
-        treeview.delete(item)
-
-    # Select columns that are marked as visible in the column_switches
-    selected_columns = []
-    for col in COLUMN_ORDER:
-        try:
-            if column_switches[col].get() == 1:
-                selected_columns.append(col)
-        except KeyError as e:
-            print(f"KeyError: {e} for column {col}")
-    
-    # If no columns are selected, show an error and stop the function
-    if not selected_columns:
-        print("No columns selected. Please select at least one column.")
-        return
-
-    # Map the user-friendly column names to actual database fields
-    db_columns = {
-        'Contribuyente': "contribuyentes.nombres || ' ' || contribuyentes.apellidos",
-        'Cedula': 'contribuyentes.v_e || "-" || contribuyentes.ci_contribuyente',
-        'Sector': 'sectores.nom_sector',
-        'Cod-Sector': 'sectores.cod_sector',
-        'Cod-Catastral': 'inmuebles.cod_catastral',
-        'Fecha de Pago Solicitud': 'liquidaciones.fecha_liquidacion_1',
-        'Monto Liquidado Inmueble': 'liquidaciones.monto_1',
-        'Monto Derecho-Ocupacion': 'liquidaciones.monto_2',
-        'Fecha de Pago Inmueble': 'liquidaciones.fecha_liquidacion_2',
-        'Inmueble': 'inmuebles.nom_inmueble',
-        'Uso': 'inmuebles.uso',
-        'RIF': 'contribuyentes.j_c_g || "-" || contribuyentes.rif',
-        'Telefono': 'contribuyentes.telefono',
-        'Correo': 'contribuyentes.correo',
-    }
-
-    # Map the selected columns to the actual database fields for the SQL query
-    selected_db_columns = [db_columns[col] for col in selected_columns]
-
-    # Construct the SQL query dynamically based on selected columns
-    query = f"SELECT {', '.join(selected_db_columns)} FROM inmuebles " \
-            f"JOIN contribuyentes ON inmuebles.id_contribuyente = contribuyentes.id_contribuyente " \
-            f"JOIN sectores ON inmuebles.id_sector = sectores.id_sector " \
-            f"JOIN liquidaciones ON inmuebles.id_inmueble = liquidaciones.id_inmueble ORDER BY ci_contribuyente ASC"
-
-    # print(f"Executing Query: {query}\n\n\n")  # Debugging: Show the query being executed
-    
-    treeview["columns"] = selected_columns
-            
-    for col in selected_columns:
-        treeview.heading(col, text=col)
-        treeview.column(col, anchor="center")
-
-    # Try to fetch the data from the database
-    try:
-        with connection() as conn:
-            cursor = conn.cursor()
-            cursor.execute(query)
-            filtered_data = cursor.fetchall()
-
-            # Update the Treeview columns and insert the new data into the Treeview
-
-            # Insert the rows fetched from the query into the Treeview
-            for row in filtered_data:
-                treeview.insert("", "end", values=row)
-    
-    except Exception as e:
-        print(f"Error during query execution: {e}")
 
 def refresh_treeview(treeview, column_switches):
     # Clear the Treeview before updating with new data
@@ -578,11 +505,7 @@ def cedula_search(my_tree, original_data, cedula_entry):
     """Filter treeview data based on Cedula."""
     cedula_value = cedula_entry.get().strip()
     if not cedula_value:
-        messagebox.showerror('Error en la busqueda','Debe ingresar un dato en el campo cedula')
         print("Cedula field is empty.")
-        return
-    elif not cedula_value.isdigit():
-        messagebox.showerror('Error en la busqueda','Debe ingresar un dato valido en el campo cedula')
         return
 
     # Print headers of the tree
@@ -603,7 +526,6 @@ def cedula_search(my_tree, original_data, cedula_entry):
         cedula_index = headers.index('Cedula')
     except ValueError:
         print("Cedula column not found in tree headers.")
-        messagebox.showerror('Error en la busqueda','No se encontro el campo Cedula en la tabla de resultados')
         return
 
     # Filter the data based on the entered Cedula value
@@ -630,10 +552,6 @@ def nombre_search(my_tree, original_data, name_entry):
     name_value = name_entry.get().strip()
     if not name_value:
         print("Name field is empty.")
-        messagebox.showerror('Error en la busqueda','Debe ingresar un dato en el campo Nombre')
-        return
-    elif not name_value.isalpha():
-        messagebox.showerror('Error en la busqueda','Debe ingresar un dato valido en el campo Nombre')
         return
 
     # Print headers of the tree
@@ -654,7 +572,6 @@ def nombre_search(my_tree, original_data, name_entry):
         contribuyente_index = headers.index('Contribuyente')
     except ValueError:
         print("Contribuyente column not found in tree headers.")
-        messagebox.showerror('Error en la busqueda','No se encontro el campo Contribuyente en la tabla de resultados')
         return
 
     # Filter the data based on the entered Name value
@@ -672,12 +589,8 @@ def sector_search(my_tree, original_data, sector_entry):
     sector_value = sector_entry.get().strip()
     if not sector_value:
         print("Sector field is empty.")
-        messagebox.showerror('Error en la busqueda','Debe ingresar un dato en el campo Sector')
         return
-    elif not sector_value.isalpha():
-        messagebox.showerror('Error en la busqueda','Debe ingresar un dato valido en el campo Sector')
-        return
-    
+
     # Print headers of the tree
     headers = my_tree["columns"]
     print("Tree Headers:", headers)
@@ -696,7 +609,6 @@ def sector_search(my_tree, original_data, sector_entry):
         sector_index = headers.index('Sector')
     except ValueError:
         print("Sector column not found in tree headers.")
-        messagebox.showerror('Error en la busqueda','No se encontro el campo Sector en la tabla de resultados')
         return
 
     # Filter the data based on the entered Sector value
@@ -714,9 +626,7 @@ def inmueble_search(my_tree, original_data, inmueble_entry):
     inmueble_value = inmueble_entry.get().strip()
     if not inmueble_value:
         print("Inmueble field is empty.")
-        messagebox.showerror('Error en la busqueda','Debe ingresar un dato en el campo Cod-Catastral')
         return
-    
 
     # Print headers of the tree
     headers = my_tree["columns"]
@@ -736,7 +646,6 @@ def inmueble_search(my_tree, original_data, inmueble_entry):
         inmueble_index = headers.index('Inmueble')
     except ValueError:
         print("Inmueble column not found in tree headers.")
-        messagebox.showerror('Error en la busqueda','No se encontro el campo Cod-Catastral en el arbol de resultados')
         return
 
     # Filter the data based on the entered Inmueble value
@@ -772,49 +681,6 @@ def export_treeview_to_xlsx(treeview, filename):
     workbook.save(filename)
     print(f"Data exported to {filename} successfully.")
     
-def refresh(my_tree):
-
-
-    # Fetch data
-    original_data = []
-    try:
-        with connection() as conn:
-            cursor = conn.cursor()
-            sql = ''' SELECT 
-            contribuyentes.nombres || ' ' || contribuyentes.apellidos AS contribuyente,
-            contribuyentes.v_e || "-" || contribuyentes.ci_contribuyente AS cedula_completa,
-            sectores.nom_sector,
-            sectores.cod_sector,
-            inmuebles.cod_catastral,
-            liquidaciones.fecha_Liquidacion_1,
-            liquidaciones.monto_1,
-            liquidaciones.monto_2,
-            liquidaciones.fecha_Liquidacion_2,
-            inmuebles.nom_inmueble,
-            inmuebles.uso,
-            contribuyentes.j_c_g || "-" || contribuyentes.rif,
-            contribuyentes.telefono,
-            contribuyentes.correo
-            FROM
-            inmuebles
-            JOIN contribuyentes ON inmuebles.id_contribuyente = contribuyentes.id_contribuyente
-            JOIN sectores ON inmuebles.id_sector = sectores.id_sector
-            JOIN liquidaciones ON inmuebles.id_inmueble = liquidaciones.id_inmueble 
-            ORDER BY contribuyentes.ci_contribuyente ASC
-            '''
-            cursor.execute(sql)
-            original_data = cursor.fetchall()
-
-            print(f"Fetched {len(original_data)} rows from the database.")
-
-            for item in my_tree.get_children():
-                my_tree.delete(item)
-            
-            # Insert all data into Treeview initially
-            for row in original_data:
-                my_tree.insert("", "end", values=row)
-
-    except Exception as e:
-        print(f"Error during database operation: {e}")
-
-    return my_tree, original_data  # Return both my_tree and original_data
+    
+    
+    
