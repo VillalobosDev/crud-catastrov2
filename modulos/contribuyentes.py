@@ -5,7 +5,6 @@ from functions.functions import *
 from tkinter import ttk, messagebox
 from functions.rectangle import rectangle
 from config.config import centrar_ventana
-import tkinter
 
 
 def ifasignar(bottom_frame, top_frame2, window, last_window, window_title):
@@ -17,14 +16,11 @@ def ifasignar(bottom_frame, top_frame2, window, last_window, window_title):
         busquedabtn.pack_forget()
     if busquedainm:
         busquedainm.pack_forget()
-
     if recargarbusqueda:
         recargarbusqueda.pack_forget()
 
 
     poppins14bold = ("Poppins", 14, "bold")
-    poppins10 = ("Poppins", 10)
-    poppins18 = ("Poppins", 18, "bold")
 
     for widget in bottom_frame.winfo_children():
         widget.destroy()
@@ -60,7 +56,7 @@ def ifasignar(bottom_frame, top_frame2, window, last_window, window_title):
     recargarbusqueda = ctk.CTkButton(top_frame2, text="🔁", font=poppins14bold, width=30, command=lambda: cargar_datos())
     recargarbusqueda.pack(padx=5, pady=5, side="right")
 
-    busquedabtn = ctk.CTkButton(top_frame2, text="Buscar", font=poppins14bold, width=80, command=lambda: reload_treeviewsearch(my_tree, busquedainm))
+    busquedabtn = ctk.CTkButton(top_frame2, text="Buscar", font=poppins14bold, width=80, command=lambda: reload_treeviewsearch2(my_tree, busquedainm))
     busquedabtn.pack(padx=5, pady=5, side="right")
 
     busquedainm = ctk.CTkEntry(top_frame2, placeholder_text="Buscar por cedula", font=poppins14bold, width=200)
@@ -278,7 +274,7 @@ def ifgestionar(bottom_frame, top_frame2, window, last_window, window_title):
     recargarbusqueda.pack(padx=5, pady=5, side="right")
 
 
-    busquedabtn = ctk.CTkButton(top_frame2, text="Buscar", font=poppins14bold, width=80, command=lambda: reload_treeviewsearch(my_tree, busquedainm))
+    busquedabtn = ctk.CTkButton(top_frame2, text="Buscar", font=poppins14bold, width=80, command=lambda: reload_treeviewsearch2(my_tree, busquedainm))
     busquedabtn.pack(padx=5, pady=5, side="right")
 
     busquedainm = ctk.CTkEntry(top_frame2, placeholder_text="Buscar por cedula", font=poppins14bold, width=200)
@@ -547,8 +543,9 @@ def contribuyentes(window, last_window):
     busquedabtn = ctk.CTkButton(top_frame2, text="Buscar", font=poppins14bold, width=80, command=lambda: reload_treeviewsearch(my_tree, busquedainm))
     busquedabtn.pack(padx=5, pady=5, side="right")
 
-    busquedainm = ctk.CTkEntry(top_frame2, placeholder_text="Buscar por cedula", font=poppins14bold, width=200)
+    busquedainm = ctk.CTkEntry(top_frame2, placeholder_text="Buscar por cédula", font=poppins14bold, width=200)
     busquedainm.pack(padx=5, pady=5, side="right")
+    
 
     #Contenido del bottom frame
 
@@ -577,7 +574,7 @@ def contribuyentes(window, last_window):
     horizontal_scrollbar.pack(side="bottom", fill="x")
 
 
-    my_tree['columns'] = ('ID', 'nombre', 'apellido', 'cedula', 'rif', 'telefono', 'correo')
+    my_tree['columns'] = ('ID', 'nombre', 'apellido', 'Cedula', 'rif', 'telefono', 'correo')
     
     my_tree.column('ID', width=0, stretch=tk.NO)
     my_tree.heading('ID', text='', anchor='center')
@@ -599,44 +596,152 @@ def contribuyentes(window, last_window):
     loaddata(my_tree)
     return window, last_window
 
+def reload_treeviewsearch2(treeview, ci):
+    def cargar_datos(treeview):
+        for item in treeview.get_children():
+            treeview.delete(item)
+        
+        try:
+            with connection() as conn:
+                cursor = conn.cursor()
+                sql = 'SELECT id_contribuyente, nombres, apellidos, v_e || "-" || ci_contribuyente AS cedula_completa, j_c_g || "-" || rif AS rif_completo, telefono, correo FROM contribuyentes'
+                cursor.execute(sql)
+                results = cursor.fetchall()
+                for row in results:
+                    treeview.insert("", "end", iid=row[0], values=row[1:])
+        except Exception as e:
+            print(f"Error during database operation: {e}")
+
+    ci_value = ci.get().strip()
+    if not ci_value:
+        messagebox.showwarning("Advertencia", "Por favor ingrese una cédula para buscar.")
+        print("Cedula field is empty.")
+        ci.delete(0, tk.END)
+        ci.configure(text="")
+        cargar_datos(treeview)
+        return
+    elif not ci_value.isdigit():
+        messagebox.showerror('Error en la búsqueda', 'Debe ingresar un dato válido en el campo cédula')
+        ci.delete(0, tk.END)
+        ci.configure(text="")
+        cargar_datos(treeview)
+        return
+
+    # Print headers of the tree
+    headers = treeview["columns"]
+    print("Tree Headers:", headers)
+
+    # Print data in the tree
+    tree_data = []
+    for item in treeview.get_children():
+        tree_data.append(treeview.item(item)["values"])
+
+    # Find the index of the Cedula column in the tree headers
+    try:
+        cedula_index = headers.index('cedula')
+    except ValueError:
+        print("Cedula column not found in tree headers.")
+        messagebox.showerror('Error en la búsqueda', 'No se encontró el campo Cédula en la tabla de resultados')
+        cargar_datos(treeview)
+        ci.delete(0, tk.END)
+        ci.configure(text="")
+        return
+
+    # Filter the data based on the entered Cedula value
+    filtered_data = [row for row in tree_data if ci_value in str(row[cedula_index])]
+
+    if not filtered_data:
+        print("No se encontraron coincidencias")
+        messagebox.showinfo("Información", "No se encontraron coincidencias.")
+        cargar_datos(treeview)
+        
+        ci.delete(0, tk.END)
+        ci.configure(text="")
+        
+        return
+
+    # Print filtered data
+    print("Filtered Data:", filtered_data)
+
+    # Update Treeview
+    fetch_all_records(treeview, filtered_data)
+
 
 def reload_treeviewsearch(treeview, ci):
-    ci = ci.get()
-    if not ci:
-        messagebox.showwarning("Advertencia", "Por favor ingrese una cedula para buscar.")
+    ci_value = ci.get().strip()
+    if not ci_value:
+        messagebox.showwarning("Advertencia", "Por favor ingrese una cédula para buscar.")
+        print("Cedula field is empty.")
+        ci.delete(0, tk.END)
+        ci.configure(text="")
         loaddata(treeview)
         return
+    elif not ci_value.isdigit():
+        messagebox.showerror('Error en la búsqueda', 'Debe ingresar un dato válido en el campo cédula')
+        ci.delete(0, tk.END)
+        ci.configure(text="")
+        loaddata(treeview)
+        return
+
+    # Print headers of the tree
+    headers = treeview["columns"]
+    print("Tree Headers:", headers)
+
+    # Print data in the tree
+    tree_data = []
+    for item in treeview.get_children():
+        tree_data.append(treeview.item(item)["values"])
+
+    # Find the index of the Cedula column in the tree headers
     try:
-        with connection() as conn:
-            cursor = conn.cursor()
-            sql = ''' 
-            SELECT id_contribuyente, nombres, apellidos, v_e || "-" || ci_contribuyente AS cedula_completa, j_c_g || "-" || rif AS rif_completo,
-            telefono, correo FROM contribuyentes where ci_contribuyente = ?
-            '''
-            cursor.execute(sql,(ci,))
-            results = cursor.fetchall()
+        cedula_index = headers.index('Cedula')
+    except ValueError:
+        print("Cedula column not found in tree headers.")
+        messagebox.showerror('Error en la búsqueda', 'No se encontró el campo Cédula en la tabla de resultados')
+        loaddata(treeview)
+        ci.delete(0, tk.END)
+        ci.configure(text="")
+        return
 
-            # Clear existing rows
-            for row in treeview.get_children():
-                treeview.delete(row)
-                
+    # Filter the data based on the entered Cedula value
+    filtered_data = [row for row in tree_data if ci_value in str(row[cedula_index])]
 
-            if not results:
-                messagebox.showerror("Error", "No se ha encontrado la cédula del contribuyente.")
-                loaddata(treeview)
-                return
-
-            # Insert updated rows
-            for row in results:
-                treeview.insert("", "end", iid=row[0], values=row)
-    except Exception as e:
-        print(f"Error refreshing Treeview: {e}")
+    if not filtered_data:
+        print("No se encontraron coincidencias")
+        messagebox.showinfo("Información", "No se encontraron coincidencias.")
+        loaddata(treeview)
         
+        ci.delete(0, tk.END)
+        ci.configure(text="")
+        
+        return
+
+    # Print filtered data
+    print("Filtered Data:", filtered_data)
+
+    # Update Treeview
+    fetch_all_records(treeview, filtered_data)
+
+def fetch_all_records(tree, data):
+    # Clear the treeview
+    for item in tree.get_children():
+        tree.delete(item)
+
+    # Insert all records from the original data
+    for record in data:
+        tree.insert("", "end", values=record)
+
 def loaddata(treeview):
     try:
         with connection() as conn:
             cursor = conn.cursor()
-            sql = 'SELECT id_contribuyente, nombres, apellidos, v_e || "-" || ci_contribuyente AS cedula_completa, j_c_g || "-" || rif AS rif_completo, telefono, correo FROM contribuyentes'
+            sql = '''
+            SELECT id_contribuyente,
+            nombres, 
+            apellidos, v_e || "-" || ci_contribuyente AS cedula_completa, 
+            j_c_g || "-" || rif AS rif_completo, 
+            telefono, 
+            correo FROM contribuyentes'''
             cursor.execute(sql)
             results = cursor.fetchall()
 
