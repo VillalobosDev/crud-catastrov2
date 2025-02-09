@@ -667,7 +667,7 @@ def ifgestionar(window, bottom_frame, top_frame2, last_window, window_title, com
             new_values = (
                 new_values[0],
                 new_values[1],
-                "Recidencial",  # nom_inmueble vacío
+                "-",  # nom_inmueble vacío
                 new_values[3],
                 new_values[4],
                 new_values[5],
