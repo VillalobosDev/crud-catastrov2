@@ -179,8 +179,7 @@ def ifasignar(bottom_frame, top_frame2, window, last_window, window_title, comer
     frameinformacion = ctk.CTkFrame(frame_left)
     frameinformacion.pack(padx=10, pady=5, fill="x")
     
-    btn_mas= ctk.CTkButton(frameinformacion, text="➕", font=poppins14bold, width=40)
-    btn_mas.pack(padx=5, pady=5, side="right")
+
 
     text_label2 = ctk.CTkLabel(frameinformacion, text="Información del contribuyente", font=poppins14bold, text_color="grey")
     text_label2.pack(pady=5, padx=10, side="left")
