@@ -37,13 +37,13 @@ def ifasignar(bottom_frame, top_frame2, window, last_window, window_title):
     nombre_frame.pack(padx=10, pady=5, fill="x")
 
     apellido_frame = ctk.CTkFrame(frame_left)
-    apellido_frame.pack(padx=10, pady=5, fill="x")
+    # apellido_frame.pack(padx=10, pady=5, fill="x")
 
     cedula_frame = ctk.CTkFrame(frame_left)
     cedula_frame.pack(padx=10, pady=5, fill="x")
     
     rif_frame = ctk.CTkFrame(frame_left)
-    rif_frame.pack(padx=10, pady=5, fill="x")
+    # rif_frame.pack(padx=10, pady=5, fill="x")
     
     telefono_frame = ctk.CTkFrame(frame_left)
     telefono_frame.pack(padx=10, pady=5, fill="x")
@@ -65,30 +65,30 @@ def ifasignar(bottom_frame, top_frame2, window, last_window, window_title):
     #############################################
     
     # Entrys del frame contribuyente
-    nombre = ctk.CTkEntry(nombre_frame, placeholder_text="Nombre", font=poppins14bold, width=250)
+    nombre = ctk.CTkEntry(nombre_frame, placeholder_text="Nombre", font=poppins14bold, width=350)
     nombre.pack(pady=5, padx=5, side="left")
 
-    apellido = ctk.CTkEntry(apellido_frame, placeholder_text="Apellido", font=poppins14bold, width=250)
-    apellido.pack(pady=5, padx=5, side="left")
+    apellido = ctk.CTkEntry(apellido_frame, placeholder_text="Apellido", font=poppins14bold, width=350)
+    # apellido.pack(pady=5, padx=5, side="left")
 
     cedula_values = ["V", "E"]    
     cedula_indicator = ctk.CTkOptionMenu(cedula_frame, values=cedula_values, width=50, font=poppins14bold)
     cedula_indicator.pack(padx=5, pady=5, side="left")
 
-    cedula = ctk.CTkEntry(cedula_frame, placeholder_text="Cédula de Identidad", font=poppins14bold, width=190)
+    cedula = ctk.CTkEntry(cedula_frame, placeholder_text="Cédula de Identidad", font=poppins14bold, width=290)
     cedula.pack(pady=5, padx=5, side="left")
 
     rif_values = ["J", "C", "G"]    
     rif_indicator = ctk.CTkOptionMenu(rif_frame, values=rif_values, width=50, font=poppins14bold)
-    rif_indicator.pack(padx=5, pady=5, side="left")
+    # rif_indicator.pack(padx=5, pady=5, side="left")
 
     rif = ctk.CTkEntry(rif_frame, placeholder_text="RIF", font=poppins14bold, width=190)
-    rif.pack(pady=5, padx=5, side="left")
+    # rif.pack(pady=5, padx=5, side="left")
 
-    telefono = ctk.CTkEntry(telefono_frame, placeholder_text="Teléfono", font=poppins14bold, width=250)
+    telefono = ctk.CTkEntry(telefono_frame, placeholder_text="Teléfono", font=poppins14bold, width=350)
     telefono.pack(pady=5, padx=5, side="left")
 
-    correo = ctk.CTkEntry(correo_frame, placeholder_text="ejemplo@gmail.com", font=poppins14bold, width=250)
+    correo = ctk.CTkEntry(correo_frame, placeholder_text="ejemplo@gmail.com", font=poppins14bold, width=350)
     correo.pack(pady=5, padx=5, side="left")
     def clear():
         nombre.delete(0, tk.END)
@@ -162,9 +162,10 @@ def ifasignar(bottom_frame, top_frame2, window, last_window, window_title):
                 elif len(nombre.get()) == 0:
                     messagebox.showwarning("Advertencia", "Ingresar Nombre del contribuyente")
                     return
-                elif len(apellido.get()) == 0:
-                    messagebox.showwarning("Advertencia", "Ingresar Apellido del contribuyente")
-                    return
+
+                # elif len(apellido.get()) == 0:
+                #     messagebox.showwarning("Advertencia", "Ingresar Apellido del contribuyente")
+                #     return
 
                 sql = """INSERT INTO contribuyentes (nombres, apellidos, v_e, ci_contribuyente, j_c_g, rif, telefono, correo)
                         VALUES (?, ?, ?, ?, ?, ?, ?, ?)"""
@@ -188,11 +189,13 @@ def ifasignar(bottom_frame, top_frame2, window, last_window, window_title):
         except Exception as e:
             print(f"Error al guardar los datos: {e}")
 
-    btnsave = ctk.CTkButton(frame_left, text="Guardar", command = guardar_datos, font=poppins14bold)
-    btnsave.pack(padx=10, pady=10, anchor="e", side="bottom")
+    btncancelar = ctk.CTkButton(frame_left, text="Atrás", command=lambda: contribuyentes(window, last_window), font=poppins14bold)
+    btncancelar.pack(padx=10, pady=5, anchor="e", side="bottom")
 
-    btncancelar = ctk.CTkButton(frame_left, text="Volver", command=lambda: contribuyentes(window, last_window), font=poppins14bold)
-    btncancelar.pack(padx=10, pady=10, anchor="e", side="bottom")
+    btnsave = ctk.CTkButton(frame_left, text="Guardar", command = guardar_datos, font=poppins14bold)
+    btnsave.pack(padx=10, pady=5, anchor="e", side="bottom")
+
+
 
     # Contenido del RIGHT FRAME
 
@@ -218,6 +221,10 @@ def ifasignar(bottom_frame, top_frame2, window, last_window, window_title):
     for col in my_tree['columns']:
         my_tree.heading(col, text=col.capitalize(), anchor='center')  # Con el metodo de string capitalize() mostramos el texto en mayusculas
         my_tree.column(col, anchor='center')
+
+    my_tree.column('apellido', width=0, stretch=tk.NO)  # Ocultar la columna de apellido
+    my_tree.column('rif', width=0, stretch=tk.NO)  # Rif ocultar
+
 
     cargar_datos()  # Llamar a la función para cargar los datos inicialmente
 
@@ -253,13 +260,13 @@ def ifgestionar(bottom_frame, top_frame2, window, last_window, window_title):
     nombre_contribuyente_frame.pack(padx=10, pady=5, fill="x")
 
     apellido_contribuyente_frame = ctk.CTkFrame(frame_left)
-    apellido_contribuyente_frame.pack(padx=10, pady=5, fill="x")
+    # apellido_contribuyente_frame.pack(padx=10, pady=5, fill="x")
 
     cedula_frame = ctk.CTkFrame(frame_left)
     cedula_frame.pack(padx=10, pady=5, fill="x")
 
     rif_frame = ctk.CTkFrame(frame_left)
-    rif_frame.pack(padx=10, pady=5, fill="x")
+    # rif_frame.pack(padx=10, pady=5, fill="x")
 
     telefono_frame = ctk.CTkFrame(frame_left)
     telefono_frame.pack(padx=10, pady=5, fill="x")
@@ -282,38 +289,37 @@ def ifgestionar(bottom_frame, top_frame2, window, last_window, window_title):
 
     ##############################################
 
-    nombre_contribuyente = ctk.CTkEntry(nombre_contribuyente_frame, placeholder_text="Selecciona un Contribuyente", font=poppins14bold, width=250)
+    nombre_contribuyente = ctk.CTkEntry(nombre_contribuyente_frame, placeholder_text="Selecciona un Contribuyente", font=poppins14bold, width=350)
     nombre_contribuyente.pack(pady=5, padx=5, side="left")
 
-    apellido_contribuyente = ctk.CTkEntry(apellido_contribuyente_frame, placeholder_text="Apellido Contribuyente", font=poppins14bold, width=250)
-    apellido_contribuyente.pack(pady=5, padx=5, side="left")
+    apellido_contribuyente = ctk.CTkEntry(apellido_contribuyente_frame, placeholder_text="Apellido Contribuyente", font=poppins14bold, width=350)
+    # apellido_contribuyente.pack(pady=5, padx=5, side="left")
 
-    correo = ctk.CTkEntry(correo_frame, placeholder_text="correo@gmail.com", font=poppins14bold, width=250)
+    correo = ctk.CTkEntry(correo_frame, placeholder_text="correo@gmail.com", font=poppins14bold, width=350)
     correo.pack(pady=5, padx=5, side="left")
     
     cedula_values = ["V", "E"]    
     cedula_indicator = ctk.CTkOptionMenu(cedula_frame, values=cedula_values, width=50, font=poppins14bold)
     cedula_indicator.pack(padx=5, pady=5, side="left")
 
-    cedula = ctk.CTkEntry(cedula_frame, placeholder_text="Cédula de Identidad", font=poppins14bold, width=190)
+    cedula = ctk.CTkEntry(cedula_frame, placeholder_text="Cédula de Identidad", font=poppins14bold, width=290)
     cedula.pack(pady=5, padx=5, side="left")
     
     rif_values = ["J", "C", "G"]    
     rif_indicator = ctk.CTkOptionMenu(rif_frame, values=rif_values, width=50, font=poppins14bold)
-    rif_indicator.pack(padx=5, pady=5, side="left")
 
     rif = ctk.CTkEntry(rif_frame, placeholder_text="RIF", font=poppins14bold, width=190)
-    rif.pack(pady=5, padx=5, side="left")
+    # rif.pack(pady=5, padx=5, side="left")
 
-    telefono = ctk.CTkEntry(telefono_frame, placeholder_text="Teléfono", font=poppins14bold, width=250)
+    telefono = ctk.CTkEntry(telefono_frame, placeholder_text="Teléfono", font=poppins14bold, width=350)
     telefono.pack(pady=5, padx=5, side="left")
 
     def clear():
         nombre_contribuyente.delete(0, tk.END)
         nombre_contribuyente.configure(placeholder_text="Nombre")
 
-        apellido_contribuyente.delete(0, tk.END)
-        apellido_contribuyente.configure(placeholder_text="Apellido")
+        # apellido_contribuyente.delete(0, tk.END)
+        # apellido_contribuyente.configure(placeholder_text="Apellido")
 
         cedula.delete(0, tk.END)
         cedula.configure(placeholder_text="Cédula de Identidad")
@@ -427,15 +433,17 @@ def ifgestionar(bottom_frame, top_frame2, window, last_window, window_title):
                 except Exception as e:
                     print(f"Error al eliminar datos: {e}")
 
-    btnsave = ctk.CTkButton(frame_left, text="Actualizar", command=lambda: save_changes(cedula, nombre_contribuyente, apellido_contribuyente, rif, telefono, correo, cedula_indicator, rif_indicator), font=poppins14bold)
-    btnsave.pack(padx=10, pady=10, anchor="e", side="bottom")
+    btncancelar = ctk.CTkButton(frame_left, text="Atrás", command=lambda: contribuyentes(window, last_window), font=poppins14bold)
+    btncancelar.pack(padx=10, pady=5, anchor="e", side="bottom")
+
+    btnsave = ctk.CTkButton(frame_left, text="Guardar", command=lambda: save_changes(cedula, nombre_contribuyente, apellido_contribuyente, rif, telefono, correo, cedula_indicator, rif_indicator), font=poppins14bold)
+    btnsave.pack(padx=10, pady=5, anchor="e", side="bottom")
     
     btndelete = ctk.CTkButton(frame_left, text="Eliminar", command=delete_record, font=poppins14bold)
-    btndelete.pack(padx=10, pady=10, anchor="e", side="bottom")
+    btndelete.pack(padx=10, pady=5, anchor="e", side="bottom")
 
     
-    btncancelar = ctk.CTkButton(frame_left, text="Volver", command=lambda: contribuyentes(window, last_window), font=poppins14bold)
-    btncancelar.pack(padx=10, pady=10, anchor="e", side="bottom")
+
     
     
     frame_tree = ctk.CTkFrame(frame_right, fg_color="white")
@@ -460,6 +468,9 @@ def ifgestionar(bottom_frame, top_frame2, window, last_window, window_title):
         my_tree.column(col, anchor="center")
         
     my_tree.column('id_contribuyente', width=0, stretch=tk.NO)
+    my_tree.column('apellido', width=0, stretch=tk.NO)  # Ocultar la columna de apellido
+    my_tree.column('rif', width=0, stretch=tk.NO)  # Rif ocultar
+
 
     def on_tree_select(event):
         selected_item = my_tree.selection()
@@ -578,6 +589,9 @@ def contribuyentes(window, last_window):
     
     my_tree.column('ID', width=0, stretch=tk.NO)
     my_tree.heading('ID', text='', anchor='center')
+    my_tree.column('apellido', width=0, stretch=tk.NO)  # Ocultar la columna de apellido
+    my_tree.column('rif', width=0, stretch=tk.NO)  # Rif ocultar
+
     
     
     for col in my_tree['columns']:

@@ -1013,7 +1013,6 @@ def exportar_a_excel():
         column_widths = [30, 20, 25, 30, 20, 20, 30, 20, 30, 30, 30,30]
         for i, column_width in enumerate(column_widths, start=1):
             sheet.column_dimensions[openpyxl.utils.get_column_letter(i)].width = column_width
-
         # Agregar los datos al archivo Excel
         for row_data in rows:
             sheet.append([
@@ -1027,7 +1026,7 @@ def exportar_a_excel():
                 row_data[7],  # uso
                 row_data[8],  # monto_1
                 row_data[9],  # monto_2
-                row_data[8] + row_data[9],  # total_a_pagar
+                row_data[9],  # total_a_pagar
                 row_data[10]  # fecha_Liquidacion_2
             ])
 

@@ -23,10 +23,12 @@ COLUMN_ORDER = [
     'Sector',
     'Cod-Sector',
     'Cod-Catastral',
-    'Fecha de Pago Solicitud',
-    'Monto Liquidado Inmueble',
-    'Monto Derecho-Ocupacion',
-    'Fecha de Pago Inmueble',
+    'Monto Solicitud',
+    'Pago Solicitud',
+    'Monto Impuesto-Ocup',
+    'Pago Impuesto-Ocup',
+    'Monto Inm-Urbano',
+    'Pago Inm-Urbano',
     'Inmueble',
     'Uso',
     'RIF',
@@ -42,10 +44,12 @@ column_switch_states = {
     'Sector': True,
     'Cod-Sector': True,
     'Cod-Catastral': True,
-    'Fecha de Pago Solicitud': True,
-    'Monto Liquidado Inmueble': True,
-    'Monto Derecho-Ocupacion': True,
-    'Fecha de Pago Inmueble': True,
+    'Monto Solicitud': True,
+    'Pago Solicitud': True,
+    'Monto Impuesto-Ocup': True,
+    'Pago Impuesto-Ocup': True,
+    'Monto Inm-Urbano': True,
+    'Pago Inm-Urbano': True,
     'Inmueble': True,
     'Uso': True,
     'RIF': True,
@@ -75,6 +79,9 @@ def display_column_switches(top_frame4, treeview, original_data, window):
     switches_frame = ctk.CTkFrame(toplevel, corner_radius=15)
     switches_frame.pack(pady=5, padx=5, fill="both", expand=True)
     
+    button_frame = ctk.CTkFrame(switches_frame)
+    button_frame.pack(side="bottom", fill="x", padx=5, pady=5)
+    
     text_top = ctk.CTkLabel(switches_frame, text="Filtros de Busqueda", font=poppins20)
     text_top.pack(pady=10, padx=10, side="top")
 
@@ -100,7 +107,7 @@ def display_column_switches(top_frame4, treeview, original_data, window):
     text_1.pack(pady=10, side="top")
 
 
-    for col_name in ['Inmueble', 'Cod-Catastral', 'Uso']:
+    for col_name in ['Inmueble', 'Cod-Catastral', 'Uso', 'RIF']:
         switch = ctk.CTkSwitch(
             group1_frame,
             text=col_name,
@@ -124,7 +131,7 @@ def display_column_switches(top_frame4, treeview, original_data, window):
     text_2.pack(pady=10, side="top")
 
 
-    for col_name in ['Contribuyente', 'Cedula', 'RIF', 'Telefono', 'Correo']:
+    for col_name in ['Contribuyente', 'Cedula', 'Telefono', 'Correo']:
         switch = ctk.CTkSwitch(
             group2_frame,
             text=col_name,
@@ -172,8 +179,8 @@ def display_column_switches(top_frame4, treeview, original_data, window):
     text_4.pack(pady=10, side="top")
 
     
-
-    for col_name in ['Fecha de Pago Solicitud', 'Monto Liquidado Inmueble','Monto Derecho-Ocupacion',  'Fecha de Pago Inmueble']:
+#############################################################################'Monto Liquidado Inmueble'
+    for col_name in ['Monto Solicitud', 'Pago Solicitud', 'Monto Impuesto-Ocup',  'Pago Impuesto-Ocup', 'Monto Inm-Urbano', 'Pago Inm-Urbano']:
         switch = ctk.CTkSwitch(
             group4_frame,
             text=col_name,
@@ -187,21 +194,38 @@ def display_column_switches(top_frame4, treeview, original_data, window):
         if column_switch_states[col_name]:
             switch.select()
         else:
-            switch.deselect()
-            
+            switch.deselect()   
+    
+    
+
+    year_menu = ctk.CTkOptionMenu(
+        button_frame,
+        values=["2023", "2024", "2025"],
+        font=poppins12,
+    )
+    year_menu.set("Seleccionar Año")
+    year_menu.pack(side="left", padx=10, pady=10)
+
     def close_and_refresh(toplevel, treeview, column_switches):
+        if year_menu.get() == "Seleccionar Año":
+            messagebox.showwarning("Advertencia", "Debe seleccionar un año.")
+            return
         toplevel.destroy()  # Close the toplevel window
-        refresh_treeview(treeview, column_switches)  # Refresh the treeview
+        refresh_treeview(treeview, column_switches, year_menu.get())  # Refresh the treeview
 
     refresh_button = ctk.CTkButton(
-        toplevel,
+        button_frame,
         text="Aplicar",
         font=poppins12,
         command=lambda: close_and_refresh(toplevel, treeview, column_switches)
     )
-    refresh_button.pack(side="bottom", anchor="e", padx=10, pady=10)  # Place the button on the right inside the `button_frame`
+    refresh_button.pack(side="right", padx=10, pady=10)  # Place the button on the right inside the `button_frame`
+
+
 
     column_switches_created = True  # Mark column switches as created
+
+
 
 def toggle_column(column_switches, column):
     # Toggle the visibility of the column
@@ -212,6 +236,7 @@ def toggle_column(column_switches, column):
     else:
         switch.deselect()
     print(f"Column {column} visibility is now {column_switch_states[column]}")
+
 
 
 # Llama a esta función después de configurar las columnas en el Treeview
@@ -279,15 +304,22 @@ def consulta(window, last_window):
     busqueda.pack(padx=10, pady=5, side="left")
     
     show_filter_btn = ctk.CTkButton(top_frame2, text="Filtros", width=100, font=poppins14bold, command=lambda: display_column_switches(top_frame4, my_tree, original_data, window))
-    show_filter_btn.pack(padx=10, pady=5, side="left")    
+    show_filter_btn.pack(padx=10, pady=5, side="left")
+    
 
+    ##################################################################################################
+    
     export = ctk.CTkButton(top_frame2, text="Exportar a Excel", font=poppins12, command=lambda: export_treeview_to_xlsx(my_tree, "consulta_general.xlsx"))
     export.pack(side="right", padx=10, pady=5)
+
+    
 
     searchbtn = display_search_filter(top_frame3, my_tree, original_data)
     # print(type(searchbtn)) 
 
     # create_date_range_selector(top_frame4, searchbtn, my_tree, original_data)
+
+
 
 def display_search_filter(frame, my_tree, original_data):
     global search_filter_created
@@ -357,10 +389,19 @@ def display_search_filter(frame, my_tree, original_data):
         switches[label] = switch
 
     search_filter_created = True
+
+    ########################################################################################################
+
+
+    
+
+    ########################################################################################################
+
     return searchbtn
 
 
-def refresh_treeview(treeview, column_switches):
+
+def refresh_treeview(treeview, column_switches, year): 
     # Clear the Treeview before updating with new data
     for item in treeview.get_children():
         treeview.delete(item)
@@ -381,18 +422,20 @@ def refresh_treeview(treeview, column_switches):
 
     # Map the user-friendly column names to actual database fields
     db_columns = {
-        'Contribuyente': "contribuyentes.nombres || ' ' || contribuyentes.apellidos",
+        'Contribuyente': "contribuyentes.nombres",
         'Cedula': 'contribuyentes.v_e || "-" || contribuyentes.ci_contribuyente',
         'Sector': 'sectores.nom_sector',
         'Cod-Sector': 'sectores.cod_sector',
         'Cod-Catastral': 'inmuebles.cod_catastral',
-        'Fecha de Pago Solicitud': 'liquidaciones.fecha_liquidacion_1',
-        'Monto Liquidado Inmueble': 'liquidaciones.monto_1',
-        'Monto Derecho-Ocupacion': 'liquidaciones.monto_2',
-        'Fecha de Pago Inmueble': 'liquidaciones.fecha_liquidacion_2',
+        'Monto Solicitud': 'liquidaciones.monto_1',
+        'Pago Solicitud': 'liquidaciones.fecha_Liquidacion_1',
+        'Monto Impuesto-Ocup': 'liquidaciones.monto_2',
+        'Pago Impuesto-Ocup': 'liquidaciones.fecha_Liquidacion_2',
+        'Monto Inm-Urbano': 'liquidaciones.monto_3',
+        'Pago Inm-Urbano': 'liquidaciones.fecha_Liquidacion_3',
         'Inmueble': 'inmuebles.nom_inmueble',
         'Uso': 'inmuebles.uso',
-        'RIF': 'contribuyentes.j_c_g || "-" || contribuyentes.rif',
+        'RIF': 'inmuebles.j || "-" || inmuebles.rif',
         'Telefono': 'contribuyentes.telefono',
         'Correo': 'contribuyentes.correo',
     }
@@ -404,7 +447,9 @@ def refresh_treeview(treeview, column_switches):
     query = f"SELECT {', '.join(selected_db_columns)} FROM inmuebles " \
             f"JOIN contribuyentes ON inmuebles.id_contribuyente = contribuyentes.id_contribuyente " \
             f"JOIN sectores ON inmuebles.id_sector = sectores.id_sector " \
-            f"JOIN liquidaciones ON inmuebles.id_inmueble = liquidaciones.id_inmueble ORDER BY ci_contribuyente ASC"
+            f"JOIN liquidaciones ON inmuebles.id_inmueble = liquidaciones.id_inmueble " \
+            f"WHERE strftime('%Y', liquidaciones.fecha_Liquidacion_1) = ? " \
+            f"ORDER BY strftime('%Y', liquidaciones.fecha_Liquidacion_1) ASC, inmuebles.uso ASC, contribuyentes.ci_contribuyente ASC"
 
     # print(f"Executing Query: {query}\n\n\n")  # Debugging: Show the query being executed
     
@@ -418,7 +463,7 @@ def refresh_treeview(treeview, column_switches):
     try:
         with connection() as conn:
             cursor = conn.cursor()
-            cursor.execute(query)
+            cursor.execute(query, (year,))
             filtered_data = cursor.fetchall()
 
             # Update the Treeview columns and insert the new data into the Treeview
@@ -430,6 +475,48 @@ def refresh_treeview(treeview, column_switches):
     except Exception as e:
         print(f"Error during query execution: {e}")
 
+def fetch_data_by_year_range(treeview, year):
+    # Clear the Treeview before updating with new data
+    for item in treeview.get_children():
+        treeview.delete(item)
+
+    # Updated SQL query filtering by year equality
+    query = f'''
+    SELECT 
+        contribuyentes.nombres,
+        contribuyentes.v_e || "-" || contribuyentes.ci_contribuyente AS cedula_completa,
+        sectores.nom_sector,
+        sectores.cod_sector,
+        inmuebles.cod_catastral,
+        liquidaciones.monto_1,
+        liquidaciones.fecha_Liquidacion_1,
+        liquidaciones.monto_2,
+        liquidaciones.fecha_Liquidacion_2,
+        liquidaciones.monto_3,
+        liquidaciones.fecha_Liquidacion_3,
+        inmuebles.nom_inmueble,
+        inmuebles.uso,
+        inmuebles.j || "-" || inmuebles.rif,
+        contribuyentes.telefono,
+        contribuyentes.correo
+    FROM
+        inmuebles
+    JOIN contribuyentes ON inmuebles.id_contribuyente = contribuyentes.id_contribuyente
+    JOIN sectores ON inmuebles.id_sector = sectores.id_sector
+    JOIN liquidaciones ON inmuebles.id_inmueble = liquidaciones.id_inmueble 
+    WHERE strftime('%Y', liquidaciones.fecha_Liquidacion_1) = ?
+    ORDER BY inmuebles.uso ASC
+    '''
+    try:
+        with connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(query, (year,))
+            data = cursor.fetchall()
+            print(f"Fetched {len(data)} rows for year {year}.")
+            for row in data:
+                treeview.insert("", "end", values=row)
+    except Exception as e:
+        print(f"Error during database operation: {e}")
 
 def bottom_treeview(frame):
     # Treeview frame
@@ -470,13 +557,15 @@ def bottom_treeview(frame):
             sectores.nom_sector,
             sectores.cod_sector,
             inmuebles.cod_catastral,
-            liquidaciones.fecha_Liquidacion_1,
             liquidaciones.monto_1,
+            liquidaciones.fecha_Liquidacion_1,
             liquidaciones.monto_2,
             liquidaciones.fecha_Liquidacion_2,
+            liquidaciones.monto_3,
+            liquidaciones.fecha_Liquidacion_3,
             inmuebles.nom_inmueble,
             inmuebles.uso,
-            contribuyentes.j_c_g || "-" || contribuyentes.rif,
+            inmuebles.j || "-" || inmuebles.rif,
             contribuyentes.telefono,
             contribuyentes.correo
             FROM
@@ -484,7 +573,7 @@ def bottom_treeview(frame):
             JOIN contribuyentes ON inmuebles.id_contribuyente = contribuyentes.id_contribuyente
             JOIN sectores ON inmuebles.id_sector = sectores.id_sector
             JOIN liquidaciones ON inmuebles.id_inmueble = liquidaciones.id_inmueble 
-            ORDER BY contribuyentes.ci_contribuyente ASC
+            ORDER BY inmuebles.uso ASC, contribuyentes.ci_contribuyente ASC, liquidaciones.fecha_Liquidacion_1 ASC
             '''
             cursor.execute(sql)
             original_data = cursor.fetchall()
@@ -495,10 +584,14 @@ def bottom_treeview(frame):
             for row in original_data:
                 my_tree.insert("", "end", values=row)
 
+            for row in original_data:
+                my_tree.insert("", "end", values=row)
+
     except Exception as e:
         print(f"Error during database operation: {e}")
 
     return my_tree, original_data  # Return both my_tree and original_data
+
 
 
 def cedula_search(my_tree, original_data, cedula_entry):
@@ -538,6 +631,7 @@ def cedula_search(my_tree, original_data, cedula_entry):
     fetch_all_records(my_tree, filtered_data)
 
 
+
 def fetch_all_records(tree, data):
     # Clear the treeview
     for item in tree.get_children():
@@ -546,6 +640,8 @@ def fetch_all_records(tree, data):
     # Insert all records from the original data
     for record in data:
         tree.insert("", "end", values=record)
+
+
 
 def nombre_search(my_tree, original_data, name_entry):
     """Filter treeview data based on Nombre (Name)."""
@@ -582,6 +678,7 @@ def nombre_search(my_tree, original_data, name_entry):
 
     # Update Treeview
     fetch_all_records(my_tree, filtered_data)
+
 
 
 def sector_search(my_tree, original_data, sector_entry):
@@ -621,6 +718,7 @@ def sector_search(my_tree, original_data, sector_entry):
     fetch_all_records(my_tree, filtered_data)
 
 
+
 def inmueble_search(my_tree, original_data, inmueble_entry):
     """Filter treeview data based on Inmueble (Property)."""
     inmueble_value = inmueble_entry.get().strip()
@@ -657,6 +755,8 @@ def inmueble_search(my_tree, original_data, inmueble_entry):
     # Update Treeview
     fetch_all_records(my_tree, filtered_data)
 
+
+
 def export_treeview_to_xlsx(treeview, filename):
     # Create a new workbook and select the active worksheet
 
@@ -680,7 +780,7 @@ def export_treeview_to_xlsx(treeview, filename):
     # Save the workbook to the specified filename
     workbook.save(filename)
     print(f"Data exported to {filename} successfully.")
-    
-    
-    
-    
+
+
+
+

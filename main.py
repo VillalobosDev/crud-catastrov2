@@ -18,7 +18,6 @@ window.geometry("1080x720")
 window.iconbitmap(r"assets/axiow.ico")
 
 centrar_ventana(window, 1080, 720)
-menu(window)
+login(window)
 
 window.mainloop()
-
