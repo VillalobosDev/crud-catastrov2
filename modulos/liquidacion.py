@@ -276,6 +276,14 @@ def load_liquidaciones_data(treeview):
 
             # Insert updated rows
             for row in results:
+                tags = ()
+                if not row[6] or not row[8]:  # Check if "Fecha de pago Imp" or "Fecha de pago Inm" are empty
+                    tags = ('red',)
+                treeview.insert("", "end", iid=row[0], values=row[1:], tags=tags)
+
+            # Define tag styles
+            treeview.tag_configure('red', background='red')
+            for row in results:
                 treeview.insert("", "end", iid=row[0], values=row[1:])
 
     except Exception as e:
@@ -425,6 +433,7 @@ def delete_liquidacion(ci_entry, inmueble_menu, my_tree):
                 print("Error al eliminar la liquidación")
     except Exception as e:
         print(f"Error eliminando la liquidación: {e}")
+
 def liquidacion(window, last_window):
     global busquedabtn, busquedaliq, recargarbusqueda
 

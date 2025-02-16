@@ -54,7 +54,7 @@ def generate_inmuebles(num_records):
         uso = random.choice(['Residencial', 'Comercial'])
         id_contribuyente = random.choice(contribuyentes_ids)
         id_sector = random.choice(sectores_ids)
-        fecha_registro = fake.date_between(start_date=start_date, end_date=end_date)
+        fecha_registro = fake.date_between(start_date=start_date, end_date=end_date).strftime("%d-%m-%Y")
         
         if uso == 'Residencial':
             cursor.execute('''
@@ -79,21 +79,49 @@ def generate_liquidaciones(num_records):
     start_date = date(2023, 1, 1)
     end_date = date(2025, 12, 31)
 
+    valid_solicitudes = [
+        "Constancia de mensura y deslinde",
+        "Constancia de info catastral (no propietarios)",
+        "Cédula catastral (propietarios)",
+        "Copia certificada cédula catastral",
+        "Planos de ubicación",
+        "Copia certificada constancia de mensura, deslinde",
+        "Inscripción/modificación en el registro del inmueble"
+    ]
+
     for _ in range(num_records):
-        solicitud = fake.sentence(nb_words=3)
+        solicitud = random.choice(valid_solicitudes)
         monto_1 = round(random.uniform(1000, 5000), 2)
         monto_2 = round(random.uniform(1000, 5000), 2)
         monto_3 = round(random.uniform(1000, 5000), 2)
-        fecha_Liquidacion_1 = fake.date_between(start_date=start_date, end_date=end_date)
-        fecha_Liquidacion_2 = fake.date_between(start_date=start_date, end_date=end_date)
-        fecha_Liquidacion_3 = fake.date_between(start_date=start_date, end_date=end_date)
+        fecha_Liquidacion_1 = fake.date_between(start_date=start_date, end_date=end_date).strftime("%d-%m-%Y")
+        
+        # Randomly decide whether to include fecha_Liquidacion_2 and fecha_Liquidacion_3
+        if random.choice([True, False]):
+            fecha_Liquidacion_2 = fake.date_between(start_date=start_date, end_date=end_date).strftime("%d-%m-%Y")
+            fecha_Liquidacion_3 = fake.date_between(start_date=start_date, end_date=end_date).strftime("%d-%m-%Y")
+        else:
+            fecha_Liquidacion_2 = None
+            fecha_Liquidacion_3 = None
+        
         id_inmueble = random.choice(inmuebles_ids)
         id_contribuyente = random.choice(contribuyentes_ids)
+        
         cursor.execute('''
             INSERT INTO liquidaciones (solicitud, monto_1, monto_2, monto_3, fecha_Liquidacion_1, fecha_Liquidacion_2, fecha_Liquidacion_3, id_inmueble, id_contribuyente)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         ''', (solicitud, monto_1, monto_2, monto_3, fecha_Liquidacion_1, fecha_Liquidacion_2, fecha_Liquidacion_3, id_inmueble, id_contribuyente))
 
+# Generate data
+generate_contribuyentes(50)
+generate_sectores(50)
+generate_inmuebles(50)
+generate_liquidaciones(50)
+print("Data generation complete.")
+
+# Commit changes and close the connection
+conn.commit()
+conn.close()
 # Generate data
 generate_contribuyentes(50)
 generate_sectores(50)

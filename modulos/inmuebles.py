@@ -8,26 +8,22 @@ from functions.rectangle import rectangle
 from tkinter import messagebox
 from functions.calendario import open_calendar_popup
 
-uso = "Comercial"
 
 def inmuebles(window, last_window):
-    global uso, busquedabtn, busquedainm, refrescartabla
+    global busquedabtn, busquedainm, refrescartabla
     
     for widget in window.winfo_children():
         widget.destroy()
         
     def toggle_columns():
-        global uso
         if comer_rec.get():
             my_tree["displaycolumns"] = ('Cédula', 'Contribuyente', 'Código Catastral', 'Uso', 'Ubicación', 'Sector', 'Fecha de Registro')
             comer_rec.configure(text="Residencial")
-            uso = "Residencial"
-            loaddata()
+            loaddata("Residencial")
         else:
             my_tree["displaycolumns"] = ('Cédula', 'Contribuyente', 'Inmueble', 'RIF del Inmueble' ,'Código Catastral', 'Uso', 'Ubicación', 'Sector', 'Fecha de Registro')
             comer_rec.configure(text="Comercial")
-            uso = "Comercial"
-            loaddata()
+            loaddata("Comercial")
     
     poppins30bold = ("Poppins", 30, "bold")
     poppins20bold = ("Poppins", 20, "bold")
@@ -64,7 +60,7 @@ def inmuebles(window, last_window):
     comer_rec = ctk.CTkSwitch(top_frame2, text="Comerciales", font=poppins14bold, command=toggle_columns)
     comer_rec.pack(padx=5, pady=5, side="left")
 
-    refrescartabla = ctk.CTkButton(top_frame2, text="🔁", font=poppins14bold, width=30, command=lambda: loaddata())
+    refrescartabla = ctk.CTkButton(top_frame2, text="🔁", font=poppins14bold, width=30, command=lambda: loaddata("Comercial"))
     refrescartabla.pack(padx=5, pady=5, side="right")
 
     busquedabtn = ctk.CTkButton(top_frame2, text="Buscar", font=poppins14bold, width=80, command=lambda: reload_treeviewsearch(my_tree, busquedainm))
@@ -104,8 +100,7 @@ def inmuebles(window, last_window):
     canvas.pack()  # Posicionamos el canvas
     rectangle(canvas, 10, 10, 0, 0, r=5, fill='lightgray', outline='black')
 
-    def loaddata():
-        global uso
+    def loaddata(uso="Comercial"):
         try:
             with connection() as conn:
                 print("Database connection established.")
@@ -141,7 +136,7 @@ def inmuebles(window, last_window):
             print(f"Error during database operation: {e}")
 
     # Load initial data as "Comercial"
-    loaddata()
+    loaddata("Comercial")
     return window
 
 def ifasignar(bottom_frame, top_frame2, window, last_window, window_title, comer_rec):
@@ -179,7 +174,8 @@ def ifasignar(bottom_frame, top_frame2, window, last_window, window_title, comer
     frameinformacion = ctk.CTkFrame(frame_left)
     frameinformacion.pack(padx=10, pady=5, fill="x")
     
-
+    btn_mas= ctk.CTkButton(frameinformacion, text="➕", font=poppins14bold, width=40)
+    btn_mas.pack(padx=5, pady=5, side="right")
 
     text_label2 = ctk.CTkLabel(frameinformacion, text="Información del contribuyente", font=poppins14bold, text_color="grey")
     text_label2.pack(pady=5, padx=10, side="left")
@@ -668,19 +664,31 @@ def ifgestionar(window, bottom_frame, top_frame2, last_window, window_title, com
             rif.get(),
             rif_indicator.get()
         )
-        selected_values = my_tree.item(selected_item, "values")[0]
-        
+
+        # Verificar si el uso es "Residencial" y establecer los campos vacíos si es así
+        if new_values[5] == "Residencial":
+            new_values = (
+                new_values[0],
+                new_values[1],
+                "-",  # nom_inmueble vacío
+                new_values[3],
+                new_values[4],
+                new_values[5],
+                new_values[6],
+                "",  # rif vacío
+                ""  # rif_indicator vacío
+            )
 
         try:
             with connection() as conn:
                 cursor = conn.cursor()
 
                 # Get id_contribuyente from contribuyentes table
-                cursor.execute("SELECT id_contribuyente FROM contribuyentes WHERE ci_contribuyente = ?", (new_values[1][2:],))
+                cursor.execute("SELECT id_contribuyente FROM contribuyentes WHERE ci_contribuyente = ?", (new_values[0][2:],))
                 id_contribuyente = cursor.fetchone()[0]
 
                 # Get id_sector from sectores table
-                cursor.execute("SELECT id_sector FROM sectores WHERE nom_sector = ?", (new_values[7],))
+                cursor.execute("SELECT id_sector FROM sectores WHERE nom_sector = ?", (new_values[6],))
                 id_sector = cursor.fetchone()[0]
 
                 sql = '''
@@ -688,21 +696,12 @@ def ifgestionar(window, bottom_frame, top_frame2, last_window, window_title, com
                 SET nom_inmueble = ?, cod_catastral = ?, ubicacion = ?, uso = ?, id_contribuyente = ?, id_sector = ?, rif = ?, j = ?
                 WHERE id_inmueble = ?
                 '''
-                print(f"\n\n\n\nThis is new_values[2]: {new_values[3]}\n\n")
-                print(f"This is new_values[3]: {new_values[4]}\n\n")
-                print(f"This is new_values[4]: {new_values[5]}\n\n")
-                print(f"This is new_values[5]: {new_values[6]}\n\n")
-                print(f"This is id_contribuyente: {id_contribuyente}\n\n")
-                print(f"This is id_sector: {id_sector}\n\n")
-                print(f"This is new_values[7]: {new_values[8]}\n\n")
-                print(f"This is new_values[8]: {new_values[9]}\n\n")
-                print(f"This is selected_item: {selected_item}\n\n")
-
-                cursor.execute(sql, (new_values[3], new_values[4], new_values[5], new_values[6], id_contribuyente, id_sector, new_values[8], new_values[9], selected_values))
+                cursor.execute(sql, (new_values[2], new_values[3], new_values[4], new_values[5], id_contribuyente, id_sector, new_values[7], new_values[8], selected_item))
                 conn.commit()
                 print("Changes saved successfully!")
                 messagebox.showinfo("Información", "Se han Actualizado los datos correctamente")
                 reload_treeview(my_tree)
+                ifgestionar(window, bottom_frame, top_frame2, last_window, window_title, comer_rec)
                 labelcontri.configure(text='')
                 my_tree.bind("<ButtonRelease-1>", on_tree_select)
         except Exception as e:
@@ -752,15 +751,12 @@ def ifgestionar(window, bottom_frame, top_frame2, last_window, window_title, com
     my_tree.pack(pady=10, padx=10, fill="both", expand=True)
     
 
-    my_tree["columns"] = ("id", "Cédula", "Contribuyente", "Inmueble", "RIF del Inmueble", "Código Catastral", "Uso", "Ubicación", "Sector", "Fecha de Registro")
+    my_tree["columns"] = ("Cédula", "Contribuyente", "Inmueble", "RIF del Inmueble", "Código Catastral", "Uso", "Ubicación", "Sector", "Fecha de Registro")
     for col in my_tree["columns"]:
         my_tree.heading(col, text=col.capitalize(), anchor="center")
         my_tree.column(col, anchor="center")
         if col == "Código Catastral":
             my_tree.column(col, anchor="center", width=400)
-
-    my_tree.column("id", width=0, stretch=tk.NO)
-    my_tree.heading("id", text="", anchor="center")
 
     # Fetch data to populate Treeview
     reload_treeview(my_tree)
@@ -787,7 +783,7 @@ def reload_treeview(treeview):
 
             # Insert updated rows
             for row in results:
-                treeview.insert("", "end", iid=row[0], values=row)
+                treeview.insert("", "end", iid=row[0], values=row[1:])
 
     except Exception as e:
         print(f"Error fetching data: {e}")
@@ -812,7 +808,7 @@ def reload_treeviewsearch(treeview, ci):
     tree_data = []
     for item in treeview.get_children():
         tree_data.append(treeview.item(item)["values"])
-
+    print("Tree Data:", tree_data)
 
     
     # Find the index of the Cedula column in the tree headers
@@ -830,7 +826,7 @@ def reload_treeviewsearch(treeview, ci):
     if not filtered_data:
         messagebox.showinfo("Información", "No se encontraron resultados para la cédula ingresada.")
         print("No results found for the entered cédula.")
-        loaddata2(treeview)
+        reload_treeview(treeview)
         
         return
     print("Filtered Data:", filtered_data)
@@ -846,39 +842,3 @@ def fetch_all_records(tree, data):
     # Insert all records from the original data
     for record in data:
         tree.insert("", "end", values=record)
-
-def loaddata2(my_tree):
-    global uso
-    try:
-        with connection() as conn:
-            print("Database connection established.")
-            cursor = conn.cursor()
-            sql = """
-        SELECT c.v_e || "-" || c.ci_contribuyente,
-        c.nombres || ' ' || c.apellidos AS contribuyente,
-        i.nom_inmueble,
-        i.j || "-" || i.rif,
-        i.cod_catastral,
-        i.uso, 
-        i.ubicacion,
-        s.nom_sector AS sector,
-        i.fecha_registro
-        FROM inmuebles i
-        JOIN contribuyentes c ON i.id_contribuyente = c.id_contribuyente
-        JOIN sectores s ON i.id_sector = s.id_sector
-        WHERE i.uso = ?
-        ORDER BY c.ci_contribuyente ASC
-        """
-            cursor.execute(sql, (uso,))
-            results = cursor.fetchall()
-
-            # Clear existing rows
-            for row in my_tree.get_children():
-                my_tree.delete(row)
-
-            # Ensure data fits Treeview structure
-            for row in results:
-                my_tree.insert("", "end", values=row)
-
-    except Exception as e:
-        print(f"Error during database operation: {e}")
