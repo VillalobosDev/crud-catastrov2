@@ -1,8 +1,8 @@
 import customtkinter as ctk
 
 from tkcalendar import Calendar
-from functions.rango_fecha import rango_fecha_search
 from config.config import centrar_ventana
+
 
 
 def open_calendar_popup(entry_widget):
@@ -75,3 +75,54 @@ def create_date_range_selector(parent_frame, searchbtn, my_tree, original_data):
     else:
         print("Btn doesn't exist")
     return start_date_entry, end_date_entry
+
+from datetime import datetime
+
+def rango_fecha_search(my_tree, original_data, start_date_str, end_date_str):
+    """Filter treeview data based on date range."""
+    if not start_date_str or not end_date_str:
+        print("Both start and end dates must be provided.")
+        return
+
+    # Convert string objects to datetime objects
+    try:
+        start_date = datetime.strptime(start_date_str, "%d-%m-%Y")
+        end_date = datetime.strptime(end_date_str, "%d-%m-%Y")
+    except ValueError:
+        print("Invalid date format. Please use DD-MM-YYYY.")
+        return
+
+    # Print the existing columns of the tree
+    headers = my_tree["columns"]
+    print("\n\n\n\n\n\n\n\nTree Headers:", headers)
+
+    tree_data = []
+    for item in my_tree.get_children():
+        tree_data.append(my_tree.item(item)["values"])
+
+    # Find the index of the 'Pago Solicitud' column in the tree headers
+    try:
+        pago_solicitud_index = headers.index('Pago Solicitud')
+    except ValueError as e:
+        print(f"Date column not found in tree headers: {e}")
+        return
+
+    # Filter the data based on the selected date range
+    filtered_data = []
+    for row in tree_data:
+        try:
+            pago_solicitud = datetime.strptime(row[pago_solicitud_index], "%d-%m-%Y") if row[pago_solicitud_index] else None
+
+            if pago_solicitud and start_date <= pago_solicitud <= end_date:
+                filtered_data.append(row)
+        except ValueError:
+            continue
+
+    print("\n\n\n\n\n\n\n\n\nFiltered Data:", filtered_data)
+
+    update_treeview(my_tree, filtered_data)
+
+def update_treeview(my_tree, data):
+    """Update the treeview with new data."""
+    from modulos.consulta_general import fetch_all_records
+    fetch_all_records(my_tree, data)
