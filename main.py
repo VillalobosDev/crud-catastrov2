@@ -19,5 +19,5 @@ window.iconbitmap(r"assets/axiow.ico")
 
 centrar_ventana(window, 1080, 720)
 login(window)
-#
+
 window.mainloop()
