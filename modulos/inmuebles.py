@@ -128,16 +128,20 @@ def inmuebles(window, last_window):
                 for row in my_tree.get_children():
                     my_tree.delete(row)
 
-                # Ensure data fits Treeview structure
-                for row in results:
-                    my_tree.insert("", "end", values=row)
+                # Ensure data fits Treeview structure with alternating row colors
+                for index, row in enumerate(results):
+                    tags = ('odd',) if index % 2 == 0 else ('even',)
+                    my_tree.insert("", "end", values=row, tags=tags)
+
+                # Define tag styles
+                my_tree.tag_configure('odd', background='#f0f0f0')
+                my_tree.tag_configure('even', background='white')
 
         except Exception as e:
             print(f"Error during database operation: {e}")
 
     # Load initial data as "Comercial"
     loaddata("Comercial")
-    return window
 
 def ifasignar(bottom_frame, top_frame2, window, last_window, window_title, comer_rec):
     global busquedainm, busquedabtn, refrescartabla, id_contr
@@ -174,8 +178,6 @@ def ifasignar(bottom_frame, top_frame2, window, last_window, window_title, comer
     frameinformacion = ctk.CTkFrame(frame_left)
     frameinformacion.pack(padx=10, pady=5, fill="x")
     
-    btn_mas= ctk.CTkButton(frameinformacion, text="➕", font=poppins14bold, width=40)
-    btn_mas.pack(padx=5, pady=5, side="right")
 
     text_label2 = ctk.CTkLabel(frameinformacion, text="Información del contribuyente", font=poppins14bold, text_color="grey")
     text_label2.pack(pady=5, padx=10, side="left")
@@ -349,9 +351,14 @@ def ifasignar(bottom_frame, top_frame2, window, last_window, window_title, comer
             for row in my_tree.get_children():
                 my_tree.delete(row)
 
-            # Insert new rows
-            for row in data:
-                my_tree.insert("", "end", values=row)
+            # Insert new rows with alternating row colors
+            for index, row in enumerate(data):
+                tags = ('odd',) if index % 2 == 0 else ('even',)
+                my_tree.insert("", "end", values=row, tags=tags)
+
+            # Define tag styles
+            my_tree.tag_configure('odd', background='#f0f0f0')
+            my_tree.tag_configure('even', background='white')
         except Exception as e:
             print(f"Error fetching data: {e}")
 
@@ -651,7 +658,7 @@ def ifgestionar(window, bottom_frame, top_frame2, last_window, window_title, com
 
         my_tree.unbind("<ButtonRelease-1>")
         my_tree.bind("<<TreeviewSelect>>", on_tree_select)
-                     
+                 
     def save_changes(selected_item):
         new_values = (
             contribuyenteci.get(),
@@ -662,7 +669,8 @@ def ifgestionar(window, bottom_frame, top_frame2, last_window, window_title, com
             uso_var.get(),
             sector.get(),
             rif.get(),
-            rif_indicator.get()
+            rif_indicator.get(),
+            fecha.get()  # Add the fecha value here
         )
 
         # Verificar si el uso es "Residencial" y establecer los campos vacíos si es así
@@ -676,7 +684,8 @@ def ifgestionar(window, bottom_frame, top_frame2, last_window, window_title, com
                 new_values[5],
                 new_values[6],
                 "",  # rif vacío
-                ""  # rif_indicator vacío
+                "",  # rif_indicator vacío
+                new_values[9]  # Keep the fecha value
             )
 
         try:
@@ -693,10 +702,10 @@ def ifgestionar(window, bottom_frame, top_frame2, last_window, window_title, com
 
                 sql = '''
                 UPDATE inmuebles
-                SET nom_inmueble = ?, cod_catastral = ?, ubicacion = ?, uso = ?, id_contribuyente = ?, id_sector = ?, rif = ?, j = ?
+                SET nom_inmueble = ?, cod_catastral = ?, ubicacion = ?, uso = ?, id_contribuyente = ?, id_sector = ?, rif = ?, j = ?, fecha_registro = ?
                 WHERE id_inmueble = ?
                 '''
-                cursor.execute(sql, (new_values[2], new_values[3], new_values[4], new_values[5], id_contribuyente, id_sector, new_values[7], new_values[8], selected_item))
+                cursor.execute(sql, (new_values[2], new_values[3], new_values[4], new_values[5], id_contribuyente, id_sector, new_values[7], new_values[8], new_values[9], selected_item))
                 conn.commit()
                 print("Changes saved successfully!")
                 messagebox.showinfo("Información", "Se han Actualizado los datos correctamente")
@@ -781,9 +790,13 @@ def reload_treeview(treeview):
             for row in treeview.get_children():
                 treeview.delete(row)
 
-            # Insert updated rows
-            for row in results:
-                treeview.insert("", "end", iid=row[0], values=row[1:])
+            # Insert updated rows with alternating row colors
+            for index, row in enumerate(results):
+                tags = ('odd',) if index % 2 == 0 else ('even',)
+                treeview.insert("", "end", iid=row[0], values=row[1:], tags=tags)
+
+                treeview.tag_configure('odd', background='#f0f0f0')
+                treeview.tag_configure('even', background='white')
 
     except Exception as e:
         print(f"Error fetching data: {e}")

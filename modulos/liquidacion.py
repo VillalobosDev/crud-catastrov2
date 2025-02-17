@@ -9,7 +9,6 @@ import customtkinter as ctk
 from tkinter import ttk
 from config.config import centrar_ventana
 import openpyxl
-import sqlite3
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 
 selected_id_liquidacion = None
@@ -274,17 +273,14 @@ def load_liquidaciones_data(treeview):
             for row in treeview.get_children():
                 treeview.delete(row)
 
-            # Insert updated rows
-            for row in results:
-                tags = ()
-                if not row[6] or not row[8]:  # Check if "Fecha de pago Imp" or "Fecha de pago Inm" are empty
-                    tags = ('red',)
+            # Insert updated rows with alternating row colors
+            for index, row in enumerate(results):
+                tags = ('odd',) if index % 2 == 0 else ('even',)
                 treeview.insert("", "end", iid=row[0], values=row[1:], tags=tags)
 
             # Define tag styles
-            treeview.tag_configure('red', background='red')
-            for row in results:
-                treeview.insert("", "end", iid=row[0], values=row[1:])
+            treeview.tag_configure('odd', background='#f0f0f0')
+            treeview.tag_configure('even', background='white')
 
     except Exception as e:
         print(f"Error fetching data: {e}")
@@ -294,7 +290,7 @@ def load_liquidaciones_data2(treeview):
         with connection() as conn:
             cursor = conn.cursor()
             sql = """
-            SELECT c.v_e || "-" ||c.ci_contribuyente, c.nombres || ' ' || c.apellidos AS contribuyente_nombre
+            SELECT c.v_e || "-" || c.ci_contribuyente, c.nombres || ' ' || c.apellidos AS contribuyente_nombre
             FROM contribuyentes c
             ORDER BY c.ci_contribuyente ASC
             """
@@ -305,9 +301,14 @@ def load_liquidaciones_data2(treeview):
             for row in treeview.get_children():
                 treeview.delete(row)
 
-            # Insert updated rows
-            for row in results:
-                treeview.insert("", "end", values=row)
+            # Insert updated rows with alternating row colors
+            for index, row in enumerate(results):
+                tags = ('odd',) if index % 2 == 0 else ('even',)
+                treeview.insert("", "end", values=row, tags=tags)
+
+            # Define tag styles
+            treeview.tag_configure('odd', background='#f0f0f0')
+            treeview.tag_configure('even', background='white')
 
     except Exception as e:
         print(f"Error fetching data: {e}")
@@ -386,8 +387,8 @@ def update_liquidacion(tree, ci_entry, nombre_entry, inmueble_menu, info, monto1
                 inmueble = cursor.fetchone()
                 if inmueble:
                     id_inmueble = inmueble[0]
-                    cursor.execute("UPDATE liquidaciones SET solicitud = ? ,monto_1 = ?, monto_2 = ?, monto_3 = ? ,fecha_Liquidacion_1 = ?, fecha_Liquidacion_2 = ?, fecha_Liquidacion_2 = ?, id_inmueble = ? WHERE id_liquidacion = ?",
-                                   (info, monto1, monto2, monto3, fecha1, fecha2, fecha3,id_inmueble, selected_id_liquidacion))
+                    cursor.execute("UPDATE liquidaciones SET solicitud = ? ,monto_1 = ?, monto_2 = ?, monto_3 = ? ,fecha_Liquidacion_1 = ?, fecha_Liquidacion_2 = ?, fecha_Liquidacion_3 = ?, id_inmueble = ? WHERE id_liquidacion = ?",
+                                   (info, monto1, monto2, monto3, fecha1, fecha2, fecha3, id_inmueble, selected_id_liquidacion))
                     conn.commit()
                     load_liquidaciones_data(tree)
                     clearentrys(ci_entry, nombre_entry, inmueble_menu, info, monto1_entry, monto2_entry, monto3_entry, fecha1_entry, fecha2_entry, fecha3_entry)
@@ -479,13 +480,13 @@ def liquidacion(window, last_window):
 
     
 
-    crearinm = ctk.CTkButton(top_frame2, text="Asignar", command=lambda: ifasignar(window, bottom_frame, top_frame2, busquedabtn, busquedaliq, last_window, window_title), font=poppins14bold)
+    crearinm = ctk.CTkButton(top_frame2, text="Asignar", command=lambda: ifasignar(window, bottom_frame, top_frame2, busquedabtn, busquedaliq, last_window, window_title, btn_exportar), font=poppins14bold)
     crearinm.pack(padx=5, pady=5, side="left")
 
-    gestionarinm = ctk.CTkButton(top_frame2, text="Gestionar", command=lambda: ifgestionar(window, bottom_frame, top_frame2, busquedabtn, busquedaliq, last_window, window_title), font=poppins14bold)
+    gestionarinm = ctk.CTkButton(top_frame2, text="Gestionar", command=lambda: ifgestionar(window, bottom_frame, top_frame2, busquedabtn, busquedaliq, last_window, window_title, btn_exportar), font=poppins14bold)
     gestionarinm.pack(padx=5, pady=5, side="left")
 
-    btn_exportar = ctk.CTkButton(top_frame2, text="Exportar Excel", command=exportar_a_excel, font=poppins14bold)
+    btn_exportar = ctk.CTkButton(top_frame2, text="Exportar Excel", command=lambda: exportar_a_excel(my_tree), font=poppins14bold)
     btn_exportar.pack(padx=5, pady=5, side="left")
 
 
@@ -498,12 +499,14 @@ def liquidacion(window, last_window):
 
             
     # Contenido del bottom frame
+
+    
     treeframe = ctk.CTkFrame(bottom_frame, corner_radius=15)
     treeframe.pack(padx=5, pady=5, fill="both", expand=True)
 
     # Creando el treeview para mostrar los registros
-    frame_tree = ctk.CTkFrame(treeframe, fg_color='white', width=580, height=360)
-    frame_tree.pack(pady=10, padx=10, expand=True, fill="both")
+    frame_tree = ctk.CTkScrollableFrame(treeframe, fg_color='white', width=580, height=360, orientation="horizontal")
+    frame_tree.pack(pady=5, padx=5, expand=True, fill="both")
 
     my_tree = setup_treeview(frame_tree)
     load_liquidaciones_data(my_tree)
@@ -513,15 +516,11 @@ def liquidacion(window, last_window):
     style.configure("Custom.Treeview", font=("Poppins", 12), rowheight=25)
     style.configure("Custom.Treeview.Heading", font=("Poppins", 12, "bold"))
 
-    # Crear el scrollbar vertical con CustomTkinter
-    horizontal_scrollbar = ttk.Scrollbar(frame_tree, orient="horizontal", command=my_tree.xview)
-    my_tree.configure(xscrollcommand=horizontal_scrollbar.set)
-    horizontal_scrollbar.pack(side="bottom", fill="x")
 
     # Añadir evento de doble clic
     my_tree.bind("<Double-1>", on_double_click)
 
-def ifgestionar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold, last_window, window_title):
+def ifgestionar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold, last_window, window_title, exportarbtn):
     global busquedabtn, busquedaliq, recargarbusqueda
     window_title.configure(text="Gestión de liquidaciones | Gestionar")
 
@@ -531,6 +530,8 @@ def ifgestionar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold
         busquedaliqold.pack_forget()
     if recargarbusqueda:
         recargarbusqueda.pack_forget()
+    if exportarbtn:
+        exportarbtn.pack_forget()
 
     poppins14bold = ("Poppins", 14, "bold")
     poppins18 = ("Poppins", 18, "bold")
@@ -650,18 +651,12 @@ def ifgestionar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold
     btndelete = ctk.CTkButton(frame_left, text="Eliminar", command=lambda: delete_liquidacion(ci_entry, inmueble_menu, my_tree), font=poppins14bold)
     btndelete.pack(padx=10, pady=5, anchor="e", side="bottom")
     # Add Treeview for the right frame.
-    frame_tree = ctk.CTkFrame(frame_right, fg_color="white")
-    frame_tree.pack(pady=10, padx=10, expand=True, fill="both")
+
+    frame_tree = ctk.CTkScrollableFrame(frame_right, fg_color='white', width=580, height=360, orientation="horizontal")
+    frame_tree.pack(pady=5, padx=5, expand=True, fill="both")
 
     my_tree = setup_treeview(frame_tree)
     load_liquidaciones_data(my_tree)
-
-    horizontal_scrollbar = ttk.Scrollbar(frame_tree, orient="horizontal", command=my_tree.xview)
-
-    my_tree.configure(xscrollcommand=horizontal_scrollbar.set)
-
-    horizontal_scrollbar.pack(side="bottom", fill="x")
-
     
     recargarbusqueda = ctk.CTkButton(top_frame2, text="🔁", font=poppins14bold, width=30, command=lambda: load_liquidaciones_data(my_tree))
     recargarbusqueda.pack(padx=5, pady=5, side="right")      
@@ -734,7 +729,7 @@ def ifgestionar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold
 
             return selected_iid
     
-def ifasignar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold, last_window, window_title):
+def ifasignar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold, last_window, window_title, exportarbtn):
     global busquedabtn, busquedaliq, recargarbusqueda
     
     window_title.configure(text="Gestión de liquidaciones | Asignar")
@@ -744,6 +739,8 @@ def ifasignar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold, 
         busquedaliqold.pack_forget()
     if recargarbusqueda:
         recargarbusqueda.pack_forget()
+    if exportarbtn:
+        exportarbtn.pack_forget()
 
     poppins14bold = ("Poppins", 14, "bold")
     poppins18 = ("Poppins", 18, "bold")
@@ -966,24 +963,8 @@ def ifasignar(window, bottom_frame, top_frame2, busquedabtnold, busquedaliqold, 
         except Exception as e:
             print(f"Error guardando la liquidación: {e}")
  
-def exportar_a_excel():
+def exportar_a_excel(treeview):
     try:
-        # Conectar a la base de datos
-        conn = sqlite3.connect('db.db')
-        cursor = conn.cursor()
-
-        # Consulta para obtener los datos
-        cursor.execute('''
-            SELECT l.fecha_Liquidacion_1, l.id_liquidacion, i.nom_inmueble, c.nombres || ' ' || c.apellidos, 
-                   c.ci_contribuyente, s.nom_sector, i.cod_catastral, i.uso, l.monto_1, l.monto_2, l.fecha_Liquidacion_2
-            FROM liquidaciones l
-            JOIN inmuebles i ON l.id_inmueble = i.id_inmueble
-            JOIN contribuyentes c ON l.id_contribuyente = c.id_contribuyente
-            JOIN sectores s ON i.id_sector = s.id_sector
-            ORDER BY c.ci_contribuyente ASC
-        ''')
-        rows = cursor.fetchall()
-
         # Pedir al usuario que elija la ubicación y el nombre del archivo
         file_path = filedialog.asksaveasfilename(defaultextension=".xlsx", filetypes=[("Excel files", "*.xlsx"), ("All files", "*.*")])
         if not file_path:
@@ -995,49 +976,28 @@ def exportar_a_excel():
         sheet.title = 'Liquidaciones totales'
 
         # Agregar encabezados de columna
-        headers = [
-            "Fecha Liquidación", "N° Liquidación", "Inmueble", "Nombres y Apellidos",
-            "Cédula", "Sector", "Código Catastral", "Uso", "Monto Liquidado",
-            "Imp derecho de ocupación", "Total a Pagar", "Fecha Liquidación"
-        ]
+        headers = ["Cédula", "Contribuyente", "Código Catastral", "Solicitud", "Monto de Solicitud", "Fecha de pago Solicitud", "Monto del Imp-Ocup", "Fecha de pago Imp", "Monto del Inm-Urbano", "Fecha de pago Inm"]
         sheet.append(headers)
 
         # Cambiar la fuente y el tamaño de los encabezados
         header_font = Font(name='Arial', size=12, bold=True)
         thin_border = Border(left=Side(style='thin'), right=Side(style='thin'), top=Side(style='thin'), bottom=Side(style='thin'))
         yellow_fill = PatternFill(start_color="FFFF00", end_color="FFFF00", fill_type="solid")
-        
-        
+
         for cell in sheet[1]:
             cell.font = header_font
             cell.alignment = Alignment(horizontal='center', vertical='center')
             cell.border = thin_border
-            
-        # Resaltar las celdas de monto_2 y fecha_Liquidacion_2 en amarillo en los encabezados
-        sheet["L1"].fill = yellow_fill  # monto_2
-        sheet["J1"].fill = yellow_fill  # fecha_Liquidacion_2
-            
-            
+
         # Ajustar el ancho de las columnas
-        column_widths = [30, 20, 25, 30, 20, 20, 30, 20, 30, 30, 30,30]
+        column_widths = [20, 40, 40, 40, 30, 30, 30, 30, 30, 30]
         for i, column_width in enumerate(column_widths, start=1):
             sheet.column_dimensions[openpyxl.utils.get_column_letter(i)].width = column_width
-        # Agregar los datos al archivo Excel
-        for row_data in rows:
-            sheet.append([
-                row_data[0],  # fecha_Liquidacion_1
-                row_data[1],  # id_liquidacion
-                row_data[2],  # nom_inmueble
-                row_data[3],  # nombres y apellidos
-                row_data[4],  # ci_contribuyente
-                row_data[5],  # nom_sector
-                row_data[6],  # cod_catastral
-                row_data[7],  # uso
-                row_data[8],  # monto_1
-                row_data[9],  # monto_2
-                row_data[9],  # total_a_pagar
-                row_data[10]  # fecha_Liquidacion_2
-            ])
+
+        # Agregar los datos del Treeview al archivo Excel
+        for row_id in treeview.get_children():
+            row_data = treeview.item(row_id)['values']
+            sheet.append(row_data)
 
         # Cambiar la fuente y el tamaño de los datos
         data_font = Font(name='Arial', size=10)
@@ -1045,26 +1005,18 @@ def exportar_a_excel():
             for cell in row:
                 cell.font = data_font
                 cell.alignment = Alignment(horizontal='center', vertical='center')
-                
-        # Resaltar las celdas de monto_2 y fecha_Liquidacion_2 en amarillo
-        yellow_fill = PatternFill(start_color="FFFF00", end_color="FFFF00", fill_type="solid")
-        for row in sheet.iter_rows(min_row=2, max_row=sheet.max_row, min_col=1, max_col=sheet.max_column):
-            row[9].fill = yellow_fill  # monto_2
-            row[11].fill = yellow_fill  # fecha_Liquidacion_2
-                
-                
+
         # Resaltar las filas en rojo si las fechas están vacías
         red_fill = PatternFill(start_color="FF0000", end_color="FF0000", fill_type="solid")
         for row in sheet.iter_rows(min_row=2, max_row=sheet.max_row, min_col=1, max_col=sheet.max_column):
-            fecha_liquidacion_1 = row[0].value
-            fecha_liquidacion_2 = row[11].value
-            if not fecha_liquidacion_1 or not fecha_liquidacion_2:
+            fecha_pago_soli = row[5].value
+            fecha_pago_imp = row[7].value
+            fecha_pago_inm = row[9].value
+            if not fecha_pago_soli or not fecha_pago_imp or not fecha_pago_inm:
                 for cell in row:
                     cell.fill = red_fill
-                    
-                            
+
         # Agregar bordes a todas las celdas
-        thin_border = Border(left=Side(style='thin'), right=Side(style='thin'), top=Side(style='thin'), bottom=Side(style='thin'))
         for row in sheet.iter_rows(min_row=1, max_row=sheet.max_row, min_col=1, max_col=sheet.max_column):
             for cell in row:
                 cell.border = thin_border
@@ -1077,9 +1029,6 @@ def exportar_a_excel():
         messagebox.showerror("Error", "Permiso denegado: asegúrese de que el archivo no esté abierto en otra aplicación.")
     except Exception as e:
         messagebox.showerror("Error", f"Error al exportar los datos: {e}")
-
-    finally:
-        conn.close()
 
 
 

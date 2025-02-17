@@ -7,6 +7,18 @@ def centrar_ventana(ventana, ancho, alto):
     y = (ventana_alto // 2) - (alto // 2)
     
     ventana.geometry(f"{ancho}x{alto}+{x}+{y}")
+
+import json
+
+def set_window_icon(window):
+    with open('config/config.json', 'r') as config_file:
+        config = json.load(config_file)
+        theme = config.get('theme', 'light').lower()
+    
+    if theme == "light":
+        window.iconbitmap(r"assets/axio.ico")
+    else:
+        window.iconbitmap(r"assets/axiow.ico")
     
     
 

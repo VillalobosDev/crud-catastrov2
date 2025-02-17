@@ -3,7 +3,7 @@ import tkinter as tk
 from PIL import Image
 from modulos.transitions import transition_to_next_ui
 from config.config_temas import open_config_window
-from config.config import centrar_ventana
+from config.config import centrar_ventana, set_window_icon
 import json
 
 
@@ -91,7 +91,7 @@ def menubar(window):
         window.title("Axio")
         window.geometry("1000x600")
         window.resizable(False, False)
-        window.iconbitmap(r"assets/axiow.ico")
+        set_window_icon(window)
         centrar_ventana(window, 1000, 600)
 
         # Llamar a la función login con la nueva ventana

@@ -560,7 +560,7 @@ def bottom_treeview(frame, my_tree=None):
         treeframe.pack(padx=5, pady=5, fill="both", expand=True)
 
         # Treeview container
-        frame_tree = ctk.CTkFrame(treeframe, fg_color='white', width=580, height=360)
+        frame_tree = ctk.CTkScrollableFrame(treeframe, fg_color='white', width=580, height=360, orientation="horizontal")
         frame_tree.pack(pady=10, padx=10, expand=True, fill="both")
 
         style = ttk.Style()
@@ -570,10 +570,7 @@ def bottom_treeview(frame, my_tree=None):
         my_tree = ttk.Treeview(frame_tree, style="Custom.Treeview", show="headings")
         my_tree.pack(pady=10, padx=10, fill="both", expand=True)
 
-        # Scrollbar
-        horizontal_scrollbar = ttk.Scrollbar(frame_tree, orient="horizontal", command=my_tree.xview)
-        my_tree.configure(xscrollcommand=horizontal_scrollbar.set)
-        horizontal_scrollbar.pack(side="bottom", fill="x")
+
 
         # Use the global COLUMN_ORDER variable
         my_tree["columns"] = COLUMN_ORDER
