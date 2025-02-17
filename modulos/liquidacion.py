@@ -241,6 +241,8 @@ def fetch_all_records(tree, data):
     for item in tree.get_children():
         tree.delete(item)
 
+    
+
     # Insert all records from the original data
     for record in data:
         tree.insert("", "end", values=record)
@@ -1012,7 +1014,7 @@ def exportar_a_excel(treeview):
             fecha_pago_soli = row[5].value
             fecha_pago_imp = row[7].value
             fecha_pago_inm = row[9].value
-            if not fecha_pago_soli or not fecha_pago_imp or not fecha_pago_inm:
+            if not  fecha_pago_soli or not fecha_pago_imp or not fecha_pago_inm or fecha_pago_imp == 'None' or fecha_pago_inm == 'None':
                 for cell in row:
                     cell.fill = red_fill
 

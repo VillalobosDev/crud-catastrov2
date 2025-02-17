@@ -7,6 +7,7 @@ from tkinter import ttk
 from tkinter import filedialog
 from functions.rango_fecha import *
 from openpyxl import Workbook
+from openpyxl.styles import Alignment, Font, Border, Side
 from tkinter import messagebox
 import tkinter
 
@@ -858,12 +859,15 @@ def inmueble_search(my_tree, original_data, inmueble_entry, bottomframe):
     # Update Treeview
     fetch_all_records(my_tree, filtered_data)
 
+
+
+
 def export_treeview_to_xlsx(treeview, filename):
     # Create a new workbook and select the active worksheet
 
     filename = filedialog.asksaveasfilename(defaultextension=".xlsx", filetypes=[("Excel files", "*.xlsx"), ("All files", "*.*")])
     if not filename:
-        tkinter.messagebox.showinfo("Export Cancelled", "Debe elegir un nombre de archivo para exportar los datos.")
+        messagebox.showwarning("Advertencia", "Debe elegir un nombre de archivo para exportar los datos.")
         return
 
     workbook = Workbook()
@@ -873,15 +877,51 @@ def export_treeview_to_xlsx(treeview, filename):
     headings = treeview["columns"]
     sheet.append(headings)  # Append headings as the first row
 
+    # Define styles
+    bold_font = Font(name='Calibri', bold=True, size=12)
+    regular_font = Font(name='Calibri', size=11)
+    border_style = Border(
+        left=Side(style='thin'),
+        right=Side(style='thin'),
+        top=Side(style='thin'),
+        bottom=Side(style='thin')
+    )
+
+    # Center align the headings and apply bold font
+    for cell in sheet[1]:
+        cell.alignment = Alignment(horizontal='center', vertical='center')
+        cell.font = bold_font
+        cell.border = border_style
+
     # Iterate through the Treeview items and append them to the worksheet
     for item in treeview.get_children():
         row = treeview.item(item)["values"]
         sheet.append(row)
 
+    # Center align the data rows and apply regular font and border
+    for row in sheet.iter_rows(min_row=2, max_row=sheet.max_row, min_col=1, max_col=sheet.max_column):
+        for cell in row:
+            cell.alignment = Alignment(horizontal='center', vertical='center')
+            cell.font = regular_font
+            cell.border = border_style
+
+    # Adjust column widths
+    for col in sheet.columns:
+        max_length = 0
+        column = col[0].column_letter  # Get the column name
+        for cell in col:
+            try:
+                if len(str(cell.value)) > max_length:
+                    max_length = len(cell.value)
+            except:
+                pass
+        adjusted_width = (max_length + 2)
+        sheet.column_dimensions[column].width = adjusted_width
+
     # Save the workbook to the specified filename
     workbook.save(filename)
     print(f"Data exported to {filename} successfully.")
-
+    messagebox.showinfo("información", "Los datos se exportaron correctamente.")
 
 
 
