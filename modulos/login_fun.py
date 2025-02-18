@@ -4,7 +4,7 @@ import customtkinter as ctk
 from modulos.menu import menu
 from modulos2.menu import menu2
 from modulos.menubar import soporte
-from config.config import centrar_ventana
+from config.config import centrar_ventana, set_window_icon
 import json
 
 
@@ -14,8 +14,8 @@ def cargar_img_axio(frame_login):
     
     try:
         # Cargar la imagen desde la carpeta assets
-        imagen = Image.open("assets/axio_claro.png")
-        imagendark = Image.open("assets/axio_oscuro.png")
+        imagen = Image.open("assets/axio_claro.png").resize((100, 130), Image.LANCZOS)
+        imagendark = Image.open("assets/axio_oscuro.png").resize((100, 130), Image.LANCZOS)
 
         imagen_tk = ctk.CTkImage(light_image=imagen, dark_image=imagendark, size=(100,130))
 
@@ -188,7 +188,7 @@ def check(entry, window, left_frame):
             new_window = ctk.CTk()
             new_window.title("Axio")
             new_window.geometry("1080x720")
-            new_window.iconbitmap(r"assets/axiow.ico")
+            set_window_icon(new_window)
             centrar_ventana(new_window, 1080, 720)
 
             menu(new_window)
@@ -212,7 +212,7 @@ def check2(entry, window, left_frame):
             new_window = ctk.CTk()
             new_window.title("Axio")
             new_window.geometry("1080x720")
-            new_window.iconbitmap(r"assets/axiow.ico")
+            set_window_icon(new_window)
             centrar_ventana(new_window, 1080, 720)
 
             menu2(new_window)
