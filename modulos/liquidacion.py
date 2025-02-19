@@ -185,10 +185,11 @@ def reload_treeviewsearch2(treeview, ci_contribuyente):
     print("Filtered Data:", filtered_data)
 
     # Update Treeview
-    fetch_all_records(treeview, filtered_data)
+    fetch_all_records2(treeview, filtered_data)
 
 
 def reload_treeviewsearch(treeview, ci_contribuyente):
+
     ci = ci_contribuyente.get().strip()
     if not ci:
         messagebox.showerror('Error en la búsqueda', 'Debe ingresar un dato en el campo cédula')
@@ -232,20 +233,54 @@ def reload_treeviewsearch(treeview, ci_contribuyente):
         return
     # Print filtered data
     print("Filtered Data:", filtered_data)
-
+    for item in treeview.get_children():
+        treeview.delete(item)
     # Update Treeview
     fetch_all_records(treeview, filtered_data)
+def fetch_all_records2(tree, data):
+    # Clear the treeview
+    for item in tree.get_children():
+        tree.delete(item)
+
+    for i, row in enumerate(data):
+        tag = 'gray' if i % 2 == 0 else 'default'
+        tree.insert("", "end", values=row, tags=(tag,))
+
+    # Apply tag configuration for gray and white rows
+    tree.tag_configure('gray', background='#f0f0f0')
+    tree.tag_configure('default', background='white')
 
 def fetch_all_records(tree, data):
     # Clear the treeview
     for item in tree.get_children():
         tree.delete(item)
 
-    
 
-    # Insert all records from the original data
-    for record in data:
-        tree.insert("", "end", values=record)
+    #############################################
+    headers = tree["columns"]
+    print("\n\n\n\n\nTree Headers in fetch_all_records:\n\n\n\n\n", headers)
+
+    # Check if the specified columns are present
+    try:
+        pago_impuesto_ocup_index = headers.index('Fecha de pago Imp')
+        pago_inm_urbano_index = headers.index('Fecha de pago Inm')
+    except ValueError as e:
+        print(f"Error: {e}")
+        messagebox.showinfo("No Results", "No se encontraron las columnas 'Pago Impuesto-Ocup' o 'Pago Inm-Urbano'.")
+        return
+    
+    for i, row in enumerate(data):
+        # Check if the specified columns are None or empty
+        if row[pago_impuesto_ocup_index] is None or row[pago_inm_urbano_index] is None or row[pago_impuesto_ocup_index] == 'None' or row[pago_inm_urbano_index] == 'None' or not row[pago_impuesto_ocup_index] or not row[pago_inm_urbano_index]:
+            tree.insert("", "end", values=row, tags=('red',))
+        else:
+            tag = 'gray' if i % 2 == 0 else 'default'
+            tree.insert("", "end", values=row, tags=(tag,))
+
+    # Apply tag configuration for red and gray rows
+    tree.tag_configure('red', background='red')
+    tree.tag_configure('gray', background='#f0f0f0')
+    tree.tag_configure('default', background='white')
 
 def load_liquidaciones_data(treeview):
     try:
@@ -276,16 +311,18 @@ def load_liquidaciones_data(treeview):
                 treeview.delete(row)
 
             # Insert updated rows
-            for row in results:
-                tags = ()
-                if not row[6] or not row[8]:  # Check if "Fecha de pago Imp" or "Fecha de pago Inm" are empty
-                    tags = ('red',)
-                treeview.insert("", "end", iid=row[0], values=row[1:], tags=tags)
+            for i, row in enumerate(results):
+                # Check if "Fecha de pago Imp" or "Fecha de pago Inm" are None or empty
+                if row[6] is None or row[8] is None or row[6] == 'None' or row[8] == 'None' or not row[6] or not row[8]:
+                    treeview.insert("", "end", iid=row[0], values=row[1:], tags=('red',))
+                else:
+                    tag = 'gray' if i % 2 == 0 else 'default'
+                    treeview.insert("", "end", iid=row[0], values=row[1:], tags=(tag,))
 
-            # Define tag styles
+            # Apply tag configuration for red and gray rows
             treeview.tag_configure('red', background='red')
-            for row in results:
-                treeview.insert("", "end", iid=row[0], values=row[1:])
+            treeview.tag_configure('gray', background='#f0f0f0')
+            treeview.tag_configure('default', background='white')
 
     except Exception as e:
         print(f"Error fetching data: {e}")

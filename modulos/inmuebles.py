@@ -103,7 +103,6 @@ def inmuebles(window, last_window):
     rectangle(canvas, 10, 10, 0, 0, r=5, fill='lightgray', outline='black')
 
     def loaddata(uso="Comercial"):
-    def loaddata(uso="Comercial"):
         try:
             with connection() as conn:
                 print("Database connection established.")
@@ -707,10 +706,21 @@ def ifgestionar(window, bottom_frame, top_frame2, last_window, window_title, com
 
                 sql = '''
                 UPDATE inmuebles
-                SET nom_inmueble = ?, cod_catastral = ?, ubicacion = ?, uso = ?, id_contribuyente = ?, id_sector = ?, rif = ?, j = ?, fecha_registro = ?
+                SET nom_inmueble = ?,
+                cod_catastral = ?,
+                ubicacion = ?, 
+                uso = ?, 
+                id_contribuyente = ?, 
+                id_sector = ?, 
+                rif = ?, 
+                j = ?, 
+                fecha_registro = ?
                 WHERE id_inmueble = ?
                 '''
-                cursor.execute(sql, (new_values[2], new_values[3], new_values[4], new_values[5], id_contribuyente, id_sector, new_values[7], new_values[8], new_values[9], selected_item))
+                for i, value in enumerate([new_values[2], new_values[3], new_values[4], new_values[5], id_contribuyente, id_sector, new_values[7], new_values[8], new_values[9], selected_item]):
+                    print(f"\n\nValue {i}: {value}")
+                cursor.execute(sql, (new_values[2], new_values[3], new_values[4], new_values[5],
+                                      id_contribuyente, id_sector, new_values[7], new_values[8], new_values[9], selected_item))
                 conn.commit()
                 print("Changes saved successfully!")
                 messagebox.showinfo("Información", "Se han Actualizado los datos correctamente")

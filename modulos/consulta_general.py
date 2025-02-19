@@ -202,7 +202,6 @@ def display_column_switches(top_frame4, treeview, original_data, window):
     year_menu = ctk.CTkOptionMenu(
         button_frame,
         values=["2023", "2024", "2025", "2026", "2027", "2028"],
-        values=["2023", "2024", "2025", "2026", "2027", "2028"],
         font=poppins12,
     )
     year_menu.set("Seleccionar Año")
@@ -319,14 +318,12 @@ def consulta(window, last_window):
     
 
     searchbtn = display_search_filter(top_frame3, my_tree, original_data, bottomframe = bottom_frame)
-    searchbtn = display_search_filter(top_frame3, my_tree, original_data, bottomframe = bottom_frame)
     # print(type(searchbtn)) 
 
     # create_date_range_selector(top_frame4, searchbtn, my_tree, original_data)
 
 
 
-def display_search_filter(frame, my_tree, original_data, bottomframe):
 def display_search_filter(frame, my_tree, original_data, bottomframe):
     global search_filter_created
     global selected_columns
@@ -469,12 +466,8 @@ def refresh_treeview(treeview, column_switches, year):
             f"JOIN contribuyentes ON inmuebles.id_contribuyente = contribuyentes.id_contribuyente " \
             f"JOIN sectores ON inmuebles.id_sector = sectores.id_sector " \
             f"JOIN liquidaciones ON inmuebles.id_inmueble = liquidaciones.id_inmueble " \
-            f"WHERE extract_year(liquidaciones.fecha_Liquidacion_1) = ? " \
-            f"ORDER BY contribuyentes.ci_contribuyente ASC"
-            f"WHERE extract_year(liquidaciones.fecha_Liquidacion_1) = ? " \
-            f"ORDER BY contribuyentes.ci_contribuyente ASC"
+            f"WHERE strftime('%Y', liquidaciones.fecha_Liquidacion_1) = ?"
 
-    print(f"Executing Query: {query}\n\n\n")  # Debugging: Show the query being executed
     print(f"Executing Query: {query}\n\n\n")  # Debugging: Show the query being executed
     
     treeview["columns"] = selected_columns
@@ -487,14 +480,12 @@ def refresh_treeview(treeview, column_switches, year):
     try:
         with connection() as conn:
             conn.create_function("extract_year", 1, extract_year)
-            conn.create_function("extract_year", 1, extract_year)
             cursor = conn.cursor()
             cursor.execute(query, (year,))
             filtered_data = cursor.fetchall()
 
             print(f"Fetched {len(filtered_data)} rows from the database.")  # Debugging: Show the number of rows fetched
 
-            print(f"Fetched {len(filtered_data)} rows from the database.")  # Debugging: Show the number of rows fetched
 
             # Update the Treeview columns and insert the new data into the Treeview
 
@@ -524,31 +515,7 @@ def refresh_treeview(treeview, column_switches, year):
                 treeview.tag_configure('red', background='red')
                 treeview.tag_configure('gray', background='#f0f0f0')
                 treeview.tag_configure('default', background='white')
-            # Print headers of the tree
-            headers = treeview["columns"]
-            print("Tree Headers in refresh_treeview:", headers)
-            for header in headers:
-                print(header)
-                # Find the indices of the columns to check for empty values
-                try:
-                    pago_impuesto_ocup_index = headers.index('Pago Impuesto-Ocup')
-                    pago_inm_urbano_index = headers.index('Pago Inm-Urbano')
-                except ValueError as e:
-                    print(f"Error: {e}")
-                    return
-
-                for i, row in enumerate(filtered_data):
-                    # Check if the specified columns are empty
-                    if not row[pago_impuesto_ocup_index] or not row[pago_inm_urbano_index]:
-                        treeview.insert("", "end", values=row, tags=('red',))
-                    else:
-                        tag = 'gray' if i % 2 == 0 else 'default'
-                        treeview.insert("", "end", values=row, tags=(tag,))
-
-                # Apply tag configuration for red and gray rows
-                treeview.tag_configure('red', background='red')
-                treeview.tag_configure('gray', background='#f0f0f0')
-                treeview.tag_configure('default', background='white')
+           
     
     except Exception as e:
         print(f"Error during query execution: {e}")
@@ -598,10 +565,15 @@ def fetch_data_by_year_range(treeview, year):
     except Exception as e:
         print(f"Error during database operation: {e}")
 
-def bottom_treeview(frame):
-    # Treeview frame
-    treeframe = ctk.CTkFrame(frame, corner_radius=15)
-    treeframe.pack(padx=5, pady=5, fill="both", expand=True)
+
+        
+def bottom_treeview(frame, existing_treeview=None):
+    if existing_treeview:
+        my_tree = existing_treeview
+    else:
+        # Treeview frame
+        treeframe = ctk.CTkFrame(frame, corner_radius=15)
+        treeframe.pack(padx=5, pady=5, fill="both", expand=True)
 
         # Treeview container
         frame_tree = ctk.CTkScrollableFrame(treeframe, fg_color='white', width=580, height=360, orientation="horizontal")
@@ -614,10 +586,10 @@ def bottom_treeview(frame):
         my_tree = ttk.Treeview(frame_tree, style="Custom.Treeview", show="headings")
         my_tree.pack(pady=10, padx=10, fill="both", expand=True)
 
-    # Scrollbar
-    horizontal_scrollbar = ttk.Scrollbar(frame_tree, orient="horizontal", command=my_tree.xview)
-    my_tree.configure(xscrollcommand=horizontal_scrollbar.set)
-    horizontal_scrollbar.pack(side="bottom", fill="x")
+        # Scrollbar
+        horizontal_scrollbar = ttk.Scrollbar(frame_tree, orient="horizontal", command=my_tree.xview)
+        my_tree.configure(xscrollcommand=horizontal_scrollbar.set)
+        horizontal_scrollbar.pack(side="bottom", fill="x")
 
         # Use the global COLUMN_ORDER variable
         my_tree["columns"] = COLUMN_ORDER
@@ -654,7 +626,6 @@ def bottom_treeview(frame):
             JOIN sectores ON inmuebles.id_sector = sectores.id_sector
             JOIN liquidaciones ON inmuebles.id_inmueble = liquidaciones.id_inmueble 
             ORDER BY contribuyentes.ci_contribuyente ASC
-            ORDER BY contribuyentes.ci_contribuyente ASC
             '''
             cursor.execute(sql)
             original_data = cursor.fetchall()
@@ -670,65 +641,36 @@ def bottom_treeview(frame):
             print("Tree Headers in bottom_treeview:")
             for header in headers:
                 print(header)
-                # Find the indices of the columns to check for empty values
-                try:
-                    pago_impuesto_ocup_index = headers.index('Pago Impuesto-Ocup')
-                    pago_inm_urbano_index = headers.index('Pago Inm-Urbano')
-                except ValueError as e:
-                    print(f"Error: {e}")
-                    return
 
-                for i, row in enumerate(original_data):
-                    # Check if the specified columns are empty
-                    if not row[pago_impuesto_ocup_index] or not row[pago_inm_urbano_index]:
-                        my_tree.insert("", "end", values=row, tags=('red',))
-                    else:
-                        tag = 'gray' if i % 2 == 0 else 'default'
-                        my_tree.insert("", "end", values=row, tags=(tag,))
+            # Find the indices of the columns to check for empty values
+            try:
+                pago_impuesto_ocup_index = headers.index('Pago Impuesto-Ocup')
+                pago_inm_urbano_index = headers.index('Pago Inm-Urbano')
+            except ValueError as e:
+                print(f"Error: {e}")
+                return
 
-                # Apply tag configuration for red and gray rows
-                my_tree.tag_configure('red', background='red')
-                my_tree.tag_configure('gray', background='#f0f0f0')
-                my_tree.tag_configure('default', background='white')
-            # Clear the Treeview before inserting new data
-            for item in my_tree.get_children():
-                my_tree.delete(item)
+            for i, row in enumerate(original_data):
+                # Check if the specified columns are empty
+                if not row[pago_impuesto_ocup_index] or not row[pago_inm_urbano_index]:
+                    my_tree.insert("", "end", values=row, tags=('red',))
+                else:
+                    tag = 'gray' if i % 2 == 0 else 'default'
+                    my_tree.insert("", "end", values=row, tags=(tag,))
 
-            headers = my_tree["columns"]
-            print("Tree Headers in bottom_treeview:")
-            for header in headers:
-                print(header)
-                # Find the indices of the columns to check for empty values
-                try:
-                    pago_impuesto_ocup_index = headers.index('Pago Impuesto-Ocup')
-                    pago_inm_urbano_index = headers.index('Pago Inm-Urbano')
-                except ValueError as e:
-                    print(f"Error: {e}")
-                    return
-
-                for i, row in enumerate(original_data):
-                    # Check if the specified columns are empty
-                    if not row[pago_impuesto_ocup_index] or not row[pago_inm_urbano_index]:
-                        my_tree.insert("", "end", values=row, tags=('red',))
-                    else:
-                        tag = 'gray' if i % 2 == 0 else 'default'
-                        my_tree.insert("", "end", values=row, tags=(tag,))
-
-                # Apply tag configuration for red and gray rows
-                my_tree.tag_configure('red', background='red')
-                my_tree.tag_configure('gray', background='#f0f0f0')
-                my_tree.tag_configure('default', background='white')
+            # Apply tag configuration for red and gray rows
+            my_tree.tag_configure('red', background='red')
+            my_tree.tag_configure('gray', background='#f0f0f0')
+            my_tree.tag_configure('default', background='white')
 
     except Exception as e:
         print(f"Error during database operation: {e}")
 
     return my_tree, original_data  # Return both my_tree and original_data
 
-
-
-def cedula_search(my_tree, original_data, cedula_entry, bottomframe):
 def cedula_search(my_tree, original_data, cedula_entry, bottomframe):
     """Filter treeview data based on Cedula."""
+
     cedula_value = cedula_entry.get().strip()
     if not cedula_value:
         print("Cedula field is empty.")
@@ -745,8 +687,6 @@ def cedula_search(my_tree, original_data, cedula_entry, bottomframe):
     # print("Tree Data:", tree_data)
     # print("Tree Data:", tree_data)
 
-    # Print original_data
-    print("Original Data:", original_data)
 
     # Find the index of the Cedula column in the tree headers
     try:
@@ -810,35 +750,8 @@ def fetch_all_records(tree, data):
     tree.tag_configure('red', background='red')
     tree.tag_configure('gray', background='#f0f0f0')
     tree.tag_configure('default', background='white')
-    # Print headers of the tree
-    headers = tree["columns"]
-    print("Tree Headers in fetch_all_records:", headers)
-
-    # Check if the specified columns are present
-    try:
-        pago_impuesto_ocup_index = headers.index('Pago Impuesto-Ocup')
-        pago_inm_urbano_index = headers.index('Pago Inm-Urbano')
-    except ValueError as e:
-        print(f"Error: {e}")
-        messagebox.showinfo("No Results", "No se encontraron las columnas 'Pago Impuesto-Ocup' o 'Pago Inm-Urbano'.")
-        return
-
-    # Insert the rows fetched from the query into the Treeview
-    for i, row in enumerate(data):
-        # Check if the specified columns are None or empty
-        if row[pago_impuesto_ocup_index] is None or row[pago_inm_urbano_index] is None or row[pago_impuesto_ocup_index] == 'None' or row[pago_inm_urbano_index] == 'None' or not row[pago_impuesto_ocup_index] or not row[pago_inm_urbano_index]:
-            tree.insert("", "end", values=row, tags=('red',))
-        else:
-            tag = 'gray' if i % 2 == 0 else 'default'
-            tree.insert("", "end", values=row, tags=(tag,))
-
-    # Apply tag configuration for red and gray rows
-    tree.tag_configure('red', background='red')
-    tree.tag_configure('gray', background='#f0f0f0')
-    tree.tag_configure('default', background='white')
 
 
-def nombre_search(my_tree, original_data, name_entry, bottomframe):
 def nombre_search(my_tree, original_data, name_entry, bottomframe):
     """Filter treeview data based on Nombre (Name)."""
     name_value = name_entry.get().strip()
