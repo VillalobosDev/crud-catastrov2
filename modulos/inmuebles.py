@@ -568,6 +568,7 @@ def ifgestionar(window, bottom_frame, top_frame2, last_window, window_title, com
         if uso_var.get() == "Comercial":
             inmueble_frame.pack(padx=10, pady=5, anchor="w")
             rif_frame.pack(padx=10, pady=5, anchor="w")
+            
         else:
             inmueble_frame.pack_forget()
             rif_frame.pack_forget()
@@ -619,19 +620,19 @@ def ifgestionar(window, bottom_frame, top_frame2, last_window, window_title, com
         values = my_tree.item(selected_item, "values")
 
         contribuyenteci.delete(0, ctk.END)
-        contribuyenteci.insert(0, values[0])
+        contribuyenteci.insert(0, values[1])
 
         contribuyentenombre.delete(0, ctk.END)
-        contribuyentenombre.insert(0, values[1])
+        contribuyentenombre.insert(0, values[2])
 
         inmueble.delete(0, ctk.END)
-        inmueble.insert(0, values[2])
+        inmueble.insert(0, values[3])
         
         inmuebleubic.delete(0, ctk.END)
-        inmuebleubic.insert(0, values[6])
+        inmuebleubic.insert(0, values[7])
 
         # Separar el prefijo del RIF y el número del RIF
-        rif_value = values[3].split("-")
+        rif_value = values[4].split("-")
         if len(rif_value) == 2:
             rif_indicator.set(rif_value[0])  # Asigna el prefijo al CTkOptionMenu
             rif.delete(0, ctk.END)
@@ -639,21 +640,21 @@ def ifgestionar(window, bottom_frame, top_frame2, last_window, window_title, com
         else:
             rif_indicator.set("")
             rif.delete(0, ctk.END)
-            rif.insert(0, values[3])
+            rif.insert(0, values[4])
 
         inmueblecod.delete(0, ctk.END)
-        inmueblecod.insert(0, values[4])
+        inmueblecod.insert(0, values[5])
 
-        uso_var.set(values[5])
-        sector.set(values[7])
+        uso_var.set(values[6])
+        sector.set(values[8])
         
         fecha.delete(0, ctk.END)
-        fecha.insert(0, values[8])
+        fecha.insert(0, values[9])
 
-        labelcontri.configure(text=f"{values[1]}",  text_color=ctk.ThemeManager.theme["CTkLabel"]["text_color"])
+        labelcontri.configure(text=f"{values[2]}",  text_color=ctk.ThemeManager.theme["CTkLabel"]["text_color"])
 
         # Mostrar u ocultar el frame de inmueble según el valor de uso
-        if values[5] == "Comercial":
+        if values[6] == "Comercial":
             inmueble_frame.pack(padx=10, pady=5, anchor="w")
             rif_frame.pack(padx=10, pady=5, anchor="w")
         else:
@@ -664,6 +665,7 @@ def ifgestionar(window, bottom_frame, top_frame2, last_window, window_title, com
         my_tree.bind("<<TreeviewSelect>>", on_tree_select)
                  
     def save_changes(selected_item):
+        id = my_tree.item(selected_item)["values"][0]
         new_values = (
             contribuyenteci.get(),
             contribuyentenombre.get(),
@@ -720,7 +722,7 @@ def ifgestionar(window, bottom_frame, top_frame2, last_window, window_title, com
                 for i, value in enumerate([new_values[2], new_values[3], new_values[4], new_values[5], id_contribuyente, id_sector, new_values[7], new_values[8], new_values[9], selected_item]):
                     print(f"\n\nValue {i}: {value}")
                 cursor.execute(sql, (new_values[2], new_values[3], new_values[4], new_values[5],
-                                      id_contribuyente, id_sector, new_values[7], new_values[8], new_values[9], selected_item))
+                                      id_contribuyente, id_sector, new_values[7], new_values[8], new_values[9], id))
                 conn.commit()
                 print("Changes saved successfully!")
                 messagebox.showinfo("Información", "Se han Actualizado los datos correctamente")
@@ -775,12 +777,14 @@ def ifgestionar(window, bottom_frame, top_frame2, last_window, window_title, com
     my_tree.pack(pady=10, padx=10, fill="both", expand=True)
     
 
-    my_tree["columns"] = ("Cédula", "Contribuyente", "Inmueble", "RIF del Inmueble", "Código Catastral", "Uso", "Ubicación", "Sector", "Fecha de Registro")
+    my_tree["columns"] = ("ID", "Cédula", "Contribuyente", "Inmueble", "RIF del Inmueble", "Código Catastral", "Uso", "Ubicación", "Sector", "Fecha de Registro")
     for col in my_tree["columns"]:
         my_tree.heading(col, text=col.capitalize(), anchor="center")
         my_tree.column(col, anchor="center")
         if col == "Código Catastral":
             my_tree.column(col, anchor="center", width=400)
+    # Hide the first column (ID)
+    my_tree.column('ID', width=0, stretch=tk.NO)
 
     # Fetch data to populate Treeview
     reload_treeview(my_tree)
@@ -808,10 +812,15 @@ def reload_treeview(treeview):
             # Insert updated rows with alternating row colors
             for index, row in enumerate(results):
                 tags = ('odd',) if index % 2 == 0 else ('even',)
-                treeview.insert("", "end", iid=row[0], values=row[1:], tags=tags)
+                treeview.insert("", "end", values=row, tags=tags)
 
-                treeview.tag_configure('odd', background='#f0f0f0')
-                treeview.tag_configure('even', background='white')
+            # Define tag styles
+            treeview.tag_configure('odd', background='#f0f0f0')
+            treeview.tag_configure('even', background='white')
+
+            # Hide the first column (ID)
+            treeview.column('#0', width=0, stretch=tk.NO)
+            treeview.heading('#0', text='')
 
     except Exception as e:
         print(f"Error fetching data: {e}")

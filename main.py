@@ -1,6 +1,7 @@
 import customtkinter as ctk
 from modulos.consulta_general import consulta
 from modulos.menu import menu
+from modulos.inmuebles import inmuebles
 from modulos.login_fun import login
 from config.config_temas import load_config, apply_theme, apply_color
 from config.config import centrar_ventana, set_window_icon
@@ -21,7 +22,7 @@ window.geometry("1080x720")
 set_window_icon(window)
 
 centrar_ventana(window, 1080, 720)
-consulta(window, menu)
+# consulta(window, menu)
 # login(window)
-
+inmuebles(window, menu)
 window.mainloop()

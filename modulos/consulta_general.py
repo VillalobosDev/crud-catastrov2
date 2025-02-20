@@ -7,7 +7,7 @@ from tkinter import ttk
 from tkinter import filedialog
 from functions.rango_fecha import *
 from openpyxl import Workbook
-from openpyxl.styles import Alignment, Font, Border, Side
+from openpyxl.styles import Alignment, Font, Border, Side, PatternFill
 from tkinter import messagebox
 import tkinter
 
@@ -72,10 +72,10 @@ def display_column_switches(top_frame4, treeview, original_data, window):
     # Frame to hold switches
     toplevel = ctk.CTkToplevel(window)
     toplevel.title("Filtros")
-    toplevel.geometry("800x400")
+    toplevel.geometry("800x600")
     toplevel.grab_set()
     toplevel.resizable(False, False)
-    centrar_ventana(toplevel, 800, 500)
+    centrar_ventana(toplevel, 800, 550)
 
     switches_frame = ctk.CTkFrame(toplevel, corner_radius=15)
     switches_frame.pack(pady=5, padx=5, fill="both", expand=True)
@@ -466,9 +466,10 @@ def refresh_treeview(treeview, column_switches, year):
             f"JOIN contribuyentes ON inmuebles.id_contribuyente = contribuyentes.id_contribuyente " \
             f"JOIN sectores ON inmuebles.id_sector = sectores.id_sector " \
             f"JOIN liquidaciones ON inmuebles.id_inmueble = liquidaciones.id_inmueble " \
-            f"WHERE strftime('%Y', liquidaciones.fecha_Liquidacion_1) = ?"
+            f"WHERE substr(liquidaciones.fecha_Liquidacion_1, -4) = ?"
 
     print(f"Executing Query: {query}\n\n\n")  # Debugging: Show the query being executed
+    print(f"Year parameter: {year}\n\n\n")  # Debugging: Show the year parameter being passed
     
     treeview["columns"] = selected_columns
             
@@ -479,18 +480,13 @@ def refresh_treeview(treeview, column_switches, year):
     # Try to fetch the data from the database
     try:
         with connection() as conn:
-            conn.create_function("extract_year", 1, extract_year)
             cursor = conn.cursor()
             cursor.execute(query, (year,))
             filtered_data = cursor.fetchall()
 
             print(f"Fetched {len(filtered_data)} rows from the database.")  # Debugging: Show the number of rows fetched
 
-
             # Update the Treeview columns and insert the new data into the Treeview
-
-            # Insert the rows fetched from the query into the Treeview
-            # Print headers of the tree
             headers = treeview["columns"]
             print("Tree Headers in refresh_treeview:", headers)
             for header in headers:
@@ -515,11 +511,9 @@ def refresh_treeview(treeview, column_switches, year):
                 treeview.tag_configure('red', background='red')
                 treeview.tag_configure('gray', background='#f0f0f0')
                 treeview.tag_configure('default', background='white')
-           
     
     except Exception as e:
         print(f"Error during query execution: {e}")
-
 
 
 def fetch_data_by_year_range(treeview, year):
@@ -884,8 +878,6 @@ def inmueble_search(my_tree, original_data, inmueble_entry, bottomframe):
     fetch_all_records(my_tree, filtered_data)
 
 
-
-
 def export_treeview_to_xlsx(treeview, filename):
     # Create a new workbook and select the active worksheet
 
@@ -910,6 +902,9 @@ def export_treeview_to_xlsx(treeview, filename):
         top=Side(style='thin'),
         bottom=Side(style='thin')
     )
+    red_fill = PatternFill(start_color="FF0000", end_color="FF0000", fill_type="solid")
+    gray_fill = PatternFill(start_color="F0F0F0", end_color="F0F0F0", fill_type="solid")
+    white_fill = PatternFill(start_color="FFFFFF", end_color="FFFFFF", fill_type="solid")
 
     # Center align the headings and apply bold font
     for cell in sheet[1]:
@@ -917,17 +912,36 @@ def export_treeview_to_xlsx(treeview, filename):
         cell.font = bold_font
         cell.border = border_style
 
+    # Print headers of the tree
+    headers = treeview["columns"]
+    print("Tree Headers in export_treeview_to_xlsx:", headers)
+
+    # Check if the specified columns are present
+    try:
+        pago_impuesto_ocup_index = headers.index('Pago Impuesto-Ocup')
+        pago_inm_urbano_index = headers.index('Pago Inm-Urbano')
+    except ValueError as e:
+        print(f"Error: {e}")
+        messagebox.showinfo("No Results", "No se encontraron las columnas 'Pago Impuesto-Ocup' o 'Pago Inm-Urbano'.")
+        return
+
     # Iterate through the Treeview items and append them to the worksheet
-    for item in treeview.get_children():
+    for i, item in enumerate(treeview.get_children()):
         row = treeview.item(item)["values"]
         sheet.append(row)
 
-    # Center align the data rows and apply regular font and border
-    for row in sheet.iter_rows(min_row=2, max_row=sheet.max_row, min_col=1, max_col=sheet.max_column):
-        for cell in row:
+        # Check if the specified columns are None or empty
+        if row[pago_impuesto_ocup_index] is None or row[pago_inm_urbano_index] is None or row[pago_impuesto_ocup_index] == 'None' or row[pago_inm_urbano_index] == 'None' or not row[pago_impuesto_ocup_index] or not row[pago_inm_urbano_index]:
+            fill = red_fill
+        else:
+            fill = gray_fill if i % 2 == 0 else white_fill
+
+        # Apply styles to the row
+        for cell in sheet[i + 2]:  # +2 to account for the header row and 0-based index
             cell.alignment = Alignment(horizontal='center', vertical='center')
             cell.font = regular_font
             cell.border = border_style
+            cell.fill = fill
 
     # Adjust column widths
     for col in sheet.columns:
@@ -946,6 +960,3 @@ def export_treeview_to_xlsx(treeview, filename):
     workbook.save(filename)
     print(f"Data exported to {filename} successfully.")
     messagebox.showinfo("información", "Los datos se exportaron correctamente.")
-
-
-
