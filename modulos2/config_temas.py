@@ -1,6 +1,5 @@
 import customtkinter as ctk
 import tkinter as tk
-from modulos.transitions import transition_to_next_ui
 from config.config import centrar_ventana
 import json
 

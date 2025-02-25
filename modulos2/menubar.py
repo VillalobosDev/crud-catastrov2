@@ -1,7 +1,6 @@
 import customtkinter as ctk
 import tkinter as tk
 from PIL import Image
-from modulos.transitions import transition_to_next_ui
 from modulos2.config_temas import open_config_window
 from config.config import centrar_ventana
 import json
